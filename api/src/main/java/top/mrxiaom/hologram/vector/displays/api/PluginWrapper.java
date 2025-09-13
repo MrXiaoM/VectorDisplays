@@ -31,7 +31,6 @@ public class PluginWrapper {
     /**
      * @see JavaPlugin#getResource(String)
      */
-    @Nullable
     public InputStream getResource(String filename) {
         return plugin.getResource(filename);
     }
