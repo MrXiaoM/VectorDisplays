@@ -55,7 +55,9 @@ public class HologramAPI {
     }
 
     public void onEnable() {
-        PacketEvents.getAPI().init();
+        if (!PacketEvents.class.getName().startsWith(apiPackage)) {
+            PacketEvents.getAPI().init();
+        }
 
         SpigotEntityLibPlatform platform = new SpigotEntityLibPlatform(plugin);
         APIConfig settings = new APIConfig(PacketEvents.getAPI())
@@ -75,6 +77,8 @@ public class HologramAPI {
 
     public void onDisable() {
         hologram.removeAll();
-        PacketEvents.getAPI().terminate();
+        if (!PacketEvents.class.getName().startsWith(apiPackage)) {
+            PacketEvents.getAPI().terminate();
+        }
     }
 }
