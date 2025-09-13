@@ -1,4 +1,4 @@
-import java.util.Locale
+import java.util.*
 
 plugins {
     id("java")
@@ -39,7 +39,8 @@ dependencies {
 
     for (item in project.project(":nms").subprojects) {
         if (item.name == "shared") {
-            implementation(item)
+            compileOnly(item)
+            add("shadowLink", item)
         } else {
             add("shadowLink", item)
         }
@@ -49,6 +50,9 @@ tasks {
     jar {
         archiveClassifier.set("api")
     }
+    getByName<Jar>(sourceSets.main.get().sourcesJarTaskName) {
+        from(project(":nms:shared").sourceSets.main.get().allSource)
+    }
     shadowJar {
         configurations.add(shadowLink)
         archiveClassifier.set("")
@@ -56,7 +60,12 @@ tasks {
     build {
         dependsOn(shadowJar)
     }
-    javadoc {
+    getByName<Javadoc>(sourceSets.main.get().javadocTaskName) {
+        val task = project(":nms:shared").run {
+            val taskName = this@run.sourceSets.main.get().javadocTaskName
+            this@run.tasks.named<Javadoc>(taskName).get()
+        }
+        source += task.source
         (options as StandardJavadocDocletOptions).apply {
             links("https://hub.spigotmc.org/javadocs/spigot/")
 
