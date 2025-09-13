@@ -28,9 +28,8 @@ public abstract class Element implements HologramWrapper {
     private double textWidth, textHeight;
     protected final @NotNull TextHologram hologram;
     public Element(@NotNull String id) {
-        String type = getClass().getSimpleName().toLowerCase();
         this.id = id;
-        this.hologram = new TextHologram("ng_element_" + type + "_" + id, RenderMode.VIEWER_LIST)
+        this.hologram = new TextHologram(RenderMode.VIEWER_LIST)
                 .setInterpolationDurationTransformation(3)
                 .setInterpolationDurationRotation(0)
                 .setAlignment(TextDisplay.TextAlignment.LEFT)

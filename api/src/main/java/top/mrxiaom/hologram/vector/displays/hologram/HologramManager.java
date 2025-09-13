@@ -2,17 +2,13 @@ package top.mrxiaom.hologram.vector.displays.hologram;
 
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class HologramManager {
     private final JavaPlugin plugin;
-    private final Map<String, TextHologram> hologramsMap = new ConcurrentHashMap<>();
+    private final List<TextHologram> holograms = new CopyOnWriteArrayList<>();
     public HologramManager(JavaPlugin plugin) {
         this.plugin = plugin;
     }
@@ -21,33 +17,30 @@ public class HologramManager {
         return plugin;
     }
 
-    public Map<String, TextHologram> getHologramsMap() {
-        return hologramsMap;
-    }
-
     public List<TextHologram> getHolograms() {
-        return new ArrayList<>(this.hologramsMap.values());
+        return Collections.unmodifiableList(this.holograms);
     }
 
     public void spawn(TextHologram textHologram, Location location) {
         textHologram.spawn(location);
-        this.hologramsMap.put(textHologram.getId(), textHologram);
+        if (!this.holograms.contains(textHologram)) {
+            this.holograms.add(textHologram);
+        }
     }
 
     public void register(TextHologram textHologram) {
-        this.hologramsMap.put(textHologram.getId(), textHologram);
+        if (!this.holograms.contains(textHologram)) {
+            this.holograms.add(textHologram);
+        }
     }
 
     public void remove(TextHologram textHologram) {
-        remove(textHologram.getId());
-    }
-
-    public void remove(String id) {
-        Optional.ofNullable(this.hologramsMap.remove(id)).ifPresent(TextHologram::kill);
+        this.holograms.remove(textHologram);
+        textHologram.kill();
     }
 
     public void removeAll() {
-        this.hologramsMap.values().forEach(TextHologram::kill);
-        this.hologramsMap.clear();
+        this.holograms.forEach(TextHologram::kill);
+        this.holograms.clear();
     }
 }

@@ -39,7 +39,6 @@ public class TextHologram {
 
     private long updateTaskPeriod = 20L * 3;
     private double nearbyEntityScanningDistance = 40.0;
-    private final String id;
 
     private int entityID;
 
@@ -67,26 +66,18 @@ public class TextHologram {
     private boolean dead = true;
     private BukkitTask task;
 
-    public TextHologram(String id, RenderMode renderMode) {
+    public TextHologram(RenderMode renderMode) {
         JavaPlugin plugin = HologramAPI.getHologram().getPlugin();
         if (plugin == null) {
             throw new IllegalStateException("HologramAPI is not initialized!");
         }
         this.plugin = plugin;
         this.renderMode = renderMode;
-        validateId(id);
-        this.id = id.toLowerCase();
         startRunnable();
     }
 
-    public TextHologram(String id) {
-        this(id, RenderMode.NEARBY);
-    }
-
-    private void validateId(String id) {
-        if (id.contains(" ")) {
-            throw new IllegalArgumentException("The hologram ID cannot contain spaces! (" + id + ")");
-        }
+    public TextHologram() {
+        this(RenderMode.NEARBY);
     }
 
     private void startRunnable() {
@@ -300,10 +291,6 @@ public class TextHologram {
     private void sendPacket(PacketWrapper<?> packet) {
         if (this.renderMode == RenderMode.NONE) return;
         viewers.forEach(player -> HologramAPI.getPlayerManager().sendPacket(player, packet));
-    }
-
-    public String getId() {
-        return id;
     }
 
     public long getUpdateTaskPeriod() {

@@ -74,6 +74,7 @@ public class HologramAPI {
     }
 
     public void onDisable() {
+        hologram.removeAll();
         PacketEvents.getAPI().terminate();
     }
 }

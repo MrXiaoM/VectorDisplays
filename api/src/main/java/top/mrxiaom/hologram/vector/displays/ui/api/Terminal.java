@@ -34,7 +34,7 @@ public abstract class Terminal implements HologramWrapper {
     public Terminal(@NotNull String id, @NotNull Location location, int widthSpace, int heightLines) {
         this.id = id;
         this.location = location;
-        this.hologram = new TextHologram("ng_terminal_" + id, RenderMode.VIEWER_LIST)
+        this.hologram = new TextHologram(RenderMode.VIEWER_LIST)
                 .setInterpolationDurationTransformation(3)
                 .setInterpolationDurationRotation(0)
                 .setAlignment(TextDisplay.TextAlignment.LEFT)
