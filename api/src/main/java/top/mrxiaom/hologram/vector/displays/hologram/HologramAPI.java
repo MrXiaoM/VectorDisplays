@@ -6,7 +6,6 @@ import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
 import me.tofaa.entitylib.APIConfig;
 import me.tofaa.entitylib.EntityLib;
 import me.tofaa.entitylib.spigot.SpigotEntityLibPlatform;
-import org.bukkit.plugin.java.JavaPlugin;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
 import top.mrxiaom.hologram.vector.displays.hologram.utils.ItemsAdderHolder;
 import top.mrxiaom.hologram.vector.displays.hologram.utils.ReplaceText;
@@ -43,6 +42,7 @@ public class HologramAPI {
         this.plugin = plugin;
     }
 
+    @SuppressWarnings({"UnstableApiUsage", "deprecation"})
     public void onLoad() {
         if (!PacketEvents.class.getName().startsWith(apiPackage)) {
             PacketEvents.setAPI(SpigotPacketEventsBuilder.build(plugin.getPlugin()));
