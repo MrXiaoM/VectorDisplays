@@ -21,12 +21,12 @@ import java.util.function.Consumer;
 /**
  * 悬浮字界面终端面板，负责定位与包含元素
  */
-public abstract class Terminal implements HologramWrapper {
+public abstract class Terminal<This extends Terminal<This>> implements HologramWrapper<This> {
     private final @NotNull String id;
     private @NotNull Location location;
     private final List<Player> viewers = new ArrayList<>();
-    private final Map<String, List<Element>> pages = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-    private final List<Element> elements = new ArrayList<>();
+    private final Map<String, List<Element<?>>> pages = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    private final List<Element<?>> elements = new ArrayList<>();
     private final TextHologram hologram;
     private double width, height;
     private double interactDistance = 2.5;
@@ -45,11 +45,17 @@ public abstract class Terminal implements HologramWrapper {
         setSize(widthSpace, heightLines);
     }
 
+    @Override
+    @SuppressWarnings({"unchecked"})
+    public This $this() {
+        return (This) this;
+    }
+
     /**
      * 界面元素初始化方法，在这里确定悬浮字位置，并生成悬浮字
      */
     public void init() {
-        for (Element element : elements) {
+        for (Element<?> element : elements) {
             element.init();
         }
     }
@@ -58,7 +64,7 @@ public abstract class Terminal implements HologramWrapper {
      * 销毁悬浮字
      */
     public void dispose() {
-        for (Element element : elements) {
+        for (Element<?> element : elements) {
             element.dispose();
         }
         viewers.clear();
@@ -84,7 +90,7 @@ public abstract class Terminal implements HologramWrapper {
      * 向界面添加元素，建议在 <code>init()</code> 之前将元素添加完成
      * @param element 元素实例
      */
-    public void addElement(Element element) {
+    public void addElement(Element<?> element) {
         element.setTerminal(this);
         elements.add(element);
     }
@@ -94,7 +100,7 @@ public abstract class Terminal implements HologramWrapper {
      * @param element 界面元素
      * @param consumer 额外参数
      */
-    public <T extends Element> void addElement(T element, Consumer<T> consumer) {
+    public <T extends Element<?>> void addElement(T element, Consumer<T> consumer) {
         consumer.accept(element);
         addElement(element);
     }
@@ -103,8 +109,8 @@ public abstract class Terminal implements HologramWrapper {
      * 向界面添加元素，建议在 <code>init()</code> 之前将元素添加完成
      * @param elements 元素实例
      */
-    public void addElements(Element... elements) {
-        for (Element element : elements) {
+    public void addElements(Element<?>... elements) {
+        for (Element<?> element : elements) {
             addElement(element);
         }
     }
@@ -113,9 +119,9 @@ public abstract class Terminal implements HologramWrapper {
      * 向界面添加元素，建议在 <code>init()</code> 之前将元素添加完成
      * @param elements 元素实例
      */
-    public void addElements(Collection<Element> elements) {
+    public void addElements(Collection<Element<?>> elements) {
         if (elements == null) return;
-        for (Element element : elements) {
+        for (Element<?> element : elements) {
             addElement(element);
         }
     }
@@ -123,13 +129,13 @@ public abstract class Terminal implements HologramWrapper {
     /**
      * 获取已添加的元素列表
      */
-    public List<Element> getElements() {
+    public List<Element<?>> getElements() {
         return Collections.unmodifiableList(elements);
     }
 
     @Nullable
-    public Element getElement(String id) {
-        for (Element element : elements) {
+    public Element<?> getElement(String id) {
+        for (Element<?> element : elements) {
             if (element.getId().equals(id)) {
                 return element;
             }
@@ -138,7 +144,7 @@ public abstract class Terminal implements HologramWrapper {
     }
 
     @Nullable
-    public List<Element> getPage(@NotNull String pageName) {
+    public List<Element<?>> getPage(@NotNull String pageName) {
         return pages.get(pageName);
     }
 
@@ -155,7 +161,7 @@ public abstract class Terminal implements HologramWrapper {
         clearElements();
     }
 
-    public void addPage(@NotNull String pageName, @NotNull List<Element> elements) {
+    public void addPage(@NotNull String pageName, @NotNull List<Element<?>> elements) {
         pages.put(pageName, elements);
     }
 
@@ -170,8 +176,8 @@ public abstract class Terminal implements HologramWrapper {
     }
 
     public void applyPage(@NotNull String pageName) {
-        List<Element> list = pages.get(pageName);
-        for (Element element : elements) {
+        List<Element<?>> list = pages.get(pageName);
+        for (Element<?> element : elements) {
             element.dispose();
         }
         clearElements();
@@ -198,7 +204,7 @@ public abstract class Terminal implements HologramWrapper {
     public void removeViewer(Player player) {
         viewers.remove(player);
         hologram.removeViewer(player);
-        for (Element element : elements) {
+        for (Element<?> element : elements) {
             element.getHologram().removeViewer(player);
         }
     }
@@ -214,7 +220,7 @@ public abstract class Terminal implements HologramWrapper {
         if (!hologram.getViewers().contains(player)) {
             hologram.addViewer(player);
         }
-        for (Element element : elements) {
+        for (Element<?> element : elements) {
             TextHologram hologram = element.getHologram();
             if (!hologram.getViewers().contains(player)) {
                 hologram.addViewer(player);
@@ -223,7 +229,7 @@ public abstract class Terminal implements HologramWrapper {
     }
 
     public void ensureViewersAdded() {
-        for (Element element : elements) {
+        for (Element<?> element : elements) {
             TextHologram hologram = element.getHologram();
             for (Player player : viewers) {
                 if (!hologram.getViewers().contains(player)) {
@@ -393,7 +399,7 @@ public abstract class Terminal implements HologramWrapper {
      * 定时器事件，每秒执行4次
      */
     public void onTimerTick() {
-        for (Element element : getElements()) {
+        for (Element<?> element : getElements()) {
             if (element instanceof Hoverable hoverable) {
                 boolean hover = false;
                 for (Player player : Bukkit.getOnlinePlayers()) {
@@ -417,7 +423,7 @@ public abstract class Terminal implements HologramWrapper {
      */
     public boolean tryPerformClick(Player player, Action action) {
         Location eyeLocation = player.getEyeLocation();
-        for (Element element : elements) {
+        for (Element<?> element : elements) {
             Location point = HologramUtils.raytraceHologram(this, element.getHologram(), eyeLocation);
             if (point != null && eyeLocation.distance(point) <= getInteractDistance()) {
                 element.performClick(player, action);
