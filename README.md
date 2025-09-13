@@ -12,7 +12,7 @@ Minecraft 世界终端用户界面解决方案
 + 到[爱发电](https://afdian.com/a/mrxiaom)进行购买
 + 克隆本仓库，自行构建
 
-至少需要 Java 17 环境才能安装本插件。
+至少需要 Java 17 环境才能安装本插件，此外，本插件需要前置 [packetevents](https://modrinth.com/plugin/packetevents/versions?l=spigot) 才能正常运行。
 
 ## 简介
 
