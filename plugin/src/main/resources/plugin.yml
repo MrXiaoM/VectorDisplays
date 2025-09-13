@@ -2,10 +2,16 @@ name: VectorDisplays
 version: '${version}'
 main: top.mrxiaom.hologram.vector.displays.VectorDisplays
 api-version: 1.19
+depend:
+  - packetevents
 softdepend:
   - PlaceholderAPI
   - ItemsAdder
 authors: [ MrXiaoM ]
+libraries:
+  - "net.kyori:adventure-platform-bukkit:4.4.1"
+  - "net.kyori:adventure-text-serializer-plain:4.23.0"
+  - "net.kyori:adventure-text-minimessage:4.23.0"
 commands:
   vectordisplays:
     description: 'The main command of VectorDisplays'

@@ -21,7 +21,9 @@ val shadowLink = configurations.create("shadowLink")
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.6")
+    compileOnly("com.github.retrooper:packetevents-spigot:2.9.5")
 
+    implementation("com.github.Tofaa2.EntityLib:spigot:2.4.11")
     implementation(project(":api"))
     for (item in project.project(":nms").subprojects) {
         if (item.name == "shared") {
@@ -35,6 +37,8 @@ dependencies {
 tasks {
     shadowJar {
         configurations.add(shadowLink)
+        val target = "top.mrxiaom.hologram.vector.displays"
+        relocate("me.tofaa.entitylib", "${target}.libs.entitylib")
     }
     val copyTask = create<Copy>("copyBuildArtifact") {
         dependsOn(shadowJar)
