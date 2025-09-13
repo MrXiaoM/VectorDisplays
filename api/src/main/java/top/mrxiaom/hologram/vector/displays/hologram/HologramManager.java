@@ -2,18 +2,19 @@ package top.mrxiaom.hologram.vector.displays.hologram;
 
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
+import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class HologramManager {
-    private final JavaPlugin plugin;
+    private final PluginWrapper plugin;
     private final List<TextHologram> holograms = new CopyOnWriteArrayList<>();
-    public HologramManager(JavaPlugin plugin) {
+    public HologramManager(PluginWrapper plugin) {
         this.plugin = plugin;
     }
 
-    public JavaPlugin getPlugin() {
+    public PluginWrapper getPlugin() {
         return plugin;
     }
 

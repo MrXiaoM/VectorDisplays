@@ -1,16 +1,14 @@
 package top.mrxiaom.hologram.vector.displays;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import top.mrxiaom.hologram.vector.displays.api.IRunTask;
+import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
 import top.mrxiaom.hologram.vector.displays.hologram.HologramAPI;
 import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
@@ -21,12 +19,12 @@ import java.util.TreeMap;
 
 public class TerminalManager implements Listener {
     private static TerminalManager instance = null;
-    private final JavaPlugin plugin;
+    private final PluginWrapper plugin;
     private final HologramAPI hologramAPI;
     private final Map<String, Terminal> terminals = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private long timerPeriod = 1L;
-    private BukkitTask timerTask;
-    public TerminalManager(JavaPlugin plugin) {
+    private IRunTask timerTask;
+    public TerminalManager(PluginWrapper plugin) {
         if (instance != null) {
             throw new IllegalStateException("TerminalManager has been initialized!");
         }
@@ -35,7 +33,7 @@ public class TerminalManager implements Listener {
         this.hologramAPI = new HologramAPI(plugin);
     }
 
-    public JavaPlugin getPlugin() {
+    public PluginWrapper getPlugin() {
         return plugin;
     }
 
@@ -45,8 +43,7 @@ public class TerminalManager implements Listener {
 
     public void onEnable() {
         this.hologramAPI.onEnable();
-        Bukkit.getPluginManager().registerEvents(this, plugin);
-        setTimerPeriod(timerPeriod);
+        this.plugin.registerEvents(this);
     }
 
     public long getTimerPeriod() {
@@ -60,7 +57,7 @@ public class TerminalManager implements Listener {
             this.timerTask.cancel();
             this.timerTask = null;
         }
-        this.timerTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+        this.timerTask = plugin.getScheduler().runTaskTimer(() -> {
             for (Terminal terminal : terminals.values()) {
                 terminal.onTimerTick();
             }
@@ -133,7 +130,6 @@ public class TerminalManager implements Listener {
     }
 
     @NotNull
-    @ApiStatus.Experimental
     public static TerminalManager inst() {
         return instance;
     }

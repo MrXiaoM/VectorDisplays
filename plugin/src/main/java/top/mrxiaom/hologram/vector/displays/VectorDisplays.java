@@ -2,6 +2,8 @@ package top.mrxiaom.hologram.vector.displays;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import top.mrxiaom.hologram.vector.displays.api.FoliaLibScheduler;
+import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
 import top.mrxiaom.hologram.vector.displays.config.FontConfig;
 import top.mrxiaom.hologram.vector.displays.config.IConfig;
 
@@ -9,8 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VectorDisplays extends JavaPlugin {
-    private final TerminalManager manager = new TerminalManager(this);
+    private final TerminalManager manager;
     private final List<IConfig> configList = new ArrayList<>();
+    public VectorDisplays() {
+        this.manager = new PluginWrapper(this)
+                .setScheduler(new FoliaLibScheduler(this))
+                .createTerminalManager();
+    }
 
     @Override
     public void onLoad() {

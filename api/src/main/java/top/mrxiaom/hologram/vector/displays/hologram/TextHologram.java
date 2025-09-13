@@ -21,6 +21,8 @@ import org.bukkit.entity.TextDisplay;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.joml.Vector3f;
+import top.mrxiaom.hologram.vector.displays.api.IRunTask;
+import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
 import top.mrxiaom.hologram.vector.displays.hologram.utils.Vector3F;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 
@@ -35,7 +37,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class TextHologram {
     private static final LegacyComponentSerializer legacyText = LegacyComponentSerializer.legacySection();
 
-    private final JavaPlugin plugin;
+    private final PluginWrapper plugin;
 
     private long updateTaskPeriod = 20L * 3;
     private double nearbyEntityScanningDistance = 40.0;
@@ -65,10 +67,10 @@ public class TextHologram {
     private final List<Player> viewers = new CopyOnWriteArrayList<>();
     private final List<Player> leftViewers = new CopyOnWriteArrayList<>();
     private boolean dead = true;
-    private BukkitTask task;
+    private IRunTask task;
 
     public TextHologram(RenderMode renderMode) {
-        JavaPlugin plugin = HologramAPI.getHologram().getPlugin();
+        PluginWrapper plugin = HologramAPI.getHologram().getPlugin();
         if (plugin == null) {
             throw new IllegalStateException("HologramAPI is not initialized!");
         }
@@ -83,7 +85,7 @@ public class TextHologram {
 
     private void startRunnable() {
         if (task != null) return;
-        task = Bukkit.getServer().getScheduler().runTaskTimer(HologramAPI.getHologram().getPlugin(), this::updateAffectedPlayers, 20L, updateTaskPeriod);
+        task = plugin.getScheduler().runTaskTimer(this::updateAffectedPlayers, 20L, updateTaskPeriod);
     }
 
     /**
@@ -95,7 +97,7 @@ public class TextHologram {
         this.location = location;
         entityID = ThreadLocalRandom.current().nextInt(4000, Integer.MAX_VALUE);
         PacketWrapper<?> packet = buildSpawnPacket();
-        plugin.getServer().getScheduler().runTask(plugin, () -> {
+        plugin.getScheduler().runTask(() -> {
             updateAffectedPlayers();
             sendPacket(packet);
             this.dead = false;
@@ -111,7 +113,7 @@ public class TextHologram {
     }
 
     public TextHologram update() {
-        plugin.getServer().getScheduler().runTask(plugin, () -> {
+        plugin.getScheduler().runTask(() -> {
             updateAffectedPlayers();
             TextDisplayMeta meta = createMeta();
             sendPacket(meta.createPacket());
@@ -194,7 +196,7 @@ public class TextHologram {
     private void respawnFor(Player player) {
         PacketWrapper<?> packet = buildSpawnPacket();
         sendPacket(player, packet);
-        plugin.getServer().getScheduler().runTask(plugin, () -> {
+        plugin.getScheduler().runTask(() -> {
             updateAffectedPlayers();
             TextDisplayMeta meta = createMeta();
             sendPacket(player, meta.createPacket());
@@ -370,7 +372,7 @@ public class TextHologram {
         return dead;
     }
 
-    public BukkitTask getTask() {
+    public IRunTask getTask() {
         return task;
     }
 

@@ -8,6 +8,7 @@ softdepend:
   - PlaceholderAPI
   - ItemsAdder
 authors: [ MrXiaoM ]
+folia-supported: true
 libraries:
   - "net.kyori:adventure-platform-bukkit:4.4.1"
   - "net.kyori:adventure-text-serializer-plain:4.23.0"

@@ -7,6 +7,7 @@ import me.tofaa.entitylib.APIConfig;
 import me.tofaa.entitylib.EntityLib;
 import me.tofaa.entitylib.spigot.SpigotEntityLibPlatform;
 import org.bukkit.plugin.java.JavaPlugin;
+import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
 import top.mrxiaom.hologram.vector.displays.hologram.utils.ItemsAdderHolder;
 import top.mrxiaom.hologram.vector.displays.hologram.utils.ReplaceText;
 
@@ -37,14 +38,14 @@ public class HologramAPI {
         return playerManager;
     }
 
-    private final JavaPlugin plugin;
-    public HologramAPI(JavaPlugin plugin) {
+    private final PluginWrapper plugin;
+    public HologramAPI(PluginWrapper plugin) {
         this.plugin = plugin;
     }
 
     public void onLoad() {
         if (!PacketEvents.class.getName().startsWith(apiPackage)) {
-            PacketEvents.setAPI(SpigotPacketEventsBuilder.build(plugin));
+            PacketEvents.setAPI(SpigotPacketEventsBuilder.build(plugin.getPlugin()));
             PacketEvents.getAPI().getSettings()
                     .customResourceProvider(plugin::getResource)
                     .reEncodeByDefault(false)
@@ -59,7 +60,7 @@ public class HologramAPI {
             PacketEvents.getAPI().init();
         }
 
-        SpigotEntityLibPlatform platform = new SpigotEntityLibPlatform(plugin);
+        SpigotEntityLibPlatform platform = new SpigotEntityLibPlatform(plugin.getPlugin());
         APIConfig settings = new APIConfig(PacketEvents.getAPI())
                 .usePlatformLogger();
 

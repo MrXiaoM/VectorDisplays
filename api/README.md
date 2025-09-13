@@ -46,7 +46,13 @@ libraries:
 ```java
 public class ExamplePlugin extends JavaPlugin {
     // 暂不支持多实例，请勿创建多个实例
-    private final TerminalManager terminalManager = new TerminalManager(this);
+    private final TerminalManager terminalManager;
+    public ExamplePlugin() {
+        this.terminalManager = new PluginWrapper(this)
+                // 可选，可自行实现 FoliaScheduler 替换上去
+                .setScheduler(new BukkitScheduler(this))
+                .createTerminalManager();
+    }
     @Override
     public void onLoad() {
         this.terminalManager.onLoad();

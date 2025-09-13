@@ -23,6 +23,7 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("com.github.retrooper:packetevents-spigot:2.9.5")
 
+    implementation("com.github.technicallycoded:FoliaLib:0.4.4")
     implementation("com.github.Tofaa2.EntityLib:spigot:2.4.11")
     implementation(project(":api"))
     for (item in project.project(":nms").subprojects) {
@@ -38,6 +39,7 @@ tasks {
     shadowJar {
         configurations.add(shadowLink)
         val target = "top.mrxiaom.hologram.vector.displays"
+        relocate("com.tcoded.folialib", "${target}.libs.folialib")
         relocate("me.tofaa.entitylib", "${target}.libs.entitylib")
     }
     val copyTask = create<Copy>("copyBuildArtifact") {
