@@ -12,7 +12,7 @@ import top.mrxiaom.hologram.vector.displays.ui.event.HoverStateChange;
 
 import java.util.function.Supplier;
 
-public class Button extends Element implements Hoverable {
+public class Button extends Element<Button> implements Hoverable {
     private @NotNull String text = "";
     private boolean hoverState = false;
     private ClickEvent<Button> clickEvent;
@@ -37,25 +37,27 @@ public class Button extends Element implements Hoverable {
      * 设置悬浮字文本，并重新计算悬浮字大小
      * @param text 支持 MiniMessage
      */
-    public void setText(@NotNull String text) {
+    public Button setText(@NotNull String text) {
         this.text = text;
         this.hologram.setText(AdventureHelper.miniMessage(text));
         this.calculateSize();
+        return this;
     }
 
     /**
      * 设置当玩家点击这个元素时执行操作
      * @param clickEvent 点击事件
      */
-    public void setOnClick(@Nullable ClickEvent<Button> clickEvent) {
+    public Button setOnClick(@Nullable ClickEvent<Button> clickEvent) {
         this.clickEvent = clickEvent;
+        return this;
     }
 
     /**
      * 设置当玩家点击这个元素时执行操作
      * @param supplier 点击事件
      */
-    public void setOnClick(@Nullable Supplier<ClickEvent<Button>> supplier) {
+    public Button setOnClick(@Nullable Supplier<ClickEvent<Button>> supplier) {
         if (supplier == null) {
             this.clickEvent = null;
         } else {
@@ -66,15 +68,17 @@ public class Button extends Element implements Hoverable {
                 }
             };
         }
+        return this;
     }
 
     /**
      * 设置当有任意玩家的准心指向这个元素的状态更新时执行操作
      * @param hoverStateChange 悬停状态变化事件
      */
-    public void setOnHoverStateChange(HoverStateChange<Button> hoverStateChange) {
+    public Button setOnHoverStateChange(HoverStateChange<Button> hoverStateChange) {
         this.hoverStateChange = hoverStateChange;
         hoverStateChange.perform(false, this);
+        return this;
     }
 
     @Override

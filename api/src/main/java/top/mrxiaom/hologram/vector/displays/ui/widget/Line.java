@@ -13,7 +13,7 @@ import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
 
 import java.math.BigDecimal;
 
-public class Line extends Element {
+public class Line extends Element<Line> {
     private final double spaceWidth = HologramFont.getWidth(Component.text(" "));
     private double x1, y1, x2, y2;
     private double thickness = 0.5;
@@ -56,38 +56,43 @@ public class Line extends Element {
     /**
      * 设置线条的第一个端点
      */
-    public void setPos1(double x1, double y1) {
+    public Line setPos1(double x1, double y1) {
         this.x1 = x1;
         this.y1 = y1;
+        return this;
     }
 
     /**
      * 设置线条的第一个端点
      */
-    public void setPos1(Element element) {
+    public Line setPos1(Element<?> element) {
         setPos1(element.getX(), element.getY());
+        return this;
     }
 
     /**
      * 设置线条的第二个端点
      */
-    public void setPos2(double x2, double y2) {
+    public Line setPos2(double x2, double y2) {
         this.x2 = x2;
         this.y2 = y2;
+        return this;
     }
 
     /**
      * 设置线条的第二个端点
      */
-    public void setPos2(Element element) {
+    public Line setPos2(Element<?> element) {
         setPos2(element.getX(), element.getY());
+        return this;
     }
 
     /**
      * 设置线条宽度
      */
-    public void setThickness(double thickness) {
+    public Line setThickness(double thickness) {
         this.thickness = thickness;
+        return this;
     }
 
     @Override
@@ -160,8 +165,8 @@ public class Line extends Element {
      */
     @Override
     @Deprecated
-    public void setX(double x) {
-        super.setX(x);
+    public Line setX(double x) {
+        return super.setX(x);
     }
 
     /**
@@ -180,8 +185,8 @@ public class Line extends Element {
      */
     @Override
     @Deprecated
-    public void setY(double y) {
-        super.setY(y);
+    public Line setY(double y) {
+        return super.setY(y);
     }
 
     /**
@@ -190,7 +195,7 @@ public class Line extends Element {
      */
     @Override
     @Deprecated
-    public void setPos(double x, double y) {
-        super.setPos(x, y);
+    public Line setPos(double x, double y) {
+        return super.setPos(x, y);
     }
 }

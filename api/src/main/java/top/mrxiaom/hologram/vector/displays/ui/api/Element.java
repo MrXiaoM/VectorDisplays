@@ -18,7 +18,7 @@ import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 /**
  * 悬浮字界面元素
  */
-public abstract class Element implements HologramWrapper {
+public abstract class Element<This extends Element<This>> implements HologramWrapper<This> {
     private final @NotNull String id;
     private Terminal terminal;
     private EnumAlign align;
@@ -36,6 +36,11 @@ public abstract class Element implements HologramWrapper {
                 .setBillboard(Display.Billboard.FIXED)
                 .setText(Component.text(""))
                 .removeAllViewers();
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public This $this() {
+        return (This) this;
     }
 
     void setTerminal(@NotNull Terminal terminal) {
@@ -78,9 +83,10 @@ public abstract class Element implements HologramWrapper {
     /**
      * 设置元素缩放大小
      */
-    public void setScale(float scale) {
+    public This setScale(float scale) {
         this.scale = scale;
         this.hologram.setScale(scale, scale, scale);
+        return $this();
     }
 
     /**
@@ -93,8 +99,9 @@ public abstract class Element implements HologramWrapper {
     /**
      * 设置元素位置对齐方式
      */
-    public void setAlign(EnumAlign align) {
+    public This setAlign(EnumAlign align) {
         this.align = align;
+        return $this();
     }
 
     /**
@@ -119,29 +126,33 @@ public abstract class Element implements HologramWrapper {
      * 设置元素坐标。坐标并不实时更新，需要执行 <code>updateLocation()</code> 提交悬浮字位置更新
      * @see Element#updateLocation()
      */
-    public void setX(double x) {
+    public This setX(double x) {
         this.x = x;
+        return $this();
     }
 
     /**
      * 设置元素坐标。坐标并不实时更新，需要执行 <code>updateLocation()</code> 提交悬浮字位置更新
      * @see Element#updateLocation()
      */
-    public void setY(double y) {
+    public This setY(double y) {
         this.y = y;
+        return $this();
     }
 
-    public void setZIndex(double zIndex) {
+    public This setZIndex(double zIndex) {
         this.zIndex = zIndex;
+        return $this();
     }
 
     /**
      * 设置元素坐标。坐标并不实时更新，需要执行 <code>updateLocation()</code> 提交悬浮字位置更新
      * @see Element#updateLocation()
      */
-    public void setPos(double x, double y) {
+    public This setPos(double x, double y) {
         this.x = x;
         this.y = y;
+        return $this();
     }
 
     /**

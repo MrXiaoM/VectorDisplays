@@ -1,5 +1,6 @@
 package top.mrxiaom.hologram.vector.displays;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -10,12 +11,18 @@ import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.hologram.vector.displays.api.IRunTask;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
 import top.mrxiaom.hologram.vector.displays.hologram.HologramAPI;
+import top.mrxiaom.hologram.vector.displays.ui.EnumAlign;
+import top.mrxiaom.hologram.vector.displays.ui.SimpleTerminal;
 import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
+import top.mrxiaom.hologram.vector.displays.ui.widget.Button;
+import top.mrxiaom.hologram.vector.displays.ui.widget.Line;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
+
+import static top.mrxiaom.hologram.vector.displays.ui.event.HoverStateChange.hoverBg;
 
 public class TerminalManager implements Listener {
     private static TerminalManager instance = null;

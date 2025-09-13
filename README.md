@@ -50,19 +50,19 @@ void create(Player player) {
     SimpleTerminal terminal = new SimpleTerminal("test_" + player.getName(), loc, 9, 3);
     terminal.setRotation(eyeLocation.getYaw(), -30.0f); // 设置终端面板旋转
     // 添加按钮
-    terminal.addElement(new Button("btn1"), btn -> {
-        btn.setText("<#FF0000>测试");
-        btn.setScale(0.25f); // 缩放尺寸
-        btn.setAlign(EnumAlign.RIGHT_CENTER); // 位置对齐方式
-        btn.setPos(-2, 0); // 相对位置
-        btn.setFullBrightness(); // 设置固定亮度
-        btn.setOnHoverStateChange(hoverBg(0x80000000, 0)); // 悬停更改背景颜色
-        btn.setOnClick((whoClicked, action, e) -> { // 点击执行操作
-            whoClicked.sendMessage("你以 " + action + " 方式点击了按钮 btn1");
-        });
-    });
+    terminal.addElement(new Button("btn1")
+            .setText("<#FF0000>测试")
+            .setScale(0.25f) // 缩放尺寸
+            .setAlign(EnumAlign.RIGHT_CENTER) // 位置对齐方式
+            .setPos(-2, 0) // 相对位置
+            .setFullBrightness() // 设置固定亮度
+            .setOnHoverStateChange(hoverBg(0x80000000, 0)) // 悬停更改背景颜色
+            .setOnClick((whoClicked, action, e) -> { // 点击执行操作
+                whoClicked.sendMessage("你以 " + action + " 方式点击了按钮 " + e.getId());
+            }));
     // 添加线条
-    terminal.addElement(this.line = new Line("line1"), line -> {
+    terminal.addElement(new Line("line1"), line -> {
+        // 除了链式调用以外，还可以这样
         line.setFullBrightness();
         line.setPos1(-5, -5);
         line.setPos2(5, 5);
