@@ -48,6 +48,9 @@ tasks {
         configurations.add(shadowLink)
         archiveClassifier.set("")
     }
+    build {
+        dependsOn(shadowJar)
+    }
 }
 publishing {
     publications {

@@ -1,0 +1,12 @@
+name: VectorDisplays
+version: '${version}'
+main: top.mrxiaom.hologram.vector.displays.VectorDisplays
+api-version: 1.19
+softdepend:
+  - PlaceholderAPI
+  - ItemsAdder
+authors: [ MrXiaoM ]
+commands:
+  vectordisplays:
+    description: 'The main command of VectorDisplays'
+    aliases: [ vd ]

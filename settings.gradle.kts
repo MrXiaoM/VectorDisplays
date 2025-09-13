@@ -7,3 +7,4 @@ File(rootDir, "nms").listFiles()?.forEach { file ->
         include(":nms:${file.name}")
     }
 }
+include(":plugin")
