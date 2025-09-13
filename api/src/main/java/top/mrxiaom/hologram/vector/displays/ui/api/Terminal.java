@@ -128,6 +128,16 @@ public abstract class Terminal implements HologramWrapper {
     }
 
     @Nullable
+    public Element getElement(String id) {
+        for (Element element : elements) {
+            if (element.getId().equals(id)) {
+                return element;
+            }
+        }
+        return null;
+    }
+    
+    @Nullable
     public List<Element> getPage(@NotNull String pageName) {
         return pages.get(pageName);
     }
