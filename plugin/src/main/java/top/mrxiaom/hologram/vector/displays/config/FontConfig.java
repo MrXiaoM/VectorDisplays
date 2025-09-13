@@ -1,6 +1,7 @@
 package top.mrxiaom.hologram.vector.displays.config;
 
 import org.bukkit.configuration.file.FileConfiguration;
+import top.mrxiaom.hologram.vector.displays.TerminalManager;
 import top.mrxiaom.hologram.vector.displays.VectorDisplays;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.FontManager;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.api.Font;
@@ -26,6 +27,9 @@ public class FontConfig implements IConfig {
 
     @Override
     public void reloadConfig(FileConfiguration config) {
+        long timerPeriod = config.getLong("timer-period", 1L);
+        TerminalManager.inst().setTimerPeriod(Math.max(1L, timerPeriod));
+
         String path = config.getString("fonts-file", "font.json");
         File file = new File(plugin.getDataFolder(), path);
         try {
@@ -34,9 +38,9 @@ public class FontConfig implements IConfig {
                 if (resource == null) {
                     throw new IllegalStateException("找不到资源文件 font.json");
                 }
-                manager.reload(resource);
+                this.manager.reload(resource);
             } else {
-                manager.reload(file);
+                this.manager.reload(file);
             }
             String scaleSample = config.getString("font-char-scale.sample-char", " ");
             double sampleCount = config.getDouble("font-char-scale.location-scale", 9.7407407407407407);
@@ -44,7 +48,7 @@ public class FontConfig implements IConfig {
         } catch (Throwable t) {
             plugin.getLogger().log(Level.WARNING, "重载字体时出现异常", t);
         }
-        for (Font font : manager.getFonts()) {
+        for (Font font : this.manager.getFonts()) {
             plugin.getLogger().info("已加载字体: " + font.getKey());
         }
     }
