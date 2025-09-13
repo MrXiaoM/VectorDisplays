@@ -4,16 +4,28 @@
 需要先添加依赖
 ```kotlin
 // build.gradle(.kts)
+repositories {
+    mavenCentral()
+    maven("https://repo.codemc.io/repository/maven-releases/")
+    maven("https://jitpack.io")
+}
 dependencies {
     compileOnly("net.kyori:adventure-platform-bukkit:4.4.0")
     compileOnly("net.kyori:adventure-text-serializer-plain:4.21.0")
     implementation("top.mrxiaom.hologram:VectorDisplays-API:$VERSION")
-    // TODO: 打包 packetevents 和 EntityLib
+    implementation("com.github.Tofaa2.EntityLib:spigot:2.4.11")
+    // packetevents 可选不打包，可以让用户自行添加前置
+    implementation("com.github.retrooper:packetevents-spigot:2.9.5")
 }
 tasks {
     shadowJar {
         // 配置 relocation
-        relocate("top.mrxiaom.hologram.vector.displays", "path.to.your.group")
+        val target = "path.to.your.group"
+        relocate("top.mrxiaom.hologram.vector.displays", target)
+        relocate("me.tofaa.entitylib", "${target}.libs.entitylib")
+        // packetevents 可选不打包，可以让用户自行添加前置
+        relocate("com.github.retrooper.packetevents", "${target}.libs.packetevents.api")
+        relocate("io.github.retrooper.packetevents", "${target}.libs.packetevents.impl")
     }
 }
 ```
@@ -32,7 +44,10 @@ TODO
 
 ## TextRenderer 移植
 
-编写管理类进行对接
+这是从 Minecraft 客户端移植过来的部分 TextRenderer 功能，主要用于处理文本长度。  
+例如 `getWidth`、`wrapLines` 等等，以便精确计算文本框对齐、自动换行等。
+
+以下示例简单编写管理类进行对接。
 
 ```java
 import net.kyori.adventure.text.Component;
