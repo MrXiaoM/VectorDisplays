@@ -1,5 +1,8 @@
+import moe.karla.maven.publishing.MavenPublishingExtension.PublishingType
+
 plugins {
     id("com.gradleup.shadow") version "8.3.0" apply false
+    id("moe.karla.maven-publishing")
 }
 
 val sdkVersion = 17
@@ -29,4 +32,8 @@ allprojects {
         setJavaVersion(sdkVersion)
         ext["setJavaVersion"] = ::setJavaVersion
     }
+}
+
+mavenPublishing {
+    publishingType = PublishingType.AUTOMATIC
 }

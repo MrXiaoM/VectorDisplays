@@ -3,6 +3,7 @@ import java.util.Locale
 plugins {
     id("java")
     id("maven-publish")
+    id("signing")
     id("com.gradleup.shadow")
 }
 
@@ -17,6 +18,12 @@ repositories {
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     maven("https://jitpack.io")
 }
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
 val shadowLink = configurations.create("shadowLink")
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
@@ -49,7 +56,19 @@ tasks {
     build {
         dependsOn(shadowJar)
     }
+    javadoc {
+        (options as StandardJavadocDocletOptions).apply {
+            links("https://hub.spigotmc.org/javadocs/spigot/")
+
+            locale("zh_CN")
+            encoding("UTF-8")
+            docEncoding("UTF-8")
+            addBooleanOption("keywords", true)
+            addBooleanOption("Xdoclint:none", true)
+        }
+    }
 }
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
@@ -57,6 +76,37 @@ publishing {
             groupId = project.group.toString()
             artifactId = "VectorDisplays-API"
             version = project.version.toString()
+
+            pom {
+                name.set(artifactId)
+                description.set("MrXiaoM's Bukkit plugin basic core")
+                url.set("https://github.com/MrXiaoM/PluginBase")
+                licenses {
+                    license {
+                        name.set("MIT License")
+                        url.set("https://github.com/MrXiaoM/PluginBase/blob/main/LICENSE")
+                    }
+                }
+                developers {
+                    developer {
+                        name.set("MrXiaoM")
+                        email.set("mrxiaom@qq.com")
+                    }
+                }
+                scm {
+                    url.set("https://github.com/MrXiaoM/PluginBase")
+                    connection.set("scm:git:https://github.com/MrXiaoM/PluginBase.git")
+                    developerConnection.set("scm:git:https://github.com/MrXiaoM/PluginBase.git")
+                }
+            }
         }
+    }
+}
+signing {
+    val signingKey = findProperty("signingKey")?.toString()
+    val signingPassword = findProperty("signingPassword")?.toString()
+    if (signingKey != null && signingPassword != null) {
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        sign(publishing.publications.getByName("maven"))
     }
 }
