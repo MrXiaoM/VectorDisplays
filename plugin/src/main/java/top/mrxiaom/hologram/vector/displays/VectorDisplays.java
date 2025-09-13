@@ -22,6 +22,8 @@ public class VectorDisplays extends JavaPlugin {
         manager.onEnable();
         configList.add(new FontConfig(this));
         new Commands(this);
+
+        reloadConfig();
     }
 
     @Override
