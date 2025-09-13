@@ -1,4 +1,4 @@
-package top.mrxiaom.hologram.vector.displays.ui;
+package top.mrxiaom.hologram.vector.displays;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

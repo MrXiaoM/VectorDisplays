@@ -136,7 +136,7 @@ public abstract class Terminal implements HologramWrapper {
         }
         return null;
     }
-    
+
     @Nullable
     public List<Element> getPage(@NotNull String pageName) {
         return pages.get(pageName);
