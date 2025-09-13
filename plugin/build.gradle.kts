@@ -51,7 +51,7 @@ tasks {
     processResources {
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
         from(sourceSets.main.get().resources.srcDirs) {
-            expand(mapOf("version" to version))
+            expand(mapOf("version" to rootProject.version))
             include("plugin.yml")
         }
     }
