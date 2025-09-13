@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class HologramManager {
     private final JavaPlugin plugin;
-    private final Map<TextHologram, BukkitRunnable> hologramAnimations = new ConcurrentHashMap<>();
     private final Map<String, TextHologram> hologramsMap = new ConcurrentHashMap<>();
     public HologramManager(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -20,10 +19,6 @@ public class HologramManager {
 
     public JavaPlugin getPlugin() {
         return plugin;
-    }
-
-    public Map<TextHologram, BukkitRunnable> getHologramAnimations() {
-        return hologramAnimations;
     }
 
     public Map<String, TextHologram> getHologramsMap() {

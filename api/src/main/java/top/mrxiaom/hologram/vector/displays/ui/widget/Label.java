@@ -1,0 +1,33 @@
+package top.mrxiaom.hologram.vector.displays.ui.widget;
+
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.jetbrains.annotations.NotNull;
+import top.mrxiaom.hologram.vector.displays.hologram.utils.AdventureHelper;
+import top.mrxiaom.hologram.vector.displays.ui.api.Element;
+
+public class Label extends Element {
+    private @NotNull String text = "";
+    public Label(@NotNull String id) {
+        super(id);
+    }
+    public Label(@NotNull String id, @NotNull String text) {
+        this(id);
+        setText(text);
+    }
+
+    @NotNull
+    public String getText() {
+        return text;
+    }
+
+    public void setText(@NotNull String text) {
+        this.text = text;
+        this.hologram.setText(AdventureHelper.miniMessage(text));
+        this.calculateSize();
+    }
+
+    @Override
+    public void performClick(Player player, Action action) {
+    }
+}

@@ -29,6 +29,7 @@ dependencies {
 
     compileOnly("net.kyori:adventure-platform-bukkit:4.4.1")
     compileOnly("net.kyori:adventure-text-serializer-plain:4.23.0")
+    compileOnly("net.kyori:adventure-text-minimessage:4.23.0")
     compileOnly("org.jetbrains:annotations:24.0.0")
 
     for (item in project.project(":nms").subprojects) {

@@ -13,7 +13,6 @@ import me.tofaa.entitylib.meta.display.AbstractDisplayMeta;
 import me.tofaa.entitylib.meta.display.TextDisplayMeta;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
@@ -23,6 +22,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.hologram.utils.Vector3F;
+import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class TextHologram {
     private static final LegacyComponentSerializer legacyText = LegacyComponentSerializer.legacySection();
-    private static final PlainTextComponentSerializer plainText = PlainTextComponentSerializer.plainText();
 
     private final JavaPlugin plugin;
 
@@ -260,7 +259,7 @@ public class TextHologram {
     }
 
     public String getTextWithoutColor() {
-        return plainText.serialize(text);
+        return HologramUtils.toPlain(text);
     }
 
     public TextHologram setText(String text) {

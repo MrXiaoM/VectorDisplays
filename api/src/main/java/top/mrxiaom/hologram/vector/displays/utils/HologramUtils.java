@@ -1,0 +1,286 @@
+package top.mrxiaom.hologram.vector.displays.utils;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.Location;
+import org.bukkit.event.block.Action;
+import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import top.mrxiaom.hologram.vector.displays.hologram.TextHologram;
+import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
+import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
+
+public class HologramUtils {
+    public static double LINE_HEIGHT = 12.5;
+    private static final PlainTextComponentSerializer plainText = PlainTextComponentSerializer.plainText();
+    private static final double EPSILON = 1e-10; // 用于处理浮点数精度问题
+
+    public static boolean isLeftClick(Action action) {
+        return action.equals(Action.LEFT_CLICK_AIR) || action.equals(Action.LEFT_CLICK_BLOCK);
+    }
+
+    public static boolean isRightClick(Action action) {
+        return action.equals(Action.RIGHT_CLICK_AIR) || action.equals(Action.RIGHT_CLICK_BLOCK);
+    }
+
+    public static float[] toFloat(double... doubles) {
+        float[] floats = new float[doubles.length];
+        for (int i = 0; i < doubles.length; i++) {
+            floats[i] = Float.parseFloat(String.valueOf(doubles[i]));
+        }
+        return floats;
+    }
+
+    public static String toPlain(Component component) {
+        return plainText.serialize(component);
+    }
+
+    /**
+     * 获取悬浮字内容的行数
+     *
+     * @param hologram 悬浮字
+     */
+    public static int getLines(TextHologram hologram) {
+        return toPlain(hologram.getTextAsComponent()).split("\n").length;
+    }
+
+    /**
+     * 获取悬浮字在世界坐标上的宽度
+     *
+     * @param hologram 悬浮字
+     */
+    public static double getWidth(TextHologram hologram) {
+        return HologramFont.getWidthToLocation(hologram.getTextAsComponent()) * hologram.getScale().x;
+    }
+
+    /**
+     * 获取悬浮字在世界坐标上的高度
+     *
+     * @param hologram 悬浮字
+     */
+    public static double getHeight(TextHologram hologram) {
+        return getLines(hologram) * LINE_HEIGHT * HologramFont.getCharScale() * hologram.getScale().y;
+    }
+
+    /**
+     * 获取玩家的视线落在了悬浮字上的世界坐标
+     *
+     * @param terminal 终端面板
+     * @param hologram 悬浮字
+     * @param eyeLocation 玩家视线位置，<code>player.getEyeLocation()</code>
+     * @return 如果视线没有落在悬浮字上，返回 <code>null</code>
+     */
+    @Nullable
+    public static Location raytraceHologram(@NotNull Terminal terminal, @NotNull TextHologram hologram, @NotNull Location eyeLocation) {
+        // 计算悬浮字长宽
+        double width = getWidth(hologram);
+        double height = getHeight(hologram);
+        // 悬浮字正下方坐标
+        Location loc = hologram.getLocation().clone();
+        loc.setY(loc.getY() + 1);
+        // 悬浮字四角顶点
+        double paddingHorizontal = 0.02;
+        double paddingVertical = 0.01;
+        Location loc1 = loc.clone();
+        loc1.setX(loc1.getX() - (width / 2.0) - paddingHorizontal);
+        loc1.setY(loc1.getY() + height + paddingVertical);
+        Location loc2 = loc.clone();
+        loc2.setX(loc2.getX() + (width / 2.0) + paddingHorizontal);
+        loc2.setY(loc2.getY() + height + paddingVertical);
+        Location loc3 = loc.clone();
+        loc3.setX(loc3.getX() - (width / 2.0) - paddingHorizontal);
+        loc3.setY(loc3.getY() - paddingVertical);
+        Location loc4 = loc.clone();
+        loc4.setX(loc4.getX() + (width / 2.0) + paddingHorizontal);
+        loc4.setY(loc3.getY() - paddingVertical);
+        // 获取终端面板的旋转四元数，进行变换后再输入计算交点
+        float[] r = terminal.getRotation();
+        // 计算交点
+        return calculateIntersection(
+                eyeLocation,
+                QuaternionUtils.rotateChildren(loc, r, loc1),
+                QuaternionUtils.rotateChildren(loc, r, loc2),
+                QuaternionUtils.rotateChildren(loc, r, loc3),
+                QuaternionUtils.rotateChildren(loc, r, loc4));
+    }
+
+    /**
+     * 计算射线与平面上矩形的交点 (豆包AI 生成)
+     *
+     * @param eyeLocation 玩家视角位置
+     * @param p1 矩形顶点1
+     * @param p2 矩形顶点2
+     * @param p3 矩形顶点3
+     * @param p4 矩形顶点4
+     * @return 交点坐标，若视线射线与平面平行，或交点不在矩形上，则返回 null
+     */
+    public static Location calculateIntersection(Location eyeLocation, Location p1, Location p2, Location p3, Location p4) {
+        Vector direction = eyeLocation.getDirection();
+        double aX = eyeLocation.getX();
+        double aY = eyeLocation.getY();
+        double aZ = eyeLocation.getZ();
+        double vX = direction.getX();
+        double vY = direction.getY();
+        double vZ = direction.getZ();
+        double p1X = p1.getX();
+        double p1Y = p1.getY();
+        double p1Z = p1.getZ();
+        double p2X = p2.getX();
+        double p2Y = p2.getY();
+        double p2Z = p2.getZ();
+        double p3X = p3.getX();
+        double p3Y = p3.getY();
+        double p3Z = p3.getZ();
+        double p4X = p4.getX();
+        double p4Y = p4.getY();
+        double p4Z = p4.getZ();
+        // 第一步：计算射线与平面的交点（使用前三个点确定平面）
+        double[] q = calculateRayPlaneIntersection(
+                aX, aY, aZ, vX, vY, vZ,
+                p1X, p1Y, p1Z, p2X, p2Y, p2Z, p3X, p3Y, p3Z
+        );
+
+        // 如果射线与平面不相交，直接返回null
+        if (q == null) {
+            return null;
+        }
+
+        // 将点转换为数组形式便于处理
+        double[] p1array = {p1X, p1Y, p1Z};
+        double[] p2array = {p2X, p2Y, p2Z};
+        double[] p3array = {p3X, p3Y, p3Z};
+        double[] p4array = {p4X, p4Y, p4Z};
+
+        // 第二步：确定矩形的顶点O和相邻边向量u、v
+        double[] O = p1array;
+        double[] u;
+        double[] v;
+
+        // 从其他三个点中找到与p1构成矩形相邻边的两个点
+        double[] vec2 = subtract(p2array, O);
+        double[] vec3 = subtract(p3array, O);
+        double[] vec4 = subtract(p4array, O);
+
+        // 计算各向量的点积，找到垂直的向量对（矩形相邻边互相垂直）
+        if (Math.abs(dotProduct(vec2, vec3)) < EPSILON) {
+            u = vec2;
+            v = vec3;
+        } else if (Math.abs(dotProduct(vec2, vec4)) < EPSILON) {
+            u = vec2;
+            v = vec4;
+        } else if (Math.abs(dotProduct(vec3, vec4)) < EPSILON) {
+            u = vec3;
+            v = vec4;
+        } else {
+            // 如果p1不是合适的原点，尝试p2作为原点
+            O = p2array;
+            vec2 = subtract(p1array, O);
+            vec3 = subtract(p3array, O);
+            vec4 = subtract(p4array, O);
+
+            if (Math.abs(dotProduct(vec2, vec3)) < EPSILON) {
+                u = vec2;
+                v = vec3;
+            } else if (Math.abs(dotProduct(vec2, vec4)) < EPSILON) {
+                u = vec2;
+                v = vec4;
+            } else if (Math.abs(dotProduct(vec3, vec4)) < EPSILON) {
+                u = vec3;
+                v = vec4;
+            } else {
+                return null;
+            }
+        }
+
+        // 第三步：判断交点是否在矩形内部
+        double[] w = subtract(q, O); // 从O到交点的向量
+
+        // 计算u和v的模长平方（避免除以零）
+        double uDotU = dotProduct(u, u);
+        double vDotV = dotProduct(v, v);
+        if (uDotU < EPSILON || vDotV < EPSILON) {
+            return null;
+        }
+
+        // 计算参数s和t（将w分解到u和v方向上）
+        double s = dotProduct(w, u) / uDotU;
+        double t = dotProduct(w, v) / vDotV;
+
+        // 检查s和t是否在[0, 1]范围内（考虑浮点误差）
+        if (s >= -EPSILON && s <= 1 + EPSILON &&
+                t >= -EPSILON && t <= 1 + EPSILON) {
+            return new Location(eyeLocation.getWorld(), q[0], q[1], q[2]);
+        } else {
+            return null; // 交点在矩形外
+        }
+    }
+
+    /**
+     * 计算射线与平面的交点
+     */
+    private static double[] calculateRayPlaneIntersection(
+            double aX, double aY, double aZ,
+            double vX, double vY, double vZ,
+            double p1X, double p1Y, double p1Z,
+            double p2X, double p2Y, double p2Z,
+            double p3X, double p3Y, double p3Z) {
+
+        // 计算平面的两个向量
+        double v1X = p2X - p1X;
+        double v1Y = p2Y - p1Y;
+        double v1Z = p2Z - p1Z;
+
+        double v2X = p3X - p1X;
+        double v2Y = p3Y - p1Y;
+        double v2Z = p3Z - p1Z;
+
+        // 计算平面的法向量（v1 × v2）
+        double normalX = v1Y * v2Z - v1Z * v2Y;
+        double normalY = v1Z * v2X - v1X * v2Z;
+        double normalZ = v1X * v2Y - v1Y * v2X;
+
+        // 计算射线方向向量与平面法向量的点积
+        double denominator = normalX * vX + normalY * vY + normalZ * vZ;
+
+        // 如果点积接近0，射线与平面平行或在平面上
+        if (Math.abs(denominator) < EPSILON) {
+            return null;
+        }
+
+        // 计算平面方程的d值：normal · p1 + d = 0 => d = -normal · p1
+        double d = -(normalX * p1X + normalY * p1Y + normalZ * p1Z);
+
+        // 计算参数t
+        double numerator = -(normalX * aX + normalY * aY + normalZ * aZ + d);
+        double t = numerator / denominator;
+
+        // 射线的参数t必须大于等于0（在射线方向上）
+        if (t < -EPSILON) {
+            return null;
+        }
+
+        // 计算交点坐标
+        double x = aX + t * vX;
+        double y = aY + t * vY;
+        double z = aZ + t * vZ;
+
+        return new double[]{x, y, z};
+    }
+    /**
+     * 向量相减：a - b
+     */
+    private static double[] subtract(double[] a, double[] b) {
+        return new double[]{
+                a[0] - b[0],
+                a[1] - b[1],
+                a[2] - b[2]
+        };
+    }
+    /**
+     * 向量点积
+     */
+    private static double dotProduct(double[] a, double[] b) {
+        return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    }
+}
