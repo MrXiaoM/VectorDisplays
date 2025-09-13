@@ -27,6 +27,54 @@ Minecraft 世界终端用户界面解决方案
 + 监听准心悬停状态更改事件，让元素在被玩家准心悬停时更改背景颜色等等
 + 监听玩家点击事件，让元素在被玩家点击时执行自定义操作
 
+## 快速开始 (开发者)
+
+对于需要将 VectorDisplays 作为依赖库嵌入到自己的插件里的开发者，请先阅读 [API](/api/README.md) 文档。
+
+如果只需要将 VectorDisplays 作为依赖插件，按以下步骤操作。首先添加依赖
+```kotlin
+repositories {
+    mavenCentral()
+}
+dependencies {
+    compileOnly("top.mrxiaom.hologram:VectorDisplays-API:$VERSION")
+}
+```
+创建你的第一个控制面板
+```java
+void create(Player player) {
+    Location eyeLocation = player.getEyeLocation().clone(); eyeLocation.setPitch(0);
+    // 获取玩家面前 2 格远的位置
+    Location loc = player.getLocation().clone().add(eyeLocation.getDirection().multiply(2));
+    // 操作面板ID, 位置, 宽度(单位为空格数), 高度(单位为行数)
+    SimpleTerminal terminal = new SimpleTerminal("test_" + player.getName(), loc, 9, 3);
+    terminal.setRotation(eyeLocation.getYaw(), -30.0f); // 设置终端面板旋转
+    // 添加按钮
+    terminal.addElement(new Button("btn1"), btn -> {
+        btn.setText("<#FF0000>测试");
+        btn.setScale(0.25f); // 缩放尺寸
+        btn.setAlign(EnumAlign.RIGHT_CENTER); // 位置对齐方式
+        btn.setPos(-2, 0); // 相对位置
+        btn.setFullBrightness(); // 设置固定亮度
+        btn.setOnHoverStateChange(hoverBg(0x80000000, 0)); // 悬停更改背景颜色
+        btn.setOnClick((whoClicked, action, e) -> { // 点击执行操作
+            t(whoClicked, "你以 " + action + " 方式点击了按钮 btn1");
+        });
+    });
+    // 添加线条
+    terminal.addElement(this.line = new Line("line1"), line -> {
+        line.setFullBrightness();
+        line.setPos1(-5, -5);
+        line.setPos2(5, 5);
+        line.setAlign(EnumAlign.CENTER);
+    });
+    // 添加玩家到这个终端面板
+    terminal.addViewer(player);
+    // 注册并生成悬浮字
+    TerminalManager.inst().spawn(terminal);
+}
+```
+
 ## 鸣谢
 
 + [FabricMC/yarn](https://github.com/FabricMC/yarn) 本项目 TextRenderer 实现参考
