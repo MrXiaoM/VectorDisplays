@@ -28,6 +28,7 @@ public class VectorDisplays extends JavaPlugin {
 
     @Override
     public void reloadConfig() {
+        super.saveDefaultConfig();
         super.reloadConfig();
         FileConfiguration config = getConfig();
         for (IConfig inst : configList) {
