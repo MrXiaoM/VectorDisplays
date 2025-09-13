@@ -40,7 +40,7 @@ dependencies {
     compileOnly("top.mrxiaom.hologram:VectorDisplays-API:$VERSION")
 }
 ```
-创建你的第一个控制面板
+创建你的第一个终端控制面板
 ```java
 void create(Player player) {
     Location eyeLocation = player.getEyeLocation().clone(); eyeLocation.setPitch(0);
@@ -58,7 +58,7 @@ void create(Player player) {
         btn.setFullBrightness(); // 设置固定亮度
         btn.setOnHoverStateChange(hoverBg(0x80000000, 0)); // 悬停更改背景颜色
         btn.setOnClick((whoClicked, action, e) -> { // 点击执行操作
-            t(whoClicked, "你以 " + action + " 方式点击了按钮 btn1");
+            whoClicked.sendMessage("你以 " + action + " 方式点击了按钮 btn1");
         });
     });
     // 添加线条
@@ -74,6 +74,7 @@ void create(Player player) {
     TerminalManager.inst().spawn(terminal);
 }
 ```
+[SimpleTerminal](https://github.com/MrXiaoM/VectorDisplays/blob/main/api/src/main/java/top/mrxiaom/hologram/vector/displays/ui/SimpleTerminal.java) 仅仅是默认实现，你还可以继承抽象类 [Terminal](https://github.com/MrXiaoM/VectorDisplays/blob/main/api/src/main/java/top/mrxiaom/hologram/vector/displays/ui/api/Terminal.java) 以便更好地实现你需要的功能！
 
 ## 鸣谢
 
