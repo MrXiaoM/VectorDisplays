@@ -8,6 +8,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.hologram.vector.displays.hologram.HologramAPI;
@@ -23,6 +24,8 @@ public class TerminalManager implements Listener {
     private final JavaPlugin plugin;
     private final HologramAPI hologramAPI;
     private final Map<String, Terminal> terminals = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    private long timerPeriod = 1L;
+    private BukkitTask timerTask;
     public TerminalManager(JavaPlugin plugin) {
         if (instance != null) {
             throw new IllegalStateException("TerminalManager has been initialized!");
@@ -43,14 +46,27 @@ public class TerminalManager implements Listener {
     public void onEnable() {
         this.hologramAPI.onEnable();
         Bukkit.getPluginManager().registerEvents(this, plugin);
-        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+        setTimerPeriod(timerPeriod);
+    }
+
+    public void setTimerPeriod(long timerPeriod) {
+        this.timerPeriod = timerPeriod;
+        if (this.timerTask != null) {
+            this.timerTask.cancel();
+            this.timerTask = null;
+        }
+        this.timerTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             for (Terminal terminal : terminals.values()) {
                 terminal.onTimerTick();
             }
-        }, 5L, 5L);
+        }, 1L, timerPeriod);
     }
 
     public void onDisable() {
+        if (this.timerTask != null) {
+            this.timerTask.cancel();
+            this.timerTask = null;
+        }
         for (Terminal terminal : terminals.values()) {
             terminal.dispose();
         }
