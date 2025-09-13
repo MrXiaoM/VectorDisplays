@@ -63,6 +63,7 @@ public class TextHologram {
     private final RenderMode renderMode;
     private Location location;
     private final List<Player> viewers = new CopyOnWriteArrayList<>();
+    private final List<Player> leftViewers = new CopyOnWriteArrayList<>();
     private boolean dead = true;
     private BukkitTask task;
 
@@ -90,18 +91,23 @@ public class TextHologram {
      * Only if you want to manage the holograms yourself and don't want to use the animation system use this
      */
     public void spawn(Location location) {
+        if (!dead) kill();
         this.location = location;
         entityID = ThreadLocalRandom.current().nextInt(4000, Integer.MAX_VALUE);
-        WrapperPlayServerSpawnEntity packet = new WrapperPlayServerSpawnEntity(
-                entityID, Optional.of(UUID.randomUUID()), EntityTypes.TEXT_DISPLAY,
-                new Vector3d(location.getX(), location.getY() + 1, location.getZ()), 0f, 0f, 0f, 0, Optional.empty()
-        );
+        PacketWrapper<?> packet = buildSpawnPacket();
         plugin.getServer().getScheduler().runTask(plugin, () -> {
             updateAffectedPlayers();
             sendPacket(packet);
             this.dead = false;
             update();
         });
+    }
+
+    private PacketWrapper<?> buildSpawnPacket() {
+        return new WrapperPlayServerSpawnEntity(
+                entityID, Optional.of(UUID.randomUUID()), EntityTypes.TEXT_DISPLAY,
+                new Vector3d(location.getX(), location.getY() + 1, location.getZ()), 0f, 0f, 0f, 0, Optional.empty()
+        );
     }
 
     public TextHologram update() {
@@ -151,35 +157,65 @@ public class TextHologram {
      * Only if you want to manage the holograms yourself and don't want to use the animation system use this
      */
     public void kill() {
-        WrapperPlayServerDestroyEntities packet = new WrapperPlayServerDestroyEntities(this.entityID);
+        PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
         sendPacket(packet);
         this.dead = true;
     }
 
     public TextHologram teleport(Location location) {
-        WrapperPlayServerEntityTeleport packet = new WrapperPlayServerEntityTeleport(this.entityID, SpigotConversionUtil.fromBukkitLocation(location), false);
+        PacketWrapper<?> packet = new WrapperPlayServerEntityTeleport(this.entityID, SpigotConversionUtil.fromBukkitLocation(location), false);
         this.location = location;
         sendPacket(packet);
         return this;
     }
 
     public TextHologram addAllViewers(List<Player> viewerList) {
-        this.viewers.addAll(viewerList);
+        for (Player player : viewerList) {
+            addViewer(player);
+        }
         return this;
     }
 
     public TextHologram addViewer(Player player) {
-        this.viewers.add(player);
+        boolean respawn = false;
+        if (!viewers.contains(player)) {
+            this.viewers.add(player);
+            respawn = true;
+        }
+        if (this.leftViewers.remove(player)) {
+            respawn = true;
+        }
+        if (respawn && !dead) {
+            respawnFor(player);
+        }
         return this;
+    }
+
+    private void respawnFor(Player player) {
+        PacketWrapper<?> packet = buildSpawnPacket();
+        sendPacket(player, packet);
+        plugin.getServer().getScheduler().runTask(plugin, () -> {
+            updateAffectedPlayers();
+            TextDisplayMeta meta = createMeta();
+            sendPacket(player, meta.createPacket());
+        });
     }
 
     public TextHologram removeViewer(Player player) {
         this.viewers.remove(player);
+        this.leftViewers.remove(player);
+        if (!dead) {
+            PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
+            sendPacket(player, packet);
+        }
         return this;
     }
 
     public TextHologram removeAllViewers() {
         this.viewers.clear();
+        this.leftViewers.clear();
+        PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
+        sendPacket(packet);
         return this;
     }
 
@@ -269,14 +305,23 @@ public class TextHologram {
 
     private void updateAffectedPlayers() {
         if (this.location == null) return;
-        viewers.stream()
-                .filter(player -> player.isOnline() && (player.getWorld() != this.location.getWorld() || player.getLocation().distance(this.location) > 20))
+        double viewDistance = 32.0;
+        viewers.stream() // 超出可视范围自动销毁实体
+                .filter(player -> player.isOnline() && (player.getWorld() != this.location.getWorld() || player.getLocation().distance(this.location) > viewDistance))
                 .forEach(player -> {
-                    WrapperPlayServerDestroyEntities packet = new WrapperPlayServerDestroyEntities(this.entityID);
-                    HologramAPI.getPlayerManager().sendPacket(player, packet);
+                    PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
+                    sendPacket(player, packet);
+                    if (this.renderMode == RenderMode.VIEWER_LIST && !leftViewers.contains(player)) {
+                        leftViewers.add(player);
+                    }
                 });
 
-        if (this.renderMode == RenderMode.VIEWER_LIST) return;
+        if (this.renderMode == RenderMode.VIEWER_LIST) {
+            new ArrayList<>(leftViewers).stream() // 回到可视范围自动恢复实体
+                    .filter(player -> player.isOnline() && player.getWorld() == this.location.getWorld() && player.getLocation().distance(this.location) <= viewDistance)
+                    .forEach(this::addViewer);
+            return;
+        }
 
         if (this.renderMode == RenderMode.ALL) {
             this.addAllViewers(new ArrayList<>(Bukkit.getOnlinePlayers()));
@@ -284,13 +329,17 @@ public class TextHologram {
             this.location.getWorld().getNearbyEntities(this.location, nearbyEntityScanningDistance, nearbyEntityScanningDistance, nearbyEntityScanningDistance)
                     .stream()
                     .filter(entity -> entity instanceof Player)
-                    .forEach(entity -> this.viewers.add((Player) entity));
+                    .forEach(entity -> addViewer((Player) entity));
         }
     }
 
     private void sendPacket(PacketWrapper<?> packet) {
         if (this.renderMode == RenderMode.NONE) return;
-        viewers.forEach(player -> HologramAPI.getPlayerManager().sendPacket(player, packet));
+        viewers.forEach(player -> sendPacket(player, packet));
+    }
+
+    private void sendPacket(Player player, PacketWrapper<?> packet) {
+        HologramAPI.getPlayerManager().sendPacket(player, packet);
     }
 
     public long getUpdateTaskPeriod() {
