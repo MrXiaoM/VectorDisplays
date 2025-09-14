@@ -10,7 +10,14 @@ Minecraft 世界终端用户界面解决方案
 
 对于使用者，你可以使用以下方法安装插件：
 + 到[爱发电](https://afdian.com/a/mrxiaom)进行购买
++ 通过[QQ](https://qm.qq.com/q/umnukgs1k4)联系作者进行购买
 + 克隆本仓库，自行构建
+
+> [!WARNING]
+> 
+> 任何第三方构建都是不可信的，为了您的安全，即使您不想购买，也请自行构建插件。  
+> 人话：提醒到这个份上了，遇到了后门别找我。
+> 
 
 至少需要 Java 17 环境才能安装本插件，此外，本插件需要前置 [packetevents](https://modrinth.com/plugin/packetevents/versions?l=spigot) 才能正常运行。
 
