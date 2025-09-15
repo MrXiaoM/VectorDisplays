@@ -148,7 +148,7 @@ public class QuaternionUtils {
      * @param location 子元素坐标
      * @return 变换后坐标
      */
-    public static Location rotateChildren(Terminal terminal, Location location) {
+    public static Location rotateChildren(Terminal<?> terminal, Location location) {
         return rotateChildren(terminal.getLocation(), terminal.getRotation(), location);
     }
     /**

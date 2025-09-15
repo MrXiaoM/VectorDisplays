@@ -1,5 +1,3 @@
-import java.util.function.Consumer
-
 subprojects {
     apply(plugin="java")
     repositories {

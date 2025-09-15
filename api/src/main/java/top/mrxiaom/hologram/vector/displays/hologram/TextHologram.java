@@ -18,8 +18,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
 import org.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.api.IRunTask;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;

@@ -1,7 +1,6 @@
 package top.mrxiaom.hologram.vector.displays.hologram;
 
 import org.bukkit.Location;
-import org.bukkit.plugin.java.JavaPlugin;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
 
 import java.util.*;

@@ -114,7 +114,7 @@ public class Line extends Element<Line> {
         double length = Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
 
         // 计算四个点，AB 是原线段的端点，CD 是旋转后的线段端点
-        Terminal terminal = getTerminal();
+        Terminal<?> terminal = getTerminal();
         float[] locA = terminal.getRotated(decideLocationRaw(x - length / 2.0, y));
         float[] locB = terminal.getRotated(decideLocationRaw(x + length / 2.0, y));
         float[] locC = terminal.getRotated(decideLocationRaw(x1, y1));

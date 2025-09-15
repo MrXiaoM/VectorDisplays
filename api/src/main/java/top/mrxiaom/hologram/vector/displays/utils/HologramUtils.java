@@ -72,7 +72,7 @@ public class HologramUtils {
      * @return 如果视线没有落在悬浮字上，返回 <code>null</code>
      */
     @Nullable
-    public static Location raytraceHologram(@NotNull Terminal terminal, @NotNull TextHologram hologram, @NotNull Location eyeLocation) {
+    public static Location raytraceHologram(@NotNull Terminal<?> terminal, @NotNull TextHologram hologram, @NotNull Location eyeLocation) {
         // 计算悬浮字长宽
         double width = getWidth(hologram);
         double height = getHeight(hologram);

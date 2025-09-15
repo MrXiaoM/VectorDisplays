@@ -4,7 +4,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.hologram.vector.displays.TerminalManager;
 
 import java.io.InputStream;

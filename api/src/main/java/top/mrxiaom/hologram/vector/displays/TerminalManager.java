@@ -1,6 +1,5 @@
 package top.mrxiaom.hologram.vector.displays;
 
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -97,15 +96,15 @@ public class TerminalManager implements Listener {
     /**
      * 获取所有已生成的终端面板
      */
-    public Map<String, Terminal> getTerminals() {
+    public Map<String, Terminal<?>> getTerminals() {
         return Collections.unmodifiableMap(terminals);
     }
 
     /**
      * 生成终端面板
      */
-    public void spawn(Terminal terminal) {
-        Terminal old = terminals.remove(terminal.getId());
+    public void spawn(Terminal<?> terminal) {
+        Terminal<?> old = terminals.remove(terminal.getId());
         if (old != null) old.dispose();
         HologramAPI.getHologram().spawn(terminal.getHologram(), terminal.getLocation());
         terminal.init();
@@ -115,7 +114,7 @@ public class TerminalManager implements Listener {
     /**
      * 销毁终端面板
      */
-    public void destroy(Terminal terminal) {
+    public void destroy(Terminal<?> terminal) {
         terminals.remove(terminal.getId());
         terminal.dispose();
     }
@@ -124,7 +123,7 @@ public class TerminalManager implements Listener {
      * 销毁终端面板
      */
     public void destroy(String id) {
-        Terminal terminal = terminals.remove(id);
+        Terminal<?> terminal = terminals.remove(id);
         if (terminal != null) {
             terminal.dispose();
         }

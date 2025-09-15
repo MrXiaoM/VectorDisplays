@@ -16,6 +16,8 @@
  */
 package top.mrxiaom.hologram.vector.displays.minecraft.utils;
 
+import java.io.Serial;
+
 /**
  * A mutable {@code int} wrapper.
  * <p>
@@ -32,6 +34,7 @@ public class MutableInt extends Number implements Comparable<MutableInt>, Mutabl
      *
      * @see java.io.Serializable
      */
+    @Serial
     private static final long serialVersionUID = 512176391864L;
 
     /** The mutable value. */
@@ -251,7 +254,7 @@ public class MutableInt extends Number implements Comparable<MutableInt>, Mutabl
      */
     @Override
     public Integer getValue() {
-        return Integer.valueOf(this.value);
+        return this.value;
     }
 
     /**
@@ -353,7 +356,7 @@ public class MutableInt extends Number implements Comparable<MutableInt>, Mutabl
      * @return an Integer instance containing the value from this mutable, never null
      */
     public Integer toInteger() {
-        return Integer.valueOf(intValue());
+        return intValue();
     }
 
     /**
