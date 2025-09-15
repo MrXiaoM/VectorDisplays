@@ -396,10 +396,11 @@ public abstract class Terminal<This extends Terminal<This>> implements HologramW
     }
 
     /**
-     * 定时器事件，每秒执行4次
+     * 定时器事件，执行周期由 TerminalManager 决定
      */
     public void onTimerTick() {
         for (Element<?> element : getElements()) {
+            element.onTimerTick();
             if (element instanceof Hoverable hoverable) {
                 boolean hover = false;
                 for (Player player : Bukkit.getOnlinePlayers()) {

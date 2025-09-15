@@ -11,24 +11,18 @@ import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.hologram.vector.displays.api.IRunTask;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
 import top.mrxiaom.hologram.vector.displays.hologram.HologramAPI;
-import top.mrxiaom.hologram.vector.displays.ui.EnumAlign;
-import top.mrxiaom.hologram.vector.displays.ui.SimpleTerminal;
 import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
-import top.mrxiaom.hologram.vector.displays.ui.widget.Button;
-import top.mrxiaom.hologram.vector.displays.ui.widget.Line;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static top.mrxiaom.hologram.vector.displays.ui.event.HoverStateChange.hoverBg;
-
 public class TerminalManager implements Listener {
     private static TerminalManager instance = null;
     private final PluginWrapper plugin;
     private final HologramAPI hologramAPI;
-    private final Map<String, Terminal> terminals = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    private final Map<String, Terminal<?>> terminals = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private long timerPeriod = 1L;
     private IRunTask timerTask;
     public TerminalManager(PluginWrapper plugin) {
@@ -65,7 +59,7 @@ public class TerminalManager implements Listener {
             this.timerTask = null;
         }
         this.timerTask = plugin.getScheduler().runTaskTimer(() -> {
-            for (Terminal terminal : terminals.values()) {
+            for (Terminal<?> terminal : terminals.values()) {
                 terminal.onTimerTick();
             }
         }, 1L, timerPeriod);
@@ -76,7 +70,7 @@ public class TerminalManager implements Listener {
             this.timerTask.cancel();
             this.timerTask = null;
         }
-        for (Terminal terminal : terminals.values()) {
+        for (Terminal<?> terminal : terminals.values()) {
             terminal.dispose();
         }
         terminals.clear();
@@ -90,7 +84,7 @@ public class TerminalManager implements Listener {
         Action action = e.getAction();
         // 元素点击事件处理
         if (HologramUtils.isLeftClick(action) || HologramUtils.isRightClick(action)) {
-            for (Terminal terminal : terminals.values()) {
+            for (Terminal<?> terminal : terminals.values()) {
                 if (!terminal.getViewers().contains(player)) continue;
                 if (terminal.tryPerformClick(player, action)) {
                     e.setCancelled(true);

@@ -7,11 +7,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.block.Action;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.hologram.vector.displays.hologram.HologramAPI;
 import top.mrxiaom.hologram.vector.displays.hologram.RenderMode;
 import top.mrxiaom.hologram.vector.displays.hologram.TextHologram;
 import top.mrxiaom.hologram.vector.displays.ui.EnumAlign;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
+import top.mrxiaom.hologram.vector.displays.ui.event.TimerTickEvent;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 
 
@@ -20,12 +22,13 @@ import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
  */
 public abstract class Element<This extends Element<This>> implements HologramWrapper<This> {
     private final @NotNull String id;
-    private Terminal terminal;
+    private Terminal<?> terminal;
     private EnumAlign align;
     private double x, y, zIndex;
     private float scale = 1.0f;
     private double width, height;
     private double textWidth, textHeight;
+    private TimerTickEvent<This> timerTickEvent;
     protected final @NotNull TextHologram hologram;
     public Element(@NotNull String id) {
         this.id = id;
@@ -43,7 +46,7 @@ public abstract class Element<This extends Element<This>> implements HologramWra
         return (This) this;
     }
 
-    void setTerminal(@NotNull Terminal terminal) {
+    void setTerminal(@NotNull Terminal<?> terminal) {
         this.terminal = terminal;
         this.hologram.setRightRotation(terminal.getRotation());
     }
@@ -52,7 +55,7 @@ public abstract class Element<This extends Element<This>> implements HologramWra
      * 获取悬浮字所在的终端面板
      */
     @NotNull
-    public Terminal getTerminal() {
+    public Terminal<?> getTerminal() {
         return terminal;
     }
 
@@ -254,6 +257,24 @@ public abstract class Element<This extends Element<This>> implements HologramWra
      * @param action 点击方式
      */
     public abstract void performClick(Player player, Action action);
+
+    /**
+     * 当定时器遍历悬浮字时执行的操作
+     */
+    public void onTimerTick() {
+        if (timerTickEvent != null) {
+            timerTickEvent.tick($this());
+        }
+    }
+
+    /**
+     * 设置当定时器遍历悬浮字时执行的操作
+     * @param timerTickEvent 执行操作
+     */
+    public This setTimerTickEvent(@Nullable TimerTickEvent<This> timerTickEvent) {
+        this.timerTickEvent = timerTickEvent;
+        return $this();
+    }
 
     /**
      * 销毁悬浮字
