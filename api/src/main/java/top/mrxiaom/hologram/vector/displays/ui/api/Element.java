@@ -25,7 +25,7 @@ public abstract class Element<This extends Element<This>> implements HologramWra
     private Terminal<?> terminal;
     private EnumAlign align;
     private double x, y, zIndex;
-    private float scale = 1.0f;
+    private float scaleX = 1.0f, scaleY = 1.0f;
     private double width, height;
     private double textWidth, textHeight;
     private TimerTickEvent<This> timerTickEvent;
@@ -77,18 +77,47 @@ public abstract class Element<This extends Element<This>> implements HologramWra
     }
 
     /**
-     * 获取元素缩放大小
+     * 获取元素在X方向上的缩放大小
      */
-    public float getScale() {
-        return scale;
+    public float getScaleX() {
+        return scaleX;
+    }
+
+    /**
+     * 获取元素在Y方向上的缩放大小
+     */
+    public float getScaleY() {
+        return scaleY;
+    }
+
+    /**
+     * 设置元素在X方向上的缩放大小
+     */
+    public This setScaleX(float scaleX) {
+        return setScale(scaleX, scaleY);
+    }
+
+    /**
+     * 设置元素在Y方向上的缩放大小
+     */
+    public This setScaleY(float scaleY) {
+        return setScale(scaleX, scaleY);
     }
 
     /**
      * 设置元素缩放大小
      */
     public This setScale(float scale) {
-        this.scale = scale;
-        this.hologram.setScale(scale, scale, scale);
+        return setScale(scale, scale);
+    }
+
+    /**
+     * 设置元素缩放大小
+     */
+    public This setScale(float scaleX, float scaleY) {
+        this.scaleX = scaleX;
+        this.scaleY = scaleY;
+        this.hologram.setScale(scaleX, scaleY, 1.0f);
         return $this();
     }
 
@@ -224,8 +253,8 @@ public abstract class Element<This extends Element<This>> implements HologramWra
      * 根据悬浮字的文本，计算悬浮字在世界上的长宽尺寸
      */
     public void calculateSize() {
-        this.textWidth = HologramFont.getWidth(hologram.getTextAsComponent()) * scale;
-        this.textHeight = HologramUtils.getLines(hologram) * HologramUtils.LINE_HEIGHT * scale;
+        this.textWidth = HologramFont.getWidth(hologram.getTextAsComponent()) * scaleX;
+        this.textHeight = HologramUtils.getLines(hologram) * HologramUtils.LINE_HEIGHT * scaleY;
         this.width = textWidth * HologramFont.getCharScale();
         this.height = textHeight * HologramFont.getCharScale();
     }
