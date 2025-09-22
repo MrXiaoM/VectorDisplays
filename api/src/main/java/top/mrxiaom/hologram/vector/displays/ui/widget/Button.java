@@ -41,6 +41,9 @@ public class Button extends Element<Button> implements Hoverable {
         this.text = text;
         this.hologram.setText(AdventureHelper.miniMessage(text));
         this.calculateSize();
+        if (!this.hologram.isDead()) {
+            this.updateLocation();
+        }
         return this;
     }
 
