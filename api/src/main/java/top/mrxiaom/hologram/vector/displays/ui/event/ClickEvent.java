@@ -8,10 +8,10 @@ import top.mrxiaom.hologram.vector.displays.ui.api.Element;
  * 元素点击事件
  */
 @FunctionalInterface
-public interface ClickEvent<E extends Element<E>> {
+public interface ClickEvent<E extends Element<E, ?>> {
     void perform(Player player, Action action, E element);
 
-    static <E extends Element<E>> ClickEvent<E> turnPage(String pageName) {
+    static <E extends Element<E, ?>> ClickEvent<E> turnPage(String pageName) {
         return (player, action, element) -> element.getTerminal().turnPage(pageName);
     }
 }

@@ -8,7 +8,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class HologramManager {
     private final PluginWrapper plugin;
-    private final List<TextHologram> holograms = new CopyOnWriteArrayList<>();
+    private final List<AbstractEntity<?>> virtualEntities = new CopyOnWriteArrayList<>();
     public HologramManager(PluginWrapper plugin) {
         this.plugin = plugin;
     }
@@ -17,30 +17,35 @@ public class HologramManager {
         return plugin;
     }
 
-    public List<TextHologram> getHolograms() {
-        return Collections.unmodifiableList(this.holograms);
+    public List<AbstractEntity<?>> getVirtualEntities() {
+        return Collections.unmodifiableList(this.virtualEntities);
     }
 
-    public void spawn(TextHologram textHologram, Location location) {
+    @Deprecated
+    public List<AbstractEntity<?>> getHolograms() {
+        return getVirtualEntities();
+    }
+
+    public void spawn(AbstractEntity<?> textHologram, Location location) {
         textHologram.spawn(location);
-        if (!this.holograms.contains(textHologram)) {
-            this.holograms.add(textHologram);
+        if (!this.virtualEntities.contains(textHologram)) {
+            this.virtualEntities.add(textHologram);
         }
     }
 
-    public void register(TextHologram textHologram) {
-        if (!this.holograms.contains(textHologram)) {
-            this.holograms.add(textHologram);
+    public void register(AbstractEntity<?> textHologram) {
+        if (!this.virtualEntities.contains(textHologram)) {
+            this.virtualEntities.add(textHologram);
         }
     }
 
-    public void remove(TextHologram textHologram) {
-        this.holograms.remove(textHologram);
+    public void remove(AbstractEntity<?> textHologram) {
+        this.virtualEntities.remove(textHologram);
         textHologram.kill();
     }
 
     public void removeAll() {
-        this.holograms.forEach(TextHologram::kill);
-        this.holograms.clear();
+        this.virtualEntities.forEach(AbstractEntity::kill);
+        this.virtualEntities.clear();
     }
 }

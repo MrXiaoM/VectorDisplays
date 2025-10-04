@@ -1,44 +1,39 @@
 package top.mrxiaom.hologram.vector.displays.ui.api;
 
-import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
-import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.block.Action;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.mrxiaom.hologram.vector.displays.hologram.AbstractEntity;
 import top.mrxiaom.hologram.vector.displays.hologram.HologramAPI;
-import top.mrxiaom.hologram.vector.displays.hologram.RenderMode;
-import top.mrxiaom.hologram.vector.displays.hologram.TextHologram;
+import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
 import top.mrxiaom.hologram.vector.displays.ui.EnumAlign;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.event.TimerTickEvent;
-import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
-
 
 /**
  * 悬浮字界面元素
  */
-public abstract class Element<This extends Element<This>> implements HologramWrapper<This> {
+public abstract class Element<This extends Element<This, Entity>, Entity extends AbstractEntity<Entity>> {
     private final @NotNull String id;
     private Terminal<?> terminal;
     private EnumAlign align;
     private double x, y, zIndex;
-    private float scaleX = 1.0f, scaleY = 1.0f;
-    private double width, height;
-    private double textWidth, textHeight;
+    protected float scaleX = 1.0f, scaleY = 1.0f;
+    protected double width, height;
     private TimerTickEvent<This> timerTickEvent;
-    protected final @NotNull TextHologram hologram;
+    protected final @NotNull Entity hologram;
     public Element(@NotNull String id) {
         this.id = id;
-        this.hologram = new TextHologram(RenderMode.VIEWER_LIST)
-                .setInterpolationDurationTransformation(3)
-                .setInterpolationDurationRotation(0)
-                .setAlignment(TextDisplay.TextAlignment.LEFT)
-                .setBillboard(Display.Billboard.FIXED)
-                .setText(Component.text(""))
-                .removeAllViewers();
+        this.hologram = createHologram();
+    }
+
+    protected abstract Entity createHologram();
+
+    @NotNull
+    public Entity getEntity() {
+        return hologram;
     }
 
     @SuppressWarnings({"unchecked"})
@@ -46,9 +41,8 @@ public abstract class Element<This extends Element<This>> implements HologramWra
         return (This) this;
     }
 
-    void setTerminal(@NotNull Terminal<?> terminal) {
+    protected void setTerminal(@NotNull Terminal<?> terminal) {
         this.terminal = terminal;
-        this.hologram.setRightRotation(terminal.getRotation());
     }
 
     /**
@@ -59,14 +53,6 @@ public abstract class Element<This extends Element<This>> implements HologramWra
         return terminal;
     }
 
-    /**
-     * 获取悬浮字实例 (尽量不要使用这个方法)
-     */
-    @NotNull
-    @Override
-    public TextHologram getHologram() {
-        return hologram;
-    }
 
     /**
      * 界面元素的ID
@@ -117,7 +103,6 @@ public abstract class Element<This extends Element<This>> implements HologramWra
     public This setScale(float scaleX, float scaleY) {
         this.scaleX = scaleX;
         this.scaleY = scaleY;
-        this.hologram.setScale(scaleX, scaleY, 1.0f);
         return $this();
     }
 
@@ -202,20 +187,6 @@ public abstract class Element<This extends Element<This>> implements HologramWra
     }
 
     /**
-     * 获取该元素的悬浮字宽度
-     */
-    public double getTextWidth() {
-        return textWidth;
-    }
-
-    /**
-     * 获取该元素的悬浮字高度
-     */
-    public double getTextHeight() {
-        return textHeight;
-    }
-
-    /**
      * 将悬浮字传送到 <code>decideLocation()</code> 的位置
      * @see Element#decideLocation()
      */
@@ -252,18 +223,12 @@ public abstract class Element<This extends Element<This>> implements HologramWra
     /**
      * 根据悬浮字的文本，计算悬浮字在世界上的长宽尺寸
      */
-    public void calculateSize() {
-        this.textWidth = HologramFont.getWidth(hologram.getTextAsComponent()) * scaleX;
-        this.textHeight = HologramUtils.getLines(hologram) * HologramUtils.LINE_HEIGHT * scaleY;
-        this.width = textWidth * HologramFont.getCharScale();
-        this.height = textHeight * HologramFont.getCharScale();
-    }
+    public abstract void calculateSize();
 
     /**
      * 界面元素初始化方法，在这里确定悬浮字位置，并生成悬浮字
      */
     public void init() {
-        hologram.setRightRotation(getRotation());
         calculateSize();
         HologramAPI.getHologram().spawn(hologram, decideLocation());
     }
@@ -274,7 +239,7 @@ public abstract class Element<This extends Element<This>> implements HologramWra
 
     /**
      * 提交悬浮字更新
-     * @see TextHologram#update()
+     * @see EntityTextDisplay#update()
      */
     public void update() {
         hologram.update();

@@ -5,14 +5,14 @@ import org.bukkit.event.block.Action;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.hologram.vector.displays.hologram.utils.AdventureHelper;
-import top.mrxiaom.hologram.vector.displays.ui.api.Element;
 import top.mrxiaom.hologram.vector.displays.ui.api.Hoverable;
+import top.mrxiaom.hologram.vector.displays.ui.api.TextElement;
 import top.mrxiaom.hologram.vector.displays.ui.event.ClickEvent;
 import top.mrxiaom.hologram.vector.displays.ui.event.HoverStateChange;
 
 import java.util.function.Supplier;
 
-public class Button extends Element<Button> implements Hoverable {
+public class Button extends TextElement<Button> implements Hoverable {
     private @NotNull String text = "";
     private boolean hoverState = false;
     private ClickEvent<Button> clickEvent;

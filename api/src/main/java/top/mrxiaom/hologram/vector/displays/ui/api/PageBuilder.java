@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 
 public class PageBuilder {
     private final Terminal<?> terminal;
-    private final List<Element<?>> elements = new ArrayList<>();
+    private final List<Element<?, ?>> elements = new ArrayList<>();
     public PageBuilder(Terminal<?> terminal) {
         this.terminal = terminal;
     }
@@ -17,7 +17,7 @@ public class PageBuilder {
      * 向界面添加元素，建议在 <code>init()</code> 之前将元素添加完成
      * @param element 元素实例
      */
-    public void addElement(Element<?> element) {
+    public void addElement(Element<?, ?> element) {
         element.setTerminal(terminal);
         elements.add(element);
     }
@@ -27,7 +27,7 @@ public class PageBuilder {
      * @param element 界面元素
      * @param consumer 额外参数
      */
-    public <T extends Element<?>> void addElement(T element, Consumer<T> consumer) {
+    public <T extends Element<?, ?>> void addElement(T element, Consumer<T> consumer) {
         consumer.accept(element);
         addElement(element);
     }
@@ -36,8 +36,8 @@ public class PageBuilder {
      * 向界面添加元素，建议在 <code>init()</code> 之前将元素添加完成
      * @param elements 元素实例
      */
-    public void addElements(Element<?>... elements) {
-        for (Element<?> element : elements) {
+    public void addElements(Element<?, ?>... elements) {
+        for (Element<?, ?> element : elements) {
             addElement(element);
         }
     }
@@ -46,9 +46,9 @@ public class PageBuilder {
      * 向界面添加元素，建议在 <code>init()</code> 之前将元素添加完成
      * @param elements 元素实例
      */
-    public void addElements(Collection<Element<?>> elements) {
+    public void addElements(Collection<Element<?, ?>> elements) {
         if (elements == null) return;
-        for (Element<?> element : elements) {
+        for (Element<?, ?> element : elements) {
             addElement(element);
         }
     }
@@ -56,7 +56,7 @@ public class PageBuilder {
     /**
      * 获取已添加的元素列表
      */
-    public List<Element<?>> getElements() {
+    public List<Element<?, ?>> getElements() {
         return Collections.unmodifiableList(elements);
     }
 }

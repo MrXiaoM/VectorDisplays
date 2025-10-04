@@ -8,12 +8,13 @@ import top.mrxiaom.hologram.vector.displays.ui.EnumAlign;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.api.Element;
 import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
+import top.mrxiaom.hologram.vector.displays.ui.api.TextElement;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
 
 import java.math.BigDecimal;
 
-public class Line extends Element<Line> {
+public class Line extends TextElement<Line> {
     private final double spaceWidth = HologramFont.getWidth(Component.text(" "));
     private double x1, y1, x2, y2;
     private double thickness = 0.5;
@@ -65,7 +66,7 @@ public class Line extends Element<Line> {
     /**
      * 设置线条的第一个端点
      */
-    public Line setPos1(Element<?> element) {
+    public Line setPos1(Element<?, ?> element) {
         setPos1(element.getX(), element.getY());
         return this;
     }
@@ -82,7 +83,7 @@ public class Line extends Element<Line> {
     /**
      * 设置线条的第二个端点
      */
-    public Line setPos2(Element<?> element) {
+    public Line setPos2(Element<?, ?> element) {
         setPos2(element.getX(), element.getY());
         return this;
     }

@@ -7,7 +7,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import top.mrxiaom.hologram.vector.displays.hologram.TextHologram;
+import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
 
@@ -41,7 +41,7 @@ public class HologramUtils {
      *
      * @param hologram 悬浮字
      */
-    public static int getLines(TextHologram hologram) {
+    public static int getLines(EntityTextDisplay hologram) {
         return toPlain(hologram.getTextAsComponent()).split("\n").length;
     }
 
@@ -50,7 +50,7 @@ public class HologramUtils {
      *
      * @param hologram 悬浮字
      */
-    public static double getWidth(TextHologram hologram) {
+    public static double getWidth(EntityTextDisplay hologram) {
         return HologramFont.getWidthToLocation(hologram.getTextAsComponent()) * hologram.getScale().x;
     }
 
@@ -59,7 +59,7 @@ public class HologramUtils {
      *
      * @param hologram 悬浮字
      */
-    public static double getHeight(TextHologram hologram) {
+    public static double getHeight(EntityTextDisplay hologram) {
         return getLines(hologram) * LINE_HEIGHT * HologramFont.getCharScale() * hologram.getScale().y;
     }
 
@@ -72,7 +72,7 @@ public class HologramUtils {
      * @return 如果视线没有落在悬浮字上，返回 <code>null</code>
      */
     @Nullable
-    public static Location raytraceHologram(@NotNull Terminal<?> terminal, @NotNull TextHologram hologram, @NotNull Location eyeLocation) {
+    public static Location raytraceHologram(@NotNull Terminal<?> terminal, @NotNull EntityTextDisplay hologram, @NotNull Location eyeLocation) {
         // 计算悬浮字长宽
         double width = getWidth(hologram);
         double height = getHeight(hologram);

@@ -4,9 +4,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.hologram.vector.displays.hologram.utils.AdventureHelper;
-import top.mrxiaom.hologram.vector.displays.ui.api.Element;
+import top.mrxiaom.hologram.vector.displays.ui.api.TextElement;
 
-public class Label extends Element<Label> {
+public class Label extends TextElement<Label> {
     private @NotNull String text = "";
     public Label(@NotNull String id) {
         super(id);
