@@ -5,7 +5,6 @@ import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
 import me.tofaa.entitylib.meta.EntityMeta;
-import me.tofaa.entitylib.meta.display.AbstractDisplayMeta;
 import me.tofaa.entitylib.meta.display.TextDisplayMeta;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.TextDisplay;
@@ -45,22 +44,13 @@ public class EntityTextDisplay extends EntityDisplay<EntityTextDisplay> {
     protected TextDisplayMeta createMeta() {
         TextDisplayMeta meta = (TextDisplayMeta) EntityMeta.createMeta(this.entityID, EntityTypes.TEXT_DISPLAY);
         meta.setText(getTextAsComponent());
-        meta.setInterpolationDelay(-1);
-        meta.setTransformationInterpolationDuration(this.interpolationDurationTransformation);
-        meta.setPositionRotationInterpolationDuration(this.interpolationDurationRotation);
-        meta.setTranslation(toVector3f(this.translation));
-        meta.setScale(toVector3f(this.scale));
-        meta.setBillboardConstraints(AbstractDisplayMeta.BillboardConstraints.valueOf(this.billboard.name()));
         meta.setLineWidth(this.maxLineWidth);
-        meta.setViewRange((float) this.viewRange);
         meta.setBackgroundColor(this.backgroundColor);
         meta.setTextOpacity(this.textOpacity);
         meta.setShadow(this.shadow);
         meta.setSeeThrough(this.seeThroughBlocks);
-        meta.setBrightnessOverride(this.brightnessOverride);
-        meta.setRightRotation(this.rightRotation);
-        meta.setLeftRotation(this.leftRotation);
         applyAlignment(meta);
+        applyDisplayMeta(meta);
         return meta;
     }
 

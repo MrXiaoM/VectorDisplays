@@ -6,7 +6,6 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import me.tofaa.entitylib.meta.EntityMeta;
-import me.tofaa.entitylib.meta.display.AbstractDisplayMeta;
 import me.tofaa.entitylib.meta.display.ItemDisplayMeta;
 import org.bukkit.inventory.ItemStack;
 
@@ -40,16 +39,7 @@ public class EntityItemDisplay extends EntityDisplay<EntityItemDisplay> {
         ItemDisplayMeta meta = (ItemDisplayMeta) EntityMeta.createMeta(this.entityID, EntityTypes.ITEM_DISPLAY);
         meta.setItem(itemAsPacket);
         meta.setDisplayType(displayType);
-        meta.setInterpolationDelay(-1);
-        meta.setTransformationInterpolationDuration(this.interpolationDurationTransformation);
-        meta.setPositionRotationInterpolationDuration(this.interpolationDurationRotation);
-        meta.setTranslation(toVector3f(this.translation));
-        meta.setScale(toVector3f(this.scale));
-        meta.setBillboardConstraints(AbstractDisplayMeta.BillboardConstraints.valueOf(this.billboard.name()));
-        meta.setViewRange((float) this.viewRange);
-        meta.setBrightnessOverride(this.brightnessOverride);
-        meta.setRightRotation(this.rightRotation);
-        meta.setLeftRotation(this.leftRotation);
+        applyDisplayMeta(meta);
         return meta;
     }
 

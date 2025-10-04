@@ -1,6 +1,7 @@
 package top.mrxiaom.hologram.vector.displays.hologram;
 
 import com.github.retrooper.packetevents.util.Quaternion4f;
+import me.tofaa.entitylib.meta.display.AbstractDisplayMeta;
 import org.bukkit.entity.Display;
 import org.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.hologram.utils.Vector3F;
@@ -14,15 +15,32 @@ public abstract class EntityDisplay<This extends AbstractEntity<This>> extends A
 
     protected int interpolationDurationRotation = 10;
     protected int interpolationDurationTransformation = 10;
-    protected double viewRange = 1.0;
+    protected float viewRange = 1.0f;
     protected Display.Billboard billboard = Display.Billboard.CENTER;
     protected int brightnessOverride = -1;
     protected EntityDisplay(RenderMode renderMode) {
         super(renderMode);
     }
 
+    protected void applyDisplayMeta(AbstractDisplayMeta meta) {
+        meta.setInterpolationDelay(-1);
+        meta.setTransformationInterpolationDuration(this.interpolationDurationTransformation);
+        meta.setPositionRotationInterpolationDuration(this.interpolationDurationRotation);
+        meta.setTranslation(toVector3f(this.translation));
+        meta.setScale(toVector3f(this.scale));
+        meta.setBillboardConstraints(AbstractDisplayMeta.BillboardConstraints.valueOf(this.billboard.name()));
+        meta.setViewRange(this.viewRange);
+        meta.setBrightnessOverride(this.brightnessOverride);
+        meta.setRightRotation(this.rightRotation);
+        meta.setLeftRotation(this.leftRotation);
+    }
+
     public Vector3F getScale() {
         return new Vector3F(this.scale.x, this.scale.y, this.scale.z);
+    }
+
+    public This setScale(float scale) {
+        return setScale(scale, scale, scale);
     }
 
     public This setScale(float x, float y, float z) {
@@ -105,11 +123,11 @@ public abstract class EntityDisplay<This extends AbstractEntity<This>> extends A
         return $this();
     }
 
-    public double getViewRange() {
+    public float getViewRange() {
         return viewRange;
     }
 
-    public This setViewRange(double viewRange) {
+    public This setViewRange(float viewRange) {
         this.viewRange = viewRange;
         return $this();
     }
