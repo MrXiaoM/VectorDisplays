@@ -1,0 +1,74 @@
+package top.mrxiaom.hologram.vector.displays.hologram;
+
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
+import com.github.retrooper.packetevents.util.Vector3d;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
+import io.github.retrooper.packetevents.util.SpigotConversionUtil;
+import me.tofaa.entitylib.meta.EntityMeta;
+import me.tofaa.entitylib.meta.display.AbstractDisplayMeta;
+import me.tofaa.entitylib.meta.display.ItemDisplayMeta;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.Optional;
+import java.util.UUID;
+
+public class EntityItemDisplay extends EntityDisplay<EntityItemDisplay> {
+
+    private ItemStack itemStack;
+    private com.github.retrooper.packetevents.protocol.item.ItemStack itemAsPacket = com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY;
+    private ItemDisplayMeta.DisplayType displayType = ItemDisplayMeta.DisplayType.NONE;
+
+    public EntityItemDisplay(RenderMode renderMode) {
+        super(renderMode);
+        startRunnable();
+    }
+
+    public EntityItemDisplay() {
+        this(RenderMode.NEARBY);
+    }
+
+    @Override
+    public PacketWrapper<?> buildSpawnPacket() {
+        return new WrapperPlayServerSpawnEntity(
+                entityID, Optional.of(UUID.randomUUID()), EntityTypes.ITEM_DISPLAY,
+                new Vector3d(location.getX(), location.getY() + 1, location.getZ()), 0f, 0f, 0f, 0, Optional.empty()
+        );
+    }
+
+    protected ItemDisplayMeta createMeta() {
+        ItemDisplayMeta meta = (ItemDisplayMeta) EntityMeta.createMeta(this.entityID, EntityTypes.ITEM_DISPLAY);
+        meta.setItem(itemAsPacket);
+        meta.setDisplayType(displayType);
+        meta.setInterpolationDelay(-1);
+        meta.setTransformationInterpolationDuration(this.interpolationDurationTransformation);
+        meta.setPositionRotationInterpolationDuration(this.interpolationDurationRotation);
+        meta.setTranslation(toVector3f(this.translation));
+        meta.setScale(toVector3f(this.scale));
+        meta.setBillboardConstraints(AbstractDisplayMeta.BillboardConstraints.valueOf(this.billboard.name()));
+        meta.setViewRange((float) this.viewRange);
+        meta.setBrightnessOverride(this.brightnessOverride);
+        meta.setRightRotation(this.rightRotation);
+        meta.setLeftRotation(this.leftRotation);
+        return meta;
+    }
+
+    public ItemStack getItemStack() {
+        return itemStack;
+    }
+
+    public EntityItemDisplay setItemStack(ItemStack itemStack) {
+        this.itemStack = itemStack;
+        this.itemAsPacket = SpigotConversionUtil.fromBukkitItemStack(itemStack);
+        return this;
+    }
+
+    public ItemDisplayMeta.DisplayType getDisplayType() {
+        return displayType;
+    }
+
+    public EntityItemDisplay setDisplayType(ItemDisplayMeta.DisplayType displayType) {
+        this.displayType = displayType;
+        return this;
+    }
+}
