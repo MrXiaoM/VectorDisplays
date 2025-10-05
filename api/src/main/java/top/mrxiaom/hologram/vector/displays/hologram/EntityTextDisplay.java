@@ -43,22 +43,18 @@ public class EntityTextDisplay extends EntityDisplay<EntityTextDisplay> {
 
     protected TextDisplayMeta createMeta() {
         TextDisplayMeta meta = (TextDisplayMeta) EntityMeta.createMeta(this.entityID, EntityTypes.TEXT_DISPLAY);
+        applyDisplayMeta(meta);
         meta.setText(getTextAsComponent());
         meta.setLineWidth(this.maxLineWidth);
         meta.setBackgroundColor(this.backgroundColor);
         meta.setTextOpacity(this.textOpacity);
         meta.setShadow(this.shadow);
         meta.setSeeThrough(this.seeThroughBlocks);
-        applyAlignment(meta);
-        applyDisplayMeta(meta);
-        return meta;
-    }
-
-    private void applyAlignment(TextDisplayMeta meta) {
         switch (this.alignment) {
             case LEFT -> meta.setAlignLeft(true);
             case RIGHT -> meta.setAlignRight(true);
         }
+        return meta;
     }
 
     public Component getTextAsComponent() {
