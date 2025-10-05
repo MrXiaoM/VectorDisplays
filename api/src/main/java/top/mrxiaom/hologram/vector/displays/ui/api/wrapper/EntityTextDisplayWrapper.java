@@ -1,4 +1,4 @@
-package top.mrxiaom.hologram.vector.displays.ui.api;
+package top.mrxiaom.hologram.vector.displays.ui.api.wrapper;
 
 import org.bukkit.entity.TextDisplay;
 import org.jetbrains.annotations.NotNull;

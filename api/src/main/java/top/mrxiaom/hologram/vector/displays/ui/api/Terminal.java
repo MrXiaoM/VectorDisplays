@@ -13,6 +13,7 @@ import top.mrxiaom.hologram.vector.displays.hologram.AbstractEntity;
 import top.mrxiaom.hologram.vector.displays.hologram.HologramAPI;
 import top.mrxiaom.hologram.vector.displays.hologram.RenderMode;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
+import top.mrxiaom.hologram.vector.displays.ui.api.wrapper.EntityTextDisplayWrapper;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
 

@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.hologram.vector.displays.hologram.RenderMode;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
+import top.mrxiaom.hologram.vector.displays.ui.api.wrapper.EntityTextDisplayWrapper;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 
 public abstract class TextElement<This extends Element<This, EntityTextDisplay>> extends Element<This, EntityTextDisplay> implements EntityTextDisplayWrapper<This> {
@@ -40,7 +41,7 @@ public abstract class TextElement<This extends Element<This, EntityTextDisplay>>
     @Override
     protected void setTerminal(@NotNull Terminal<?> terminal) {
         super.setTerminal(terminal);
-        this.hologram.setRightRotation(terminal.getRotation());
+        this.hologram.setRightRotation(getRotation());
     }
 
     /**

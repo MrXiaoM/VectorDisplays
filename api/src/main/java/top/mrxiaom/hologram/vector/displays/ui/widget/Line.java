@@ -98,7 +98,7 @@ public class Line extends TextElement<Line> {
 
     @Override
     public float[] getRotation() {
-        return rotation;
+        return rotation == null ? super.getRotation() : rotation;
     }
 
     /**

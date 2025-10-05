@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityItemDisplay;
 import top.mrxiaom.hologram.vector.displays.hologram.RenderMode;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
+import top.mrxiaom.hologram.vector.displays.ui.api.wrapper.EntityItemDisplayWrapper;
 
 public abstract class ItemElement<This extends Element<This, EntityItemDisplay>> extends Element<This, EntityItemDisplay> implements EntityItemDisplayWrapper<This> {
     protected float scaleZ = 1.0f;
@@ -33,7 +34,7 @@ public abstract class ItemElement<This extends Element<This, EntityItemDisplay>>
     @Override
     protected void setTerminal(@NotNull Terminal<?> terminal) {
         super.setTerminal(terminal);
-        this.hologram.setRightRotation(terminal.getRotation());
+        this.hologram.setRightRotation(getRotation());
     }
 
     @Override

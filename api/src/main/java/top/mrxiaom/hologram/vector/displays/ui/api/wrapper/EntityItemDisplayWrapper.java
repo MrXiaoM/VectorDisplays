@@ -1,6 +1,5 @@
-package top.mrxiaom.hologram.vector.displays.ui.api;
+package top.mrxiaom.hologram.vector.displays.ui.api.wrapper;
 
-import me.tofaa.entitylib.meta.display.ItemDisplayMeta;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityItemDisplay;

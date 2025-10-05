@@ -9,7 +9,7 @@ import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import me.tofaa.entitylib.meta.EntityMeta;
 import me.tofaa.entitylib.meta.display.ItemDisplayMeta;
 import org.bukkit.inventory.ItemStack;
-import top.mrxiaom.hologram.vector.displays.ui.api.DisplayType;
+import top.mrxiaom.hologram.vector.displays.ui.api.wrapper.DisplayType;
 
 import java.util.Optional;
 import java.util.UUID;
