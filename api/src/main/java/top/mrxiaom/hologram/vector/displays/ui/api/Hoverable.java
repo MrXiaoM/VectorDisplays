@@ -13,20 +13,20 @@ import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 public interface Hoverable {
     void tryUpdateHoverState(boolean hover);
 
-    static boolean handleHover(Terminal<?> terminal, EntityTextDisplay entity) {
+    static boolean handleHover(Terminal<?> terminal, float[] additionalRotation, EntityTextDisplay entity) {
         for (Player player : Bukkit.getOnlinePlayers()) {
             Location eyeLocation = player.getEyeLocation();
-            Location point = HologramUtils.raytraceHologram(terminal, entity, eyeLocation);
+            Location point = HologramUtils.raytraceHologram(terminal, additionalRotation, entity, eyeLocation);
             if (point != null && eyeLocation.distance(point) <= terminal.getInteractDistance()) {
                 return true;
             }
         }
         return false;
     }
-    static boolean handleHover(Terminal<?> terminal, EntityItemDisplay entity) {
+    static boolean handleHover(Terminal<?> terminal, float[] additionalRotation, EntityItemDisplay entity) {
         for (Player player : Bukkit.getOnlinePlayers()) {
             Location eyeLocation = player.getEyeLocation();
-            Location point = HologramUtils.raytraceHologram(terminal, entity, eyeLocation);
+            Location point = HologramUtils.raytraceHologram(terminal, additionalRotation, entity, eyeLocation);
             if (point != null && eyeLocation.distance(point) <= terminal.getInteractDistance()) {
                 return true;
             }

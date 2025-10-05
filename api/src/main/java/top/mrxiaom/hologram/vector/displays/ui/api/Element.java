@@ -11,6 +11,7 @@ import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
 import top.mrxiaom.hologram.vector.displays.ui.EnumAlign;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.event.TimerTickEvent;
+import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
 
 /**
  * 悬浮字界面元素
@@ -24,6 +25,7 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
     protected double width, height;
     private TimerTickEvent<This> timerTickEvent;
     protected final @NotNull Entity hologram;
+    private float @Nullable [] additionalRotation = null;
     public Element(@NotNull String id) {
         this.id = id;
         this.hologram = createHologram();
@@ -104,6 +106,50 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
         this.scaleX = scaleX;
         this.scaleY = scaleY;
         return $this();
+    }
+
+    /**
+     * 获取元素的额外旋转量 (四元数)
+     * @return <code>null</code> 代表不进行额外旋转
+     */
+    public float @Nullable [] getAdditionalRotation() {
+        return additionalRotation;
+    }
+
+    /**
+     * 设置元素的额外旋转量 (四元数)
+     * @param additionalRotation <code>null</code> 代表不进行额外旋转
+     */
+    public This setAdditionalRotation(float @Nullable [] additionalRotation) {
+        this.additionalRotation = additionalRotation;
+        return $this();
+    }
+
+    /**
+     * 设置元素的额外旋转量 (欧拉角)
+     * @param yaw 偏航角
+     * @param pitch 俯仰角
+     * @param roll 翻滚角
+     */
+    public This setAdditionalRotation(float yaw, float pitch, float roll) {
+        return setAdditionalRotation(QuaternionUtils.fromEulerYXZtoQuaternion(yaw, pitch, roll));
+    }
+
+    /**
+     * 设置元素的额外旋转量 (欧拉角)
+     * @param yaw 偏航角
+     * @param pitch 俯仰角
+     */
+    public This setAdditionalRotation(float yaw, float pitch) {
+        return setAdditionalRotation(yaw, pitch, 0.0f);
+    }
+
+    /**
+     * 设置元素的额外旋转量 (欧拉角)
+     * @param roll 翻滚角
+     */
+    public This setAdditionalRotation(float roll) {
+        return setAdditionalRotation(0.0f, 0.0f, roll);
     }
 
     /**
@@ -234,7 +280,10 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
     }
 
     public float[] getRotation() {
-        return terminal.getRotation();
+        if (additionalRotation == null) {
+            return terminal.getRotation();
+        }
+        return QuaternionUtils.multiplyF(terminal.getRotation(), additionalRotation);
     }
 
     /**

@@ -458,10 +458,10 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         for (Element<?, ?> element : elements) {
             Location point = null;
             if (element.getEntity() instanceof EntityTextDisplay txt) {
-                point = HologramUtils.raytraceHologram(this, txt, eyeLocation);
+                point = HologramUtils.raytraceHologram(this, element.getAdditionalRotation(), txt, eyeLocation);
             }
             if (element.getEntity() instanceof EntityItemDisplay item) {
-                point = HologramUtils.raytraceHologram(this, item, eyeLocation);
+                point = HologramUtils.raytraceHologram(this, element.getAdditionalRotation(), item, eyeLocation);
             }
             if (point != null && eyeLocation.distance(point) <= getInteractDistance()) {
                 element.performClick(player, action);

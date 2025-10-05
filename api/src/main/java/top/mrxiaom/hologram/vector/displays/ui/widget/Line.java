@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.hologram.vector.displays.ui.EnumAlign;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.api.Element;
@@ -197,5 +198,29 @@ public class Line extends TextElement<Line> {
     @Deprecated
     public Line setPos(double x, double y) {
         return super.setPos(x, y);
+    }
+
+    @Override
+    @Deprecated
+    public float @Nullable [] getAdditionalRotation() {
+        return null;
+    }
+
+    @Override
+    @Deprecated
+    public Line setAdditionalRotation(float @Nullable [] additionalRotation) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    @Deprecated
+    public Line setAdditionalRotation(float yaw, float pitch, float roll) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    @Deprecated
+    public Line setAdditionalRotation(float yaw, float pitch) {
+        throw new UnsupportedOperationException();
     }
 }

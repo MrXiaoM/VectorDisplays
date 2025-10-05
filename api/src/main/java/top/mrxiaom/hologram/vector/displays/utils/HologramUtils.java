@@ -92,7 +92,7 @@ public class HologramUtils {
      * @return 如果视线没有落在悬浮字上，返回 <code>null</code>
      */
     @Nullable
-    public static Location raytraceHologram(@NotNull Terminal<?> terminal, @NotNull EntityTextDisplay hologram, @NotNull Location eyeLocation) {
+    public static Location raytraceHologram(@NotNull Terminal<?> terminal, float @Nullable [] additionalRotation, @NotNull EntityTextDisplay hologram, @NotNull Location eyeLocation) {
         // 计算悬浮字长宽
         double width = getWidth(hologram);
         double height = getHeight(hologram);
@@ -115,7 +115,12 @@ public class HologramUtils {
         loc4.setX(loc4.getX() + (width / 2.0) + paddingHorizontal);
         loc4.setY(loc3.getY() - paddingVertical);
         // 获取终端面板的旋转四元数，进行变换后再输入计算交点
-        float[] r = terminal.getRotation();
+        float[] r;
+        if (additionalRotation == null) {
+            r = terminal.getRotation();
+        } else {
+            r = QuaternionUtils.multiplyF(terminal.getRotation(), additionalRotation);
+        }
         // 计算交点
         return calculateIntersection(
                 eyeLocation,
@@ -133,7 +138,7 @@ public class HologramUtils {
      * @return 如果视线没有落在悬浮字上，返回 <code>null</code>
      */
     @Nullable
-    public static Location raytraceHologram(@NotNull Terminal<?> terminal, @NotNull EntityItemDisplay hologram, @NotNull Location eyeLocation) {
+    public static Location raytraceHologram(@NotNull Terminal<?> terminal, float @Nullable [] additionalRotation, @NotNull EntityItemDisplay hologram, @NotNull Location eyeLocation) {
         // 计算悬浮字长宽
         double width = getWidth(hologram);
         double height = getHeight(hologram);
@@ -155,7 +160,12 @@ public class HologramUtils {
         loc4.setX(loc4.getX() + (width / 2.0) + paddingHorizontal);
         loc4.setY(loc3.getY() - (height / 2.0) - paddingVertical);
         // 获取终端面板的旋转四元数，进行变换后再输入计算交点
-        float[] r = terminal.getRotation();
+        float[] r;
+        if (additionalRotation == null) {
+            r = terminal.getRotation();
+        } else {
+            r = QuaternionUtils.multiplyF(terminal.getRotation(), additionalRotation);
+        }
         // 计算交点
         return calculateIntersection(
                 eyeLocation,
