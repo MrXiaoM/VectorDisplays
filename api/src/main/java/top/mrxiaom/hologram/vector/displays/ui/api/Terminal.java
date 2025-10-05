@@ -62,11 +62,17 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         }
     }
 
+    public This setOnPreDispose(Runnable actionPreDispose) {
+        return setOnPreDispose(t -> actionPreDispose.run());
+    }
     public This setOnPreDispose(Consumer<This> actionPreDispose) {
         this.actionPreDispose = actionPreDispose;
         return $this();
     }
 
+    public This setOnPostDispose(Runnable actionPostDispose) {
+        return setOnPostDispose(t -> actionPostDispose.run());
+    }
     public This setOnPostDispose(Consumer<This> actionPostDispose) {
         this.actionPostDispose = actionPostDispose;
         return $this();
@@ -413,11 +419,17 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         this.interactDistance = interactDistance;
     }
 
+    public This setOnPreTimerTick(Runnable actionPreTimerTick) {
+        return setOnPreTimerTick(t -> actionPreTimerTick.run());
+    }
     public This setOnPreTimerTick(Consumer<This> actionPreTimerTick) {
         this.actionPreTimerTick = actionPreTimerTick;
         return $this();
     }
 
+    public This setOnPostTimerTick(Runnable actionPostTimerTick) {
+        return setOnPostTimerTick(t -> actionPostTimerTick.run());
+    }
     public This setOnPostTimerTick(Consumer<This> actionPostTimerTick) {
         this.actionPostTimerTick = actionPostTimerTick;
         return $this();
