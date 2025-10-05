@@ -1,10 +1,12 @@
 package top.mrxiaom.hologram.vector.displays.hologram;
 
+import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityTeleport;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import me.tofaa.entitylib.meta.EntityMeta;
+import me.tofaa.entitylib.wrapper.WrapperEntity;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -26,6 +28,7 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     protected long updateTaskPeriod = 20L * 3;
     protected double nearbyEntityScanningDistance = 40.0;
 
+    protected WrapperEntity entity;
     protected int entityID;
 
     protected final RenderMode renderMode;
@@ -41,6 +44,8 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
             throw new IllegalStateException("HologramAPI is not initialized!");
         }
         this.plugin = plugin;
+        this.entity = new WrapperEntity(getEntityType());
+        this.entityID = entity.getEntityId();
         this.renderMode = renderMode;
     }
 
@@ -54,6 +59,8 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         task = plugin.getScheduler().runTaskTimer(this::updateAffectedPlayers, 20L, updateTaskPeriod);
     }
 
+    protected abstract EntityType getEntityType();
+
     /**
      * Use HologramManager#spawn(TextHologram.class, Location.class); instead!
      * Only if you want to manage the holograms yourself and don't want to use the animation system use this
@@ -61,7 +68,6 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     public void spawn(Location location) {
         if (!dead) kill();
         this.location = location;
-        entityID = ThreadLocalRandom.current().nextInt(4000, Integer.MAX_VALUE);
         PacketWrapper<?> packet = buildSpawnPacket();
         plugin.getScheduler().runTask(() -> {
             updateAffectedPlayers();

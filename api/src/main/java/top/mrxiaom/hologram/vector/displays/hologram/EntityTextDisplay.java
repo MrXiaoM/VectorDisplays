@@ -1,5 +1,6 @@
 package top.mrxiaom.hologram.vector.displays.hologram;
 
+import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -34,15 +35,20 @@ public class EntityTextDisplay extends EntityDisplay<EntityTextDisplay> {
     }
 
     @Override
+    protected EntityType getEntityType() {
+        return EntityTypes.TEXT_DISPLAY;
+    }
+
+    @Override
     public PacketWrapper<?> buildSpawnPacket() {
         return new WrapperPlayServerSpawnEntity(
-                entityID, Optional.of(UUID.randomUUID()), EntityTypes.TEXT_DISPLAY,
+                entityID, Optional.of(UUID.randomUUID()), getEntityType(),
                 new Vector3d(location.getX(), location.getY() + 1, location.getZ()), 0f, 0f, 0f, 0, Optional.empty()
         );
     }
 
     protected TextDisplayMeta createMeta() {
-        TextDisplayMeta meta = (TextDisplayMeta) EntityMeta.createMeta(this.entityID, EntityTypes.TEXT_DISPLAY);
+        TextDisplayMeta meta = (TextDisplayMeta) EntityMeta.createMeta(this.entityID, getEntityType());
         applyDisplayMeta(meta);
         meta.setText(getTextAsComponent());
         meta.setLineWidth(this.maxLineWidth);
