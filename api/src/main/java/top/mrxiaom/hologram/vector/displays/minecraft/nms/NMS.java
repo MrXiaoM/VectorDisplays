@@ -17,8 +17,10 @@ public class NMS {
             craft = "v1_19_R3";
         } else if (minor == 20 && (patch == 3 || patch == 4)) { // 1.20.3-1.20.4
             craft = "v1_20_R3";
-        } else { // 1.20.5 及以上通用
+        } else if (minor == 20 || (minor == 21 && patch <= 4)) { // 1.20.5-1.21.4
             craft = "v1_20_R4";
+        } else { // 1.21.5 及以上通用
+            craft = "v1_21_R4";
         }
         String className = NMS.class.getPackageName() + "." + craft + ".Factory";
         try {
