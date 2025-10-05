@@ -18,11 +18,11 @@ public interface EntityItemDisplayWrapper<This> extends EntityDisplayWrapper<Thi
         return $this();
     }
 
-    default ItemDisplayMeta.DisplayType getDisplayType() {
+    default DisplayType getDisplayType() {
         return getHologram().getDisplayType();
     }
 
-    default This setDisplayType(ItemDisplayMeta.DisplayType displayType) {
+    default This setDisplayType(DisplayType displayType) {
         getHologram().setDisplayType(displayType);
         return $this();
     }

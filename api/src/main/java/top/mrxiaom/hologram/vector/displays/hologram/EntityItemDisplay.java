@@ -8,6 +8,7 @@ import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import me.tofaa.entitylib.meta.EntityMeta;
 import me.tofaa.entitylib.meta.display.ItemDisplayMeta;
 import org.bukkit.inventory.ItemStack;
+import top.mrxiaom.hologram.vector.displays.ui.api.DisplayType;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -16,7 +17,7 @@ public class EntityItemDisplay extends EntityDisplay<EntityItemDisplay> {
 
     private ItemStack itemStack;
     private com.github.retrooper.packetevents.protocol.item.ItemStack itemAsPacket = com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY;
-    private ItemDisplayMeta.DisplayType displayType = ItemDisplayMeta.DisplayType.NONE;
+    private DisplayType displayType = DisplayType.NONE;
 
     public EntityItemDisplay(RenderMode renderMode) {
         super(renderMode);
@@ -38,7 +39,7 @@ public class EntityItemDisplay extends EntityDisplay<EntityItemDisplay> {
     protected ItemDisplayMeta createMeta() {
         ItemDisplayMeta meta = (ItemDisplayMeta) EntityMeta.createMeta(this.entityID, EntityTypes.ITEM_DISPLAY);
         meta.setItem(itemAsPacket);
-        meta.setDisplayType(displayType);
+        meta.setDisplayType(displayType.toEntityLib());
         applyDisplayMeta(meta);
         return meta;
     }
@@ -53,11 +54,11 @@ public class EntityItemDisplay extends EntityDisplay<EntityItemDisplay> {
         return this;
     }
 
-    public ItemDisplayMeta.DisplayType getDisplayType() {
+    public DisplayType getDisplayType() {
         return displayType;
     }
 
-    public EntityItemDisplay setDisplayType(ItemDisplayMeta.DisplayType displayType) {
+    public EntityItemDisplay setDisplayType(DisplayType displayType) {
         this.displayType = displayType;
         return this;
     }
