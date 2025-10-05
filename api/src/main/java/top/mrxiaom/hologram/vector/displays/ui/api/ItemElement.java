@@ -8,6 +8,7 @@ import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.api.wrapper.EntityItemDisplayWrapper;
 
 public abstract class ItemElement<This extends Element<This, EntityItemDisplay>> extends Element<This, EntityItemDisplay> implements EntityItemDisplayWrapper<This> {
+    public static final double scaleWidth = 48, scaleHeight = 48;
     protected float scaleZ = 1.0f;
     public ItemElement(@NotNull String id) {
         super(id);
@@ -62,8 +63,8 @@ public abstract class ItemElement<This extends Element<This, EntityItemDisplay>>
     @Override
     public void calculateSize() {
         // TODO: 确定大小
-        this.width = 32 * HologramFont.getCharScale() * scaleX;
-        this.height = 32 * HologramFont.getCharScale() * scaleY;
+        this.width = scaleWidth * HologramFont.getCharScale() * scaleX;
+        this.height = scaleHeight * HologramFont.getCharScale() * scaleY;
     }
 
     @Override

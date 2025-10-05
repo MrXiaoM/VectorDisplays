@@ -7,8 +7,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.mrxiaom.hologram.vector.displays.hologram.EntityItemDisplay;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
+import top.mrxiaom.hologram.vector.displays.ui.api.ItemElement;
 import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
 
 public class HologramUtils {
@@ -64,7 +66,25 @@ public class HologramUtils {
     }
 
     /**
-     * 获取玩家的视线落在了悬浮字上的世界坐标
+     * 获取悬浮字在世界坐标上的宽度
+     *
+     * @param hologram 悬浮字
+     */
+    public static double getWidth(EntityItemDisplay hologram) {
+        return ItemElement.scaleWidth * HologramFont.getCharScale() * hologram.getScale().x;
+    }
+
+    /**
+     * 获取悬浮字在世界坐标上的高度
+     *
+     * @param hologram 悬浮字
+     */
+    public static double getHeight(EntityItemDisplay hologram) {
+        return ItemElement.scaleHeight * HologramFont.getCharScale() * hologram.getScale().y;
+    }
+
+    /**
+     * 获取玩家的视线落在了文本悬浮字上的世界坐标
      *
      * @param terminal 终端面板
      * @param hologram 悬浮字
@@ -82,16 +102,16 @@ public class HologramUtils {
         // 悬浮字四角顶点
         double paddingHorizontal = 0.02;
         double paddingVertical = 0.01;
-        Location loc1 = loc.clone();
+        Location loc1 = loc.clone(); // 左上角
         loc1.setX(loc1.getX() - (width / 2.0) - paddingHorizontal);
         loc1.setY(loc1.getY() + height + paddingVertical);
-        Location loc2 = loc.clone();
+        Location loc2 = loc.clone(); // 右上角
         loc2.setX(loc2.getX() + (width / 2.0) + paddingHorizontal);
         loc2.setY(loc2.getY() + height + paddingVertical);
-        Location loc3 = loc.clone();
+        Location loc3 = loc.clone(); // 左下角
         loc3.setX(loc3.getX() - (width / 2.0) - paddingHorizontal);
         loc3.setY(loc3.getY() - paddingVertical);
-        Location loc4 = loc.clone();
+        Location loc4 = loc.clone(); // 右下角
         loc4.setX(loc4.getX() + (width / 2.0) + paddingHorizontal);
         loc4.setY(loc3.getY() - paddingVertical);
         // 获取终端面板的旋转四元数，进行变换后再输入计算交点
@@ -104,7 +124,46 @@ public class HologramUtils {
                 QuaternionUtils.rotateChildren(loc, r, loc3),
                 QuaternionUtils.rotateChildren(loc, r, loc4));
     }
-
+    /**
+     * 获取玩家的视线落在了物品悬浮字上的世界坐标
+     *
+     * @param terminal 终端面板
+     * @param hologram 悬浮字
+     * @param eyeLocation 玩家视线位置，<code>player.getEyeLocation()</code>
+     * @return 如果视线没有落在悬浮字上，返回 <code>null</code>
+     */
+    @Nullable
+    public static Location raytraceHologram(@NotNull Terminal<?> terminal, @NotNull EntityItemDisplay hologram, @NotNull Location eyeLocation) {
+        // 计算悬浮字长宽
+        double width = getWidth(hologram);
+        double height = getHeight(hologram);
+        // 悬浮字中间坐标
+        Location loc = hologram.getLocation().clone();loc.setY(loc.getY() + 1);
+        // 悬浮字四角顶点
+        double paddingHorizontal = 0.01;
+        double paddingVertical = 0.01;
+        Location loc1 = loc.clone(); // 左上角
+        loc1.setX(loc1.getX() - (width / 2.0) - paddingHorizontal);
+        loc1.setY(loc1.getY() + (height / 2.0) + paddingVertical);
+        Location loc2 = loc.clone(); // 右上角
+        loc2.setX(loc2.getX() + (width / 2.0) + paddingHorizontal);
+        loc2.setY(loc2.getY() + (height / 2.0) + paddingVertical);
+        Location loc3 = loc.clone(); // 左下角
+        loc3.setX(loc3.getX() - (width / 2.0) - paddingHorizontal);
+        loc3.setY(loc3.getY() - (height / 2.0) - paddingVertical);
+        Location loc4 = loc.clone(); // 右下角
+        loc4.setX(loc4.getX() + (width / 2.0) + paddingHorizontal);
+        loc4.setY(loc3.getY() - (height / 2.0) - paddingVertical);
+        // 获取终端面板的旋转四元数，进行变换后再输入计算交点
+        float[] r = terminal.getRotation();
+        // 计算交点
+        return calculateIntersection(
+                eyeLocation,
+                QuaternionUtils.rotateChildren(loc, r, loc1),
+                QuaternionUtils.rotateChildren(loc, r, loc2),
+                QuaternionUtils.rotateChildren(loc, r, loc3),
+                QuaternionUtils.rotateChildren(loc, r, loc4));
+    }
     /**
      * 计算射线与平面上矩形的交点 (豆包AI 生成)
      *
