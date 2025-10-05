@@ -284,7 +284,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
 
     /**
      * 设置悬浮字的旋转角度，以欧拉角形式。<br>
-     * 这个函数会将欧拉角 (YXZ 顺序) 转换为四元数，并应用到悬浮字的 <code>right_rotation</code>
+     * 这个函数会将欧拉角 (YXZ 顺序) 转换为四元数，并应用到悬浮字的 <code>left_rotation</code>
      * @param yaw 偏航角
      * @param pitch 俯仰角
      */
@@ -294,7 +294,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
 
     /**
      * 设置悬浮字的旋转角度，以欧拉角形式。<br>
-     * 这个函数会将欧拉角 (YXZ 顺序) 转换为四元数，并应用到悬浮字的 <code>right_rotation</code>
+     * 这个函数会将欧拉角 (YXZ 顺序) 转换为四元数，并应用到悬浮字的 <code>left_rotation</code>
      * @param yaw 偏航角
      * @param pitch 俯仰角
      */
@@ -304,7 +304,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
 
     /**
      * 设置悬浮字的旋转角度，以四元数形式。<br>
-     * 这会应用到悬浮字的 <code>right_rotation</code>
+     * 这会应用到悬浮字的 <code>left_rotation</code>
      */
     public void setRotation(float x, float y, float z, float w) {
         setRotation(new float[] { x, y, z, w });
@@ -312,10 +312,10 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
 
     /**
      * 设置悬浮字的旋转角度，以四元数形式。<br>
-     * 这会应用到悬浮字的 <code>right_rotation</code>
+     * 这会应用到悬浮字的 <code>left_rotation</code>
      */
     public void setRotation(float[] rotation) {
-        hologram.setRightRotation(this.rotation = rotation);
+        hologram.setLeftRotation(this.rotation = rotation);
     }
 
     /**

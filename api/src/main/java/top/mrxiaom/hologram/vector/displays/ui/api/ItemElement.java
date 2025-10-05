@@ -32,12 +32,6 @@ public abstract class ItemElement<This extends Element<This, EntityItemDisplay>>
     }
 
     @Override
-    protected void setTerminal(@NotNull Terminal<?> terminal) {
-        super.setTerminal(terminal);
-        this.hologram.setRightRotation(getRotation());
-    }
-
-    @Override
     public This setScale(float scale) {
         return setScale(scale, scale, scale);
     }
@@ -74,7 +68,7 @@ public abstract class ItemElement<This extends Element<This, EntityItemDisplay>>
 
     @Override
     public void init() {
-        hologram.setRightRotation(getRotation());
+        hologram.setLeftRotation(getRotation());
         super.init();
     }
 }

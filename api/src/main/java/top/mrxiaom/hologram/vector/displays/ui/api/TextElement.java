@@ -38,12 +38,6 @@ public abstract class TextElement<This extends Element<This, EntityTextDisplay>>
         return hologram;
     }
 
-    @Override
-    protected void setTerminal(@NotNull Terminal<?> terminal) {
-        super.setTerminal(terminal);
-        this.hologram.setRightRotation(getRotation());
-    }
-
     /**
      * 获取该元素的悬浮字宽度
      */
@@ -76,7 +70,7 @@ public abstract class TextElement<This extends Element<This, EntityTextDisplay>>
 
     @Override
     public void init() {
-        hologram.setRightRotation(getRotation());
+        hologram.setLeftRotation(getRotation());
         super.init();
     }
 }
