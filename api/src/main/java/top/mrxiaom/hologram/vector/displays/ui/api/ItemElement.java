@@ -1,5 +1,6 @@
 package top.mrxiaom.hologram.vector.displays.ui.api;
 
+import org.bukkit.entity.Display;
 import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityItemDisplay;
 import top.mrxiaom.hologram.vector.displays.hologram.RenderMode;
@@ -13,6 +14,9 @@ public abstract class ItemElement<This extends Element<This, EntityItemDisplay>>
     @Override
     protected EntityItemDisplay createHologram() {
         return new EntityItemDisplay(RenderMode.VIEWER_LIST)
+                .setInterpolationDurationTransformation(3)
+                .setInterpolationDurationRotation(0)
+                .setBillboard(Display.Billboard.FIXED)
                 .removeAllViewers();
     }
 
