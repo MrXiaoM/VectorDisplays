@@ -7,6 +7,7 @@ import top.mrxiaom.hologram.vector.displays.hologram.RenderMode;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 
 public abstract class ItemElement<This extends Element<This, EntityItemDisplay>> extends Element<This, EntityItemDisplay> implements EntityItemDisplayWrapper<This> {
+    protected float scaleZ = 1.0f;
     public ItemElement(@NotNull String id) {
         super(id);
     }
@@ -36,16 +37,38 @@ public abstract class ItemElement<This extends Element<This, EntityItemDisplay>>
     }
 
     @Override
+    public This setScale(float scale) {
+        return setScale(scale, scale, scale);
+    }
+
+    public This setScale(float scaleX, float scaleY, float scaleZ) {
+        this.hologram.setScale(scaleX, scaleY, scaleZ);
+        this.scaleX = scaleX;
+        this.scaleY = scaleY;
+        this.scaleZ = scaleZ;
+        return $this();
+    }
+
+    public This setScaleZ(float scaleZ) {
+        this.scaleZ = scaleZ;
+        return $this();
+    }
+
+    public float getScaleZ() {
+        return scaleZ;
+    }
+
+    @Override
+    @Deprecated
     public This setScale(float scaleX, float scaleY) {
-        this.hologram.setScale(scaleX, scaleY, 1.0f);
-        return super.setScale(scaleX, scaleY);
+        return setScale(scaleX, scaleY, scaleX);
     }
 
     @Override
     public void calculateSize() {
         // TODO: 确定大小
-        this.width = 8 * HologramFont.getCharScale();
-        this.height = 8 * HologramFont.getCharScale();
+        this.width = 32 * HologramFont.getCharScale() * scaleX;
+        this.height = 32 * HologramFont.getCharScale() * scaleY;
     }
 
     @Override
