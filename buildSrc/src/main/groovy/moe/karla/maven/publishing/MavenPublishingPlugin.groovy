@@ -6,8 +6,6 @@ import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.tasks.bundling.Zip
 
-import java.util.regex.Pattern
-
 class MavenPublishingPlugin implements Plugin<Project> {
     @Override
     void apply(Project target) {

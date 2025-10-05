@@ -18,7 +18,6 @@ import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     public static final LegacyComponentSerializer legacyText = LegacyComponentSerializer.legacySection();

@@ -3,7 +3,8 @@ package top.mrxiaom.hologram.vector.displays.hologram;
 import org.bukkit.Location;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class HologramManager {
