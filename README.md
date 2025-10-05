@@ -36,52 +36,7 @@ Minecraft 世界终端用户界面解决方案
 
 ## 快速开始 (开发者)
 
-对于需要将 VectorDisplays 作为依赖库嵌入到自己的插件里的开发者，请先阅读 [API](/api/README.md) 文档。
-
-如果只需要将 VectorDisplays 作为依赖插件，按以下步骤操作。首先添加依赖
-```kotlin
-repositories {
-    mavenCentral()
-}
-dependencies {
-    compileOnly("top.mrxiaom.hologram:VectorDisplays-API:$VERSION")
-}
-```
-创建你的第一个终端控制面板
-```java
-void create(Player player) {
-    Location eyeLocation = player.getEyeLocation().clone(); eyeLocation.setPitch(0);
-    // 获取玩家面前 2 格远的位置
-    Location loc = player.getLocation().clone().add(eyeLocation.getDirection().multiply(2));
-    // 操作面板ID, 位置, 宽度(单位为空格数), 高度(单位为行数)
-    SimpleTerminal terminal = new SimpleTerminal("test_" + player.getName(), loc, 9, 3);
-    terminal.setRotation(eyeLocation.getYaw(), -30.0f); // 设置终端面板旋转
-    // 添加按钮
-    terminal.addElement(new Button("btn1")
-            .setText("<#FF0000>测试")
-            .setScale(0.25f) // 缩放尺寸
-            .setAlign(EnumAlign.RIGHT_CENTER) // 位置对齐方式
-            .setPos(-2, 0) // 相对位置
-            .setFullBrightness() // 设置固定亮度
-            .setOnHoverStateChange(hoverBg(0x80000000, 0)) // 悬停更改背景颜色
-            .setOnClick((whoClicked, action, e) -> { // 点击执行操作
-                whoClicked.sendMessage("你以 " + action + " 方式点击了按钮 " + e.getId());
-            }));
-    // 添加线条
-    terminal.addElement(new Line("line1"), line -> {
-        // 除了链式调用以外，还可以这样
-        line.setFullBrightness();
-        line.setPos1(-5, -5);
-        line.setPos2(5, 5);
-        line.setAlign(EnumAlign.CENTER);
-    });
-    // 添加玩家到这个终端面板
-    terminal.addViewer(player);
-    // 注册并生成悬浮字
-    TerminalManager.inst().spawn(terminal);
-}
-```
-[SimpleTerminal](https://github.com/MrXiaoM/VectorDisplays/blob/main/api/src/main/java/top/mrxiaom/hologram/vector/displays/ui/SimpleTerminal.java) 仅仅是默认实现，你还可以继承抽象类 [Terminal](https://github.com/MrXiaoM/VectorDisplays/blob/main/api/src/main/java/top/mrxiaom/hologram/vector/displays/ui/api/Terminal.java) 以便更好地实现你需要的功能！
+请参阅 [MCIO Plugins](https://plugins.mcio.dev/elopers/vd/intro) 上的开发文档。
 
 ## 鸣谢
 
