@@ -51,7 +51,7 @@ public class TerminalManager implements Listener {
     }
 
     public void setTimerPeriod(long timerPeriod) {
-        if (timerPeriod == this.timerPeriod) return;
+        if (timerPeriod == this.timerPeriod && timerTask != null) return;
         this.timerPeriod = timerPeriod;
         if (this.timerTask != null) {
             this.timerTask.cancel();
