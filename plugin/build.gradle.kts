@@ -46,10 +46,9 @@ tasks {
         dependsOn(shadowJar)
         from(shadowJar.get().outputs)
         rename { "${rootProject.name}-plugin-${rootProject.version}.jar" }
-        into(project.file("out"))
+        into(rootProject.file("out"))
     }
     build { dependsOn(copyTask) }
-    clean { delete(project.file("out")) }
     processResources {
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
         from(sourceSets.main.get().resources.srcDirs) {

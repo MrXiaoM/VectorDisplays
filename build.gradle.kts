@@ -37,3 +37,7 @@ allprojects {
 mavenPublishing {
     publishingType = PublishingType.AUTOMATIC
 }
+
+tasks {
+    clean { delete(rootProject.file("out")) }
+}
