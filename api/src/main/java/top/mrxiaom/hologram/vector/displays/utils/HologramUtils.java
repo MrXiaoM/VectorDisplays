@@ -122,12 +122,7 @@ public class HologramUtils {
             r = QuaternionUtils.multiplyF(terminal.getRotation(), additionalRotation);
         }
         // 计算交点
-        return calculateIntersection(
-                eyeLocation,
-                QuaternionUtils.rotateChildren(loc, r, loc1),
-                QuaternionUtils.rotateChildren(loc, r, loc2),
-                QuaternionUtils.rotateChildren(loc, r, loc3),
-                QuaternionUtils.rotateChildren(loc, r, loc4));
+        return calculateIntersection(loc, r, loc1, loc2, loc3, loc4, eyeLocation);
     }
     /**
      * 获取玩家的视线落在了物品悬浮字上的世界坐标
@@ -143,7 +138,8 @@ public class HologramUtils {
         double width = getWidth(hologram);
         double height = getHeight(hologram);
         // 悬浮字中间坐标
-        Location loc = hologram.getLocation().clone();loc.setY(loc.getY() + 1);
+        Location loc = hologram.getLocation().clone();
+        loc.setY(loc.getY() + 1);
         // 悬浮字四角顶点
         double paddingHorizontal = 0.01;
         double paddingVertical = 0.01;
@@ -167,13 +163,68 @@ public class HologramUtils {
             r = QuaternionUtils.multiplyF(terminal.getRotation(), additionalRotation);
         }
         // 计算交点
-        return calculateIntersection(
+        return calculateIntersection(loc, r, loc1, loc2, loc3, loc4, eyeLocation);
+    }
+
+    /**
+     * 计算射线与平面上矩形的交点，要求射线与平面特定方向相同
+     * @param loc 悬浮字旋转中心坐标
+     * @param r 终端面板旋转量四元数
+     * @param loc1 矩形左上角坐标
+     * @param loc2 矩形右上角坐标
+     * @param loc3 矩形左下角坐标
+     * @param loc4 矩形右下角坐标
+     * @param eyeLocation 玩家视线位置，<code>player.getEyeLocation()</code>
+     */
+    public static Location calculateIntersection(
+            Location loc, float[] r,
+            Location loc1, Location loc2,
+            Location loc3, Location loc4,
+            Location eyeLocation
+    ) {
+        // 计算交点
+        Location point = calculateIntersection(
                 eyeLocation,
                 QuaternionUtils.rotateChildren(loc, r, loc1),
                 QuaternionUtils.rotateChildren(loc, r, loc2),
                 QuaternionUtils.rotateChildren(loc, r, loc3),
                 QuaternionUtils.rotateChildren(loc, r, loc4));
+        if (point == null) return null;
+        // 最后进行校验，要求 射线方向 和 终端面板方向 的夹角大于 90 度，才能算作成功
+        // 即玩家必须要面向终端面板的正面，才能进行悬停和点击操作
+        double[] vectorA = toDirectionVector(r);
+        double[] vectorB = toVector(eyeLocation, point);
+        double angle = Math.abs(calculateAngle(vectorA, vectorB));
+        return angle >= 90 ? point : null;
     }
+
+    /**
+     * 计算向量 AB
+     * @param locA 点A
+     * @param locB 点B
+     */
+    public static double[] toVector(Location locA, Location locB) {
+        return new double[] { locB.getX() - locA.getX(), locB.getY() - locA.getY(), locB.getZ() - locA.getZ() };
+    }
+
+    /**
+     * 将四元数转换为向量
+     * @param quaternion 四元数
+     */
+    public static double[] toDirectionVector(float[] quaternion) {
+        // 提取四元数分量并进行计算
+        float xx = quaternion[0] * quaternion[0], yy = quaternion[1] * quaternion[1], zz = quaternion[2] * quaternion[2], ww = quaternion[3] * quaternion[3];
+        float xy = quaternion[0] * quaternion[1], xz = quaternion[0] * quaternion[2], yz = quaternion[1] * quaternion[2], xw = quaternion[0] * quaternion[3];
+        float zw = quaternion[2] * quaternion[3], yw = quaternion[1] * quaternion[3], k = 1 / (xx + yy + zz + ww);
+        // 将悬浮字的默认方向 (0, 0, 1) 旋转到当前方向
+        double vX = 0, vY = 0, vZ = 1;
+        return new double[] {
+                org.joml.Math.fma((xx - yy - zz + ww) * k, vX, org.joml.Math.fma(2 * (xy - zw) * k, vY, (2 * (xz + yw) * k) * vZ)),
+                org.joml.Math.fma(2 * (xy + zw) * k, vX, org.joml.Math.fma((yy - xx - zz + ww) * k, vY, (2 * (yz - xw) * k) * vZ)),
+                org.joml.Math.fma(2 * (xz - yw) * k, vX, org.joml.Math.fma(2 * (yz + xw) * k, vY, ((zz - xx - yy + ww) * k) * vZ))
+        };
+    }
+
     /**
      * 计算射线与平面上矩形的交点 (豆包AI 生成)
      *
@@ -351,5 +402,42 @@ public class HologramUtils {
      */
     private static double dotProduct(double[] a, double[] b) {
         return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    }
+    /**
+     * 计算三维向量的模长
+     */
+    private static double magnitude(double[] vector) {
+        return Math.sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]);
+    }
+    /**
+     * 计算两个三维向量之间的夹角（角度制）
+     *
+     * @param vectorA 第一个向量，格式为 double[] {x, y, z}
+     * @param vectorB 第二个向量，格式为 double[] {x, y, z}
+     * @return 两个向量之间的夹角（角度制，范围0-180）
+     * @throws IllegalArgumentException 如果输入向量为null或长度不为3
+     */
+    public static double calculateAngle(double[] vectorA, double[] vectorB) {
+        // 计算点积
+        double dotProduct = dotProduct(vectorA, vectorB);
+
+        // 计算两个向量的模长
+        double magnitudeA = magnitude(vectorA);
+        double magnitudeB = magnitude(vectorB);
+
+        // 防止除以零
+        if (magnitudeA == 0 || magnitudeB == 0) {
+            throw new ArithmeticException("向量的模长不能为零");
+        }
+
+        // 计算cosθ
+        double cosTheta = dotProduct / (magnitudeA * magnitudeB);
+
+        // 处理由于浮点计算误差导致的略微超出范围的情况
+        cosTheta = Math.max(Math.min(cosTheta, 1.0), -1.0);
+
+        // 计算弧度并转换为角度
+        double angleRadians = Math.acos(cosTheta);
+        return Math.toDegrees(angleRadians);
     }
 }
