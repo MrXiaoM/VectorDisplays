@@ -2,6 +2,7 @@ package top.mrxiaom.hologram.vector.displays.ui.widget;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.hologram.vector.displays.ui.api.ItemElement;
@@ -12,7 +13,11 @@ import java.util.function.Supplier;
 public class Item extends ItemElement<Item> {
     private ClickEvent<Item> clickEvent;
     public Item(@NotNull String id) {
+        this(id, null);
+    }
+    public Item(@NotNull String id, @Nullable ItemStack itemStack) {
         super(id);
+        setItemStack(itemStack);
     }
 
     /**

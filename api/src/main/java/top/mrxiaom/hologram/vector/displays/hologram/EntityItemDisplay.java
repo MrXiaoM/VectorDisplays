@@ -9,6 +9,7 @@ import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import me.tofaa.entitylib.meta.EntityMeta;
 import me.tofaa.entitylib.meta.display.ItemDisplayMeta;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.hologram.vector.displays.ui.api.wrapper.DisplayType;
 
 import java.util.Optional;
@@ -16,7 +17,7 @@ import java.util.UUID;
 
 public class EntityItemDisplay extends EntityDisplay<EntityItemDisplay> {
 
-    private ItemStack itemStack;
+    private ItemStack itemStack = null;
     private com.github.retrooper.packetevents.protocol.item.ItemStack itemAsPacket = com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY;
     private DisplayType displayType = DisplayType.NONE;
 
@@ -50,13 +51,14 @@ public class EntityItemDisplay extends EntityDisplay<EntityItemDisplay> {
         return meta;
     }
 
+    @Nullable
     public ItemStack getItemStack() {
         return itemStack;
     }
 
     public EntityItemDisplay setItemStack(ItemStack itemStack) {
         this.itemStack = itemStack;
-        this.itemAsPacket = SpigotConversionUtil.fromBukkitItemStack(itemStack);
+        this.itemAsPacket = itemStack == null ? com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY : SpigotConversionUtil.fromBukkitItemStack(itemStack);
         return this;
     }
 
