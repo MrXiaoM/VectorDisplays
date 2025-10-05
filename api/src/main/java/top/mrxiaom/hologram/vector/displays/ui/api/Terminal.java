@@ -445,11 +445,11 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         for (Element<?, ?> element : getElements()) {
             element.onTimerTick();
             if (element instanceof Hoverable hoverable) {
-                if (element instanceof TextElement<?> txt) {
+                if (element.getEntity() instanceof EntityTextDisplay txt) {
                     boolean hover = false;
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         Location eyeLocation = player.getEyeLocation();
-                        Location point = HologramUtils.raytraceHologram(this, txt.getHologram(), eyeLocation);
+                        Location point = HologramUtils.raytraceHologram(this, txt, eyeLocation);
                         if (point != null && eyeLocation.distance(point) <= getInteractDistance()) {
                             hover = true;
                             break;
@@ -473,8 +473,8 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
     public boolean tryPerformClick(Player player, Action action) {
         Location eyeLocation = player.getEyeLocation();
         for (Element<?, ?> element : elements) {
-            if (element instanceof TextElement<?> txt) {
-                Location point = HologramUtils.raytraceHologram(this, txt.getHologram(), eyeLocation);
+            if (element.getEntity() instanceof EntityTextDisplay txt) {
+                Location point = HologramUtils.raytraceHologram(this, txt, eyeLocation);
                 if (point != null && eyeLocation.distance(point) <= getInteractDistance()) {
                     element.performClick(player, action);
                     return true; // 一次只允许点击一个元素

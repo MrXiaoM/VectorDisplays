@@ -1,6 +1,7 @@
 package top.mrxiaom.hologram.vector.displays.ui.event;
 
 import org.jetbrains.annotations.Nullable;
+import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
 import top.mrxiaom.hologram.vector.displays.ui.api.Element;
 import top.mrxiaom.hologram.vector.displays.ui.api.TextElement;
 
@@ -16,7 +17,7 @@ public interface HoverStateChange<E extends Element<E, ?>> {
     }
     static <E extends Element<E, ?>> HoverStateChange<E> hoverBg(int hover, int normal, @Nullable HoverStateChange<E> action) {
         return (newState, element) -> {
-            if (element instanceof TextElement<?> txt) {
+            if (element.getEntity() instanceof EntityTextDisplay txt) {
                 txt.setBackgroundColor(newState ? hover : normal);
             }
             if (action != null) action.perform(newState, element);
