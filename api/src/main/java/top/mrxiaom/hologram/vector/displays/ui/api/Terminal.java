@@ -1,7 +1,6 @@
 package top.mrxiaom.hologram.vector.displays.ui.api;
 
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
@@ -9,10 +8,7 @@ import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.block.Action;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import top.mrxiaom.hologram.vector.displays.hologram.AbstractEntity;
-import top.mrxiaom.hologram.vector.displays.hologram.HologramAPI;
-import top.mrxiaom.hologram.vector.displays.hologram.RenderMode;
-import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
+import top.mrxiaom.hologram.vector.displays.hologram.*;
 import top.mrxiaom.hologram.vector.displays.ui.api.wrapper.EntityTextDisplayWrapper;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
@@ -445,20 +441,6 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         }
         for (Element<?, ?> element : getElements()) {
             element.onTimerTick();
-            if (element instanceof Hoverable hoverable) {
-                if (element.getEntity() instanceof EntityTextDisplay txt) {
-                    boolean hover = false;
-                    for (Player player : Bukkit.getOnlinePlayers()) {
-                        Location eyeLocation = player.getEyeLocation();
-                        Location point = HologramUtils.raytraceHologram(this, txt, eyeLocation);
-                        if (point != null && eyeLocation.distance(point) <= getInteractDistance()) {
-                            hover = true;
-                            break;
-                        }
-                    }
-                    hoverable.tryUpdateHoverState(hover);
-                }
-            }
         }
         if (actionPostTimerTick != null) {
             actionPostTimerTick.accept($this());
@@ -474,12 +456,16 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
     public boolean tryPerformClick(Player player, Action action) {
         Location eyeLocation = player.getEyeLocation();
         for (Element<?, ?> element : elements) {
+            Location point = null;
             if (element.getEntity() instanceof EntityTextDisplay txt) {
-                Location point = HologramUtils.raytraceHologram(this, txt, eyeLocation);
-                if (point != null && eyeLocation.distance(point) <= getInteractDistance()) {
-                    element.performClick(player, action);
-                    return true; // 一次只允许点击一个元素
-                }
+                point = HologramUtils.raytraceHologram(this, txt, eyeLocation);
+            }
+            if (element.getEntity() instanceof EntityItemDisplay item) {
+                point = HologramUtils.raytraceHologram(this, item, eyeLocation);
+            }
+            if (point != null && eyeLocation.distance(point) <= getInteractDistance()) {
+                element.performClick(player, action);
+                return true; // 一次只允许点击一个元素
             }
         }
         return false;

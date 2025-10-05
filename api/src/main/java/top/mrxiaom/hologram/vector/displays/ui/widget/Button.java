@@ -92,6 +92,13 @@ public class Button extends TextElement<Button> implements Hoverable {
     }
 
     @Override
+    public void onTimerTick() {
+        super.onTimerTick();
+
+        tryUpdateHoverState(Hoverable.handleHover(getTerminal(), getEntity()));
+    }
+
+    @Override
     public void tryUpdateHoverState(boolean hover) {
         if (hover == hoverState) return;
         hoverState = hover;
