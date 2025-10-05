@@ -32,7 +32,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
     private double width, height;
     private double interactDistance = 2.5;
     private float[] rotation = { 0, 0, 0, 1 };
-    private Consumer<This> actionPreTimerTick, actionPostTimerTick;
+    private Consumer<This> actionPreTimerTick, actionPostTimerTick, actionPreDispose, actionPostDispose;
     public Terminal(@NotNull String id, @NotNull Location location, int widthSpace, int heightLines) {
         this.id = id;
         this.location = location;
@@ -62,16 +62,32 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         }
     }
 
+    public This setOnPreDispose(Consumer<This> actionPreDispose) {
+        this.actionPreDispose = actionPreDispose;
+        return $this();
+    }
+
+    public This setOnPostDispose(Consumer<This> actionPostDispose) {
+        this.actionPostDispose = actionPostDispose;
+        return $this();
+    }
+
     /**
      * 销毁悬浮字
      */
     public void dispose() {
+        if (actionPreDispose != null) {
+            actionPreDispose.accept($this());
+        }
         for (Element<?, ?> element : elements) {
             element.dispose();
         }
         viewers.clear();
         HologramAPI.getHologram().remove(hologram);
         hologram.removeAllViewers();
+        if (actionPostDispose != null) {
+            actionPostDispose.accept($this());
+        }
     }
 
     @NotNull
