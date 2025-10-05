@@ -32,6 +32,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
     private double width, height;
     private double interactDistance = 2.5;
     private float[] rotation = { 0, 0, 0, 1 };
+    private Consumer<This> actionPreTimerTick, actionPostTimerTick;
     public Terminal(@NotNull String id, @NotNull Location location, int widthSpace, int heightLines) {
         this.id = id;
         this.location = location;
@@ -396,10 +397,23 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         this.interactDistance = interactDistance;
     }
 
+    public This setOnPreTimerTick(Consumer<This> actionPreTimerTick) {
+        this.actionPreTimerTick = actionPreTimerTick;
+        return $this();
+    }
+
+    public This setOnPostTimerTick(Consumer<This> actionPostTimerTick) {
+        this.actionPostTimerTick = actionPostTimerTick;
+        return $this();
+    }
+
     /**
      * 定时器事件，执行周期由 TerminalManager 决定
      */
     public void onTimerTick() {
+        if (actionPreTimerTick != null) {
+            actionPreTimerTick.accept($this());
+        }
         for (Element<?, ?> element : getElements()) {
             element.onTimerTick();
             if (element instanceof Hoverable hoverable) {
@@ -416,6 +430,9 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
                     hoverable.tryUpdateHoverState(hover);
                 }
             }
+        }
+        if (actionPostTimerTick != null) {
+            actionPostTimerTick.accept($this());
         }
     }
 
