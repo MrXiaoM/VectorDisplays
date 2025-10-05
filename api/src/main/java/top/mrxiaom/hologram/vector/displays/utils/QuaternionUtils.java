@@ -32,26 +32,6 @@ public class QuaternionUtils {
         };
     }
 
-    public static float[] rotateVector(float[] vector, float[] quaternion) {
-        // 将向量转换为纯四元数 (x, y, z, 0)
-        float[] vecQuaternion = new float[] { vector[0], vector[1], vector[2], 0 };
-
-        // 计算四元数的共轭
-        float[] qConj = conjugateF(quaternion);
-
-        // 计算旋转结果: q * v * q⁻¹
-        float[] temp = multiplyF(quaternion, vecQuaternion);
-        float[] result = multiplyF(temp, qConj);
-
-        // 提取向量部分
-        return new float[] { result[0], result[1], result[2] };
-    }
-
-    // 计算四元数的共轭
-    public static float[] conjugateF(float[] q) {
-        return new float[] { -q[0], -q[1], -q[2], q[3] };
-    }
-
     // 四元数乘法
     public static float[] multiplyF(float[] a, float[] b) {
         float w = a[3] * b[3] - a[0] * b[0] - a[1] * b[1] - a[2] * b[2];
@@ -59,37 +39,6 @@ public class QuaternionUtils {
         float y = a[3] * b[1] - a[0] * b[2] + a[1] * b[3] + a[2] * b[0];
         float z = a[3] * b[2] + a[0] * b[1] - a[1] * b[0] + a[2] * b[3];
         return new float[] { x, y, z, w };
-    }
-
-    /**
-     * 合并两个旋转变换为一个四元数。
-     * 先应用第一个四元数旋转，再应用绕向量的旋转。(豆包AI 生成)
-     * @param axis 旋转轴向量 [vX, vY, vZ]
-     * @param degree 旋转角度（度）
-     * @return 合并后的四元数 [x, y, z, w]
-     */
-    public static float[] rotateByAxis(float[] axis, float degree) {
-        // 将角度转换为弧度
-        float radians = Math.toRadians(degree);
-
-        // 归一化旋转轴向量
-        float vectorLength = Math.sqrt(axis[0] * axis[0]  + axis[1] * axis[1] + axis[2] * axis[2]);
-        float[] normalized = new float[] { axis[0] / vectorLength, axis[1] / vectorLength, axis[2] / vectorLength };
-        float nx = normalized[0];
-        float ny = normalized[1];
-        float nz = normalized[2];
-
-        // 计算四元数分量
-        float halfAngle = radians / 2.0f;
-        float sinHalf = Math.sin(halfAngle);
-        float cosHalf = Math.cos(halfAngle);
-
-        return new float[]{
-                nx * sinHalf,
-                ny * sinHalf,
-                nz * sinHalf,
-                cosHalf
-        };
     }
 
     static class Quaternion {
