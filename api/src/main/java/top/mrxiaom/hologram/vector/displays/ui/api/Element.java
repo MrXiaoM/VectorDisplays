@@ -19,7 +19,7 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
     private final @NotNull String id;
     private Terminal<?> terminal;
     private EnumAlign align;
-    private double x, y, zIndex;
+    private double x, y, zIndex = 1;
     protected float scaleX = 1.0f, scaleY = 1.0f;
     protected double width, height;
     private TimerTickEvent<This> timerTickEvent;

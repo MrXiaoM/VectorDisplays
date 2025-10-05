@@ -23,7 +23,6 @@ public class Line extends TextElement<Line> {
         super(id);
         setShadow(false);
         setBackgroundColor(0x80FFFFFF);
-        setZIndex(-20);
     }
 
     /**
