@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.NotNull;
@@ -83,11 +84,15 @@ public class TerminalManager implements Listener {
         Action action = e.getAction();
         // 元素点击事件处理
         if (HologramUtils.isLeftClick(action) || HologramUtils.isRightClick(action)) {
-            for (Terminal<?> terminal : terminals.values()) {
-                if (!terminal.getViewers().contains(player)) continue;
-                if (terminal.tryPerformClick(player, action)) {
-                    e.setCancelled(true);
-                    break; // 一次只允许点击一个界面
+            // 要求玩家没有打开别的界面
+            InventoryType type = player.getOpenInventory().getType();
+            if (type == InventoryType.CRAFTING || type == InventoryType.CREATIVE || type == InventoryType.PLAYER) {
+                for (Terminal<?> terminal : terminals.values()) {
+                    if (!terminal.getViewers().contains(player)) continue;
+                    if (terminal.tryPerformClick(player, action)) {
+                        e.setCancelled(true);
+                        break; // 一次只允许点击一个界面
+                    }
                 }
             }
         }
