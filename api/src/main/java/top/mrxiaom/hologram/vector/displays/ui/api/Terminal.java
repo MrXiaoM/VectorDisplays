@@ -46,8 +46,27 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         setSize(widthSpace, heightLines);
     }
 
+    /**
+     * 获取悬浮字的渲染模式
+     */
+    @NotNull
     public RenderMode getRenderMode() {
         return hologram.getRenderMode();
+    }
+
+    /**
+     * 获取面板的靠近渲染距离
+     */
+    public double getNearbyDistance() {
+        return hologram.getNearbyEntityScanningDistance();
+    }
+
+    /**
+     * 设置玩家靠近面板多少格以内才渲染。注意，这个选项仅在 RenderMode 为 <code>NEARBY</code> 时有效。
+     */
+    public This setNearbyDistance(double nearDistance) {
+        hologram.setNearbyEntityScanningDistance(nearDistance);
+        return $this();
     }
 
     @Override

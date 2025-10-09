@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+@SuppressWarnings("UnusedReturnValue")
 public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     public static final LegacyComponentSerializer legacyText = LegacyComponentSerializer.legacySection();
 
@@ -69,7 +70,12 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
 
     protected void startRunnable() {
         if (task != null) return;
-        task = plugin.getScheduler().runTaskTimer(this::updateAffectedPlayers, 20L, updateTaskPeriod);
+        startRunnable(20L);
+    }
+
+    protected void startRunnable(long delay) {
+        if (task != null) return;
+        task = plugin.getScheduler().runTaskTimer(this::updateAffectedPlayers, delay, updateTaskPeriod);
     }
 
     protected abstract EntityType getEntityType();
@@ -78,7 +84,7 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
      * Use HologramManager#spawn(TextHologram.class, Location.class); instead!
      * Only if you want to manage the holograms yourself and don't want to use the animation system use this
      */
-    public void spawn(Location location) {
+    public void spawn(@NotNull Location location) {
         if (!dead) kill();
         this.location = location;
         PacketWrapper<?> packet = buildSpawnPacket();
@@ -118,21 +124,21 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         this.location = null;
     }
 
-    public This teleport(Location location) {
+    public This teleport(@NotNull Location location) {
         PacketWrapper<?> packet = new WrapperPlayServerEntityTeleport(this.entityID, SpigotConversionUtil.fromBukkitLocation(location), false);
         this.location = location;
         sendPacket(packet);
         return $this();
     }
 
-    public This addAllViewers(List<Player> viewerList) {
+    public This addAllViewers(@NotNull List<Player> viewerList) {
         for (Player player : viewerList) {
             addViewer(player);
         }
         return $this();
     }
 
-    public This addViewer(Player player) {
+    public This addViewer(@NotNull Player player) {
         boolean respawn = false;
         if (!viewers.contains(player)) {
             this.viewers.add(player);
@@ -147,7 +153,7 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         return $this();
     }
 
-    private void respawnFor(Player player) {
+    private void respawnFor(@NotNull Player player) {
         PacketWrapper<?> packet = buildSpawnPacket();
         sendPacket(player, packet);
         plugin.getScheduler().runTask(() -> {
@@ -157,7 +163,7 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         });
     }
 
-    public This removeViewer(Player player) {
+    public This removeViewer(@NotNull Player player) {
         this.viewers.remove(player);
         this.leftViewers.remove(player);
         if (!dead) {
@@ -218,12 +224,12 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         }
     }
 
-    private void sendPacket(PacketWrapper<?> packet) {
+    private void sendPacket(@NotNull PacketWrapper<?> packet) {
         if (this.renderMode == RenderMode.NONE) return;
         viewers.forEach(player -> sendPacket(player, packet));
     }
 
-    private void sendPacket(Player player, PacketWrapper<?> packet) {
+    private void sendPacket(@NotNull Player player, @NotNull PacketWrapper<?> packet) {
         HologramAPI.getPlayerManager().sendPacket(player, packet);
     }
 
@@ -235,18 +241,42 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         return nearbyEntityScanningDistance;
     }
 
+    public This setUpdateTaskPeriod(long updateTaskPeriod) {
+        if (updateTaskPeriod <= 0) {
+            throw new IllegalArgumentException("updateTaskPeriod can't equals or less than zero!");
+        }
+        this.updateTaskPeriod = updateTaskPeriod;
+        if (task != null) {
+            task.cancel();
+            task = null;
+            startRunnable(updateTaskPeriod);
+        }
+        return $this();
+    }
+
+    public This setNearbyEntityScanningDistance(double nearbyEntityScanningDistance) {
+        if (nearbyEntityScanningDistance <= 0) {
+            throw new IllegalArgumentException("nearbyEntityScanningDistance can't equals or less than zero!");
+        }
+        this.nearbyEntityScanningDistance = nearbyEntityScanningDistance;
+        return $this();
+    }
+
     public int getEntityID() {
         return entityID;
     }
 
+    @NotNull
     public RenderMode getRenderMode() {
         return renderMode;
     }
 
+    @Nullable
     public Location getLocation() {
         return location;
     }
 
+    @NotNull
     public List<Player> getViewers() {
         return viewers;
     }
@@ -255,6 +285,7 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         return dead;
     }
 
+    @Nullable
     public IRunTask getTask() {
         return task;
     }
