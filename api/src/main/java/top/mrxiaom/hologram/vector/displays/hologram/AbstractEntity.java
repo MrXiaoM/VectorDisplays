@@ -94,9 +94,14 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
      * Only if you want to manage the holograms yourself and don't want to use the animation system use this
      */
     public void kill() {
+        if (task != null) {
+            task.cancel();
+            task = null;
+        }
         PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
         sendPacket(packet);
         this.dead = true;
+        this.location = null;
     }
 
     public This teleport(Location location) {
