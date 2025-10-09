@@ -8,7 +8,6 @@ import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import me.tofaa.entitylib.meta.EntityMeta;
 import me.tofaa.entitylib.wrapper.WrapperEntity;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
@@ -214,9 +213,7 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
             return;
         }
 
-        if (this.renderMode == RenderMode.ALL) {
-            this.addAllViewers(new ArrayList<>(Bukkit.getOnlinePlayers()));
-        } else if (this.renderMode == RenderMode.NEARBY && this.location.getWorld() != null) {
+        if (this.renderMode == RenderMode.NEARBY && this.location.getWorld() != null) {
             this.location.getWorld().getNearbyEntities(this.location, nearbyEntityScanningDistance, nearbyEntityScanningDistance, nearbyEntityScanningDistance)
                     .stream()
                     .filter(entity -> entity instanceof Player)
