@@ -48,6 +48,7 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
             throw new IllegalStateException("HologramAPI is not initialized!");
         }
         this.plugin = plugin;
+        // TODO: 使用更好的方法生成实体ID
         this.entity = new WrapperEntity(getEntityType());
         this.entityID = entity.getEntityId();
         this.renderMode = renderMode;
@@ -223,7 +224,12 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
             this.location.getWorld().getNearbyEntities(this.location, viewDistance, viewDistance, viewDistance)
                     .stream()
                     .filter(entity -> entity instanceof Player)
-                    .forEach(entity -> addViewer((Player) entity));
+                    .forEach(entity -> {
+                        Player p = (Player) entity;
+                        if (!viewers.contains(p)) {
+                            addViewer((Player) entity);
+                        }
+                    });
         }
     }
 
