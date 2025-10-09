@@ -22,7 +22,6 @@ import java.util.function.Consumer;
 public abstract class Terminal<This extends Terminal<This>> implements EntityTextDisplayWrapper<This> {
     private final @NotNull String id;
     private @NotNull Location location;
-    private final List<Player> viewers = new ArrayList<>();
     private final Map<String, List<Element<?, ?>>> pages = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private final List<Element<?, ?>> elements = new ArrayList<>();
     private final EntityTextDisplay hologram;
@@ -31,9 +30,12 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
     private float[] rotation = { 0, 0, 0, 1 };
     private Consumer<This> actionPreTimerTick, actionPostTimerTick, actionPreDispose, actionPostDispose;
     public Terminal(@NotNull String id, @NotNull Location location, int widthSpace, int heightLines) {
+        this(RenderMode.VIEWER_LIST, id, location, widthSpace, heightLines);
+    }
+    public Terminal(@NotNull RenderMode renderMode, @NotNull String id, @NotNull Location location, int widthSpace, int heightLines) {
         this.id = id;
         this.location = location;
-        this.hologram = new EntityTextDisplay(RenderMode.VIEWER_LIST)
+        this.hologram = new EntityTextDisplay(renderMode)
                 .setInterpolationDurationTransformation(3)
                 .setInterpolationDurationRotation(0)
                 .setAlignment(TextDisplay.TextAlignment.LEFT)
@@ -42,6 +44,10 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
                 .setBackgroundColor(0x80000000)
                 .removeAllViewers();
         setSize(widthSpace, heightLines);
+    }
+
+    public RenderMode getRenderMode() {
+        return hologram.getRenderMode();
     }
 
     @Override
@@ -55,6 +61,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
      */
     public void init() {
         for (Element<?, ?> element : elements) {
+            element.getEntity().setRenderMode(getRenderMode());
             element.init();
         }
     }
@@ -85,9 +92,8 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         for (Element<?, ?> element : elements) {
             element.dispose();
         }
-        viewers.clear();
-        HologramAPI.getHologram().remove(hologram);
         hologram.removeAllViewers();
+        HologramAPI.getHologram().remove(hologram);
         if (actionPostDispose != null) {
             actionPostDispose.accept($this());
         }
@@ -215,7 +221,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
      * 获取可以看见这个终端面板的玩家列表
      */
     public List<Player> getViewers() {
-        return Collections.unmodifiableList(viewers);
+        return Collections.unmodifiableList(hologram.getViewers());
     }
 
     /**
@@ -223,10 +229,9 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
      * @param player 玩家
      */
     public void removeViewer(Player player) {
-        viewers.remove(player);
         hologram.removeViewer(player);
         for (Element<?, ?> element : elements) {
-            element.getEntity().removeViewer(player);
+            element.getEntity().setParent(hologram);
         }
     }
 
@@ -235,24 +240,18 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
      * @param player 玩家
      */
     public void addViewer(Player player) {
-        if (!viewers.contains(player)) {
-            viewers.add(player);
-        }
         if (!hologram.getViewers().contains(player)) {
             hologram.addViewer(player);
         }
         for (Element<?, ?> element : elements) {
-            AbstractEntity<?> hologram = element.getEntity();
-            if (!hologram.getViewers().contains(player)) {
-                hologram.addViewer(player);
-            }
+            element.getEntity().setParent(hologram);
         }
     }
 
     public void ensureViewersAdded() {
         for (Element<?, ?> element : elements) {
             AbstractEntity<?> hologram = element.getEntity();
-            for (Player player : viewers) {
+            for (Player player : getViewers()) {
                 if (!hologram.getViewers().contains(player)) {
                     hologram.addViewer(player);
                 }

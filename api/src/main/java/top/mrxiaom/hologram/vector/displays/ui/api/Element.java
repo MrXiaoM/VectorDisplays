@@ -45,6 +45,7 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
 
     protected void setTerminal(@NotNull Terminal<?> terminal) {
         this.terminal = terminal;
+        this.getEntity().setParent(terminal.getHologram());
     }
 
     /**

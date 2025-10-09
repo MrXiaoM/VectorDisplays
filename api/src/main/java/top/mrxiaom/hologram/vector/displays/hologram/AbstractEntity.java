@@ -11,6 +11,9 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.api.IRunTask;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
@@ -24,13 +27,15 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
 
     protected final PluginWrapper plugin;
 
+    protected AbstractEntity<?> parent = null;
+
     protected long updateTaskPeriod = 20L * 3;
     protected double nearbyEntityScanningDistance = 40.0;
 
     protected WrapperEntity entity;
     protected int entityID;
 
-    protected final RenderMode renderMode;
+    protected RenderMode renderMode;
     protected Location location;
     protected final List<Player> viewers = new CopyOnWriteArrayList<>();
     protected final List<Player> leftViewers = new CopyOnWriteArrayList<>();
@@ -45,6 +50,15 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         this.plugin = plugin;
         this.entity = new WrapperEntity(getEntityType());
         this.entityID = entity.getEntityId();
+        this.renderMode = renderMode;
+    }
+
+    public void setParent(@Nullable AbstractEntity<?> parent) {
+        this.parent = parent;
+    }
+
+    @ApiStatus.Internal
+    public void setRenderMode(@NotNull RenderMode renderMode) {
         this.renderMode = renderMode;
     }
 
@@ -163,6 +177,19 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
 
     private void updateAffectedPlayers() {
         if (this.location == null) return;
+        if (parent != null) {
+            List<Player> playerList = parent.getViewers();
+            for (Player viewer : playerList) {
+                if (viewers.contains(viewer)) continue;
+                addViewer(viewer);
+            }
+            for (Player viewer : new ArrayList<>(viewers)) {
+                if (!playerList.contains(viewer)) {
+                    removeViewer(viewer);
+                }
+            }
+            return;
+        }
         double viewDistance = 32.0;
         viewers.stream() // 超出可视范围自动销毁实体
                 .filter(player -> player.isOnline() && (player.getWorld() != this.location.getWorld() || player.getLocation().distance(this.location) > viewDistance))
