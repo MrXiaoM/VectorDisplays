@@ -198,13 +198,17 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         double viewDistance = renderMode.equals(RenderMode.NEARBY)
                 ? nearbyEntityScanningDistance
                 : 32.0;
-        viewers.stream() // 超出可视范围自动销毁实体
+        new ArrayList<>(viewers).stream() // 超出可视范围自动销毁实体
                 .filter(player -> player.isOnline() && (player.getWorld() != this.location.getWorld() || player.getLocation().distance(this.location) > viewDistance))
                 .forEach(player -> {
-                    PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
-                    sendPacket(player, packet);
-                    if (this.renderMode == RenderMode.VIEWER_LIST && !leftViewers.contains(player)) {
-                        leftViewers.add(player);
+                    if (this.renderMode == RenderMode.NEARBY) {
+                        removeViewer(player);
+                    } else {
+                        PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
+                        sendPacket(player, packet);
+                        if (this.renderMode == RenderMode.VIEWER_LIST && !leftViewers.contains(player)) {
+                            leftViewers.add(player);
+                        }
                     }
                 });
 
