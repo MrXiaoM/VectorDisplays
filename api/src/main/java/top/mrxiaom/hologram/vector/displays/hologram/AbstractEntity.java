@@ -183,13 +183,14 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
 
     private void updateAffectedPlayers() {
         if (this.location == null) return;
+        ArrayList<Player> copyViewers = new ArrayList<>(viewers);
         if (parent != null) {
             List<Player> playerList = parent.getViewers();
             for (Player viewer : playerList) {
                 if (viewers.contains(viewer)) continue;
                 addViewer(viewer);
             }
-            for (Player viewer : new ArrayList<>(viewers)) {
+            for (Player viewer : copyViewers) {
                 if (!playerList.contains(viewer)) {
                     removeViewer(viewer);
                 }
@@ -199,37 +200,37 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         double viewDistance = renderMode.equals(RenderMode.NEARBY)
                 ? nearbyEntityScanningDistance
                 : 32.0;
-        new ArrayList<>(viewers).stream() // 超出可视范围自动销毁实体
-                .filter(player -> player.isOnline() && (player.getWorld() != this.location.getWorld() || player.getLocation().distance(this.location) > viewDistance))
-                .forEach(player -> {
-                    if (this.renderMode == RenderMode.NEARBY) {
-                        removeViewer(player);
-                    } else {
-                        PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
-                        sendPacket(player, packet);
-                        if (this.renderMode == RenderMode.VIEWER_LIST && !leftViewers.contains(player)) {
-                            leftViewers.add(player);
-                        }
+        for (Player player : copyViewers) { // 超出可视范围自动销毁实体
+            if (player.isOnline() && (player.getWorld() != this.location.getWorld() || player.getLocation().distance(this.location) > viewDistance)) {
+                if (this.renderMode == RenderMode.NEARBY) {
+                    removeViewer(player);
+                } else {
+                    PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
+                    sendPacket(player, packet);
+                    if (this.renderMode == RenderMode.VIEWER_LIST && !leftViewers.contains(player)) {
+                        leftViewers.add(player);
                     }
-                });
+                }
+            }
+        }
 
         if (this.renderMode == RenderMode.VIEWER_LIST) {
-            new ArrayList<>(leftViewers).stream() // 回到可视范围自动恢复实体
-                    .filter(player -> player.isOnline() && player.getWorld() == this.location.getWorld() && player.getLocation().distance(this.location) <= viewDistance)
-                    .forEach(this::addViewer);
+            List<Player> copyLeftViewers = new ArrayList<>(leftViewers);
+            for (Player player : copyLeftViewers) { // 回到可视范围自动恢复实体
+                if (player.isOnline() && player.getWorld() == this.location.getWorld() && player.getLocation().distance(this.location) <= viewDistance) {
+                    addViewer(player);
+                }
+            }
             return;
         }
 
         if (this.renderMode == RenderMode.NEARBY && this.location.getWorld() != null) {
-            this.location.getWorld().getNearbyEntities(this.location, viewDistance, viewDistance, viewDistance)
-                    .stream()
-                    .filter(entity -> entity instanceof Player)
-                    .forEach(entity -> {
-                        Player p = (Player) entity;
-                        if (!viewers.contains(p)) {
-                            addViewer((Player) entity);
-                        }
-                    });
+            for (Player player : this.location.getWorld().getPlayers()) {
+                if (player.getLocation().distance(this.location) > viewDistance) continue;
+                if (!viewers.contains(player)) {
+                    addViewer(player);
+                }
+            }
         }
     }
 
