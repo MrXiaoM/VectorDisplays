@@ -97,8 +97,8 @@ public class HologramUtils {
         double width = getWidth(hologram);
         double height = getHeight(hologram);
         // 悬浮字正下方坐标
-        Location loc = hologram.getLocation().clone();
-        loc.setY(loc.getY() + 1);
+        Location loc = hologram.getLocation();
+        if (loc == null) return null;
         // 悬浮字四角顶点
         double paddingHorizontal = 0.02;
         double paddingVertical = 0.01;
@@ -138,8 +138,8 @@ public class HologramUtils {
         double width = getWidth(hologram);
         double height = getHeight(hologram);
         // 悬浮字中间坐标
-        Location loc = hologram.getLocation().clone();
-        loc.setY(loc.getY() + 1);
+        Location loc = hologram.getLocation();
+        if (loc == null) return null;
         // 悬浮字四角顶点
         double paddingHorizontal = 0.01;
         double paddingVertical = 0.01;

@@ -1,6 +1,5 @@
 package top.mrxiaom.hologram.vector.displays.ui.api;
 
-import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.TextDisplay;
 import org.jetbrains.annotations.NotNull;

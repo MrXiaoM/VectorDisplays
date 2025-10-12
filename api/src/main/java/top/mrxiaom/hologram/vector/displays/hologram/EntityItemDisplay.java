@@ -39,7 +39,7 @@ public class EntityItemDisplay extends EntityDisplay<EntityItemDisplay> {
     public PacketWrapper<?> buildSpawnPacket() {
         return new WrapperPlayServerSpawnEntity(
                 entityID, Optional.of(UUID.randomUUID()), getEntityType(),
-                new Vector3d(location.getX(), location.getY() + 1, location.getZ()), 0f, 0f, 0f, 0, Optional.empty()
+                new Vector3d(location.getX(), location.getY(), location.getZ()), 0f, 0f, 0f, 0, Optional.empty()
         );
     }
 
