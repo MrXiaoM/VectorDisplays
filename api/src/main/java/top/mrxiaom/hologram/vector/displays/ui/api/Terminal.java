@@ -41,8 +41,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
                 .setAlignment(TextDisplay.TextAlignment.LEFT)
                 .setBillboard(Display.Billboard.FIXED)
                 .setText(Component.text(""))
-                .setBackgroundColor(0x80000000)
-                .removeAllViewers();
+                .setBackgroundColor(0x80000000);
         setSize(widthSpace, heightLines);
     }
 

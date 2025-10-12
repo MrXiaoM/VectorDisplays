@@ -324,7 +324,7 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
      * 销毁悬浮字
      */
     public void dispose() {
-        HologramAPI.getHologram().remove(hologram);
         hologram.removeAllViewers();
+        HologramAPI.getHologram().remove(hologram);
     }
 }

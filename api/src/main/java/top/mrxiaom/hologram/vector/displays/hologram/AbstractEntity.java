@@ -174,10 +174,10 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     }
 
     public This removeAllViewers() {
-        this.viewers.clear();
-        this.leftViewers.clear();
         PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
         sendPacket(packet);
+        this.viewers.clear();
+        this.leftViewers.clear();
         return $this();
     }
 

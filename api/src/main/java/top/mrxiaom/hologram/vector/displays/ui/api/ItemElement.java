@@ -19,8 +19,7 @@ public abstract class ItemElement<This extends Element<This, EntityItemDisplay>>
         return new EntityItemDisplay(RenderMode.VIEWER_LIST)
                 .setInterpolationDurationTransformation(3)
                 .setInterpolationDurationRotation(0)
-                .setBillboard(Display.Billboard.FIXED)
-                .removeAllViewers();
+                .setBillboard(Display.Billboard.FIXED);
     }
 
     /**

@@ -24,9 +24,7 @@ public abstract class TextElement<This extends Element<This, EntityTextDisplay>>
                 .setInterpolationDurationTransformation(3)
                 .setInterpolationDurationRotation(0)
                 .setAlignment(TextDisplay.TextAlignment.LEFT)
-                .setBillboard(Display.Billboard.FIXED)
-                .setText(Component.text(""))
-                .removeAllViewers();
+                .setBillboard(Display.Billboard.FIXED);
     }
 
     /**
