@@ -1,11 +1,13 @@
 package top.mrxiaom.hologram.vector.displays;
 
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.hologram.vector.displays.api.IRunTask;
@@ -14,9 +16,7 @@ import top.mrxiaom.hologram.vector.displays.hologram.HologramAPI;
 import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class TerminalManager implements Listener {
     private static TerminalManager instance = null;
@@ -94,6 +94,19 @@ public class TerminalManager implements Listener {
                         break; // 一次只允许点击一个界面
                     }
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onWorldUnload(WorldUnloadEvent e) {
+        World world = e.getWorld();
+        List<String> keys = new ArrayList<>(terminals.keySet());
+        for (String name : keys) {
+            Terminal<?> terminal = terminals.get(name);
+            World other = terminal.getLocation().getWorld();
+            if (world == other || (other != null && world.getName().equals(other.getName()))) {
+                destroy(terminal);
             }
         }
     }
