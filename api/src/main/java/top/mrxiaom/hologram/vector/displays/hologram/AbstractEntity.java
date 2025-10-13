@@ -19,7 +19,6 @@ import top.mrxiaom.hologram.vector.displays.api.IRunTask;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @SuppressWarnings("UnusedReturnValue")
@@ -140,27 +139,18 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     }
 
     public This addViewer(@NotNull Player player) {
-        addViewer(null, player);
-        return $this();
-    }
-
-    private void addViewer(@Nullable Iterator<Player> leftViewers, @NotNull Player player) {
         boolean respawn = false;
         if (!viewers.contains(player)) {
             this.viewers.add(player);
             respawn = true;
         }
-        if (leftViewers == null) {
-            if (this.leftViewers.remove(player)) {
-                respawn = true;
-            }
-        } else {
-            leftViewers.remove();
+        if (this.leftViewers.remove(player)) {
             respawn = true;
         }
         if (respawn && !dead) {
             respawnFor(player);
         }
+        return $this();
     }
 
     private void respawnFor(@NotNull Player player) {
@@ -174,21 +164,13 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     }
 
     public This removeViewer(@NotNull Player player) {
-        removeViewer(null, player);
-        return $this();
-    }
-
-    private void removeViewer(@Nullable Iterator<Player> viewers, @NotNull Player player) {
-        if (viewers == null) {
-            this.viewers.remove(player);
-        } else {
-            viewers.remove();
-        }
+        this.viewers.remove(player);
         this.leftViewers.remove(player);
         if (!dead) {
             PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
             sendPacket(player, packet);
         }
+        return $this();
     }
 
     public This removeAllViewers() {
@@ -211,23 +193,21 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
                 addViewer(viewer);
             }
             // 将不在父实体的可视玩家列表中的玩家移出去
-            Iterator<Player> viewers = this.viewers.iterator();
-            while (viewers.hasNext()) {
-                Player player = viewers.next();
+            for (Object o : viewers.toArray()) {
+                Player player = (Player) o;
                 if (!playerList.contains(player)) {
-                    removeViewer(viewers, player);
+                    removeViewer(player);
                 }
             }
             return;
         }
         World world = this.location.getWorld();
         double viewDistance = nearbyEntityScanningDistance;
-        Iterator<Player> viewers = this.viewers.iterator();
-        while (viewers.hasNext()) { // 超出可视范围自动销毁实体
-            Player player = viewers.next();
+        for (Object o : viewers.toArray()) { // 超出可视范围自动销毁实体
+            Player player = (Player) o;
             if (player.isOnline() && (player.getWorld() != world || player.getLocation().distance(this.location) > viewDistance)) {
                 if (this.renderMode == RenderMode.NEARBY) {
-                    removeViewer(viewers, player);
+                    removeViewer(player);
                 } else {
                     PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
                     sendPacket(player, packet);
@@ -240,11 +220,10 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
 
         if (this.renderMode == RenderMode.VIEWER_LIST) {
             // 将回到可视范围的玩家添加回来
-            Iterator<Player> i = leftViewers.iterator();
-            while (i.hasNext()) {
-                Player player = i.next();
+            for (Object o : leftViewers.toArray()) {
+                Player player = (Player) o;
                 if (player.isOnline() && player.getWorld() == world && player.getLocation().distance(this.location) <= viewDistance) {
-                    addViewer(i, player);
+                    addViewer(player);
                 }
             }
             return;
