@@ -221,9 +221,7 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
             return;
         }
         World world = this.location.getWorld();
-        double viewDistance = renderMode.equals(RenderMode.NEARBY)
-                ? nearbyEntityScanningDistance
-                : 32.0;
+        double viewDistance = nearbyEntityScanningDistance;
         Iterator<Player> viewers = this.viewers.iterator();
         while (viewers.hasNext()) { // 超出可视范围自动销毁实体
             Player player = viewers.next();
