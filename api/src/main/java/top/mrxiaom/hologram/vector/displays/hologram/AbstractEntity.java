@@ -18,9 +18,9 @@ import org.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.api.IRunTask;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @SuppressWarnings("UnusedReturnValue")
 public abstract class AbstractEntity<This extends AbstractEntity<This>> {
@@ -38,8 +38,8 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
 
     protected RenderMode renderMode;
     protected Location location;
-    protected final List<Player> viewers = new CopyOnWriteArrayList<>();
-    protected final List<Player> leftViewers = new CopyOnWriteArrayList<>();
+    protected final List<Player> viewers = new ArrayList<>();
+    protected final List<Player> leftViewers = new ArrayList<>();
     protected boolean dead = true;
     protected IRunTask task;
 
