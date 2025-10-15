@@ -6,7 +6,6 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDe
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityTeleport;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import me.tofaa.entitylib.meta.EntityMeta;
-import me.tofaa.entitylib.wrapper.WrapperEntity;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -17,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.api.IRunTask;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
+import top.mrxiaom.hologram.vector.displays.minecraft.nms.NMS;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,6 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     protected long updateTaskPeriod = 20L * 3;
     protected double nearbyEntityScanningDistance = 40.0;
 
-    protected WrapperEntity entity;
     protected int entityID;
 
     protected RenderMode renderMode;
@@ -48,9 +47,7 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
             throw new IllegalStateException("HologramAPI is not initialized!");
         }
         this.plugin = plugin;
-        // TODO: 使用更好的方法生成实体ID
-        this.entity = new WrapperEntity(getEntityType());
-        this.entityID = entity.getEntityId();
+        this.entityID = NMS.nextEntityId(getEntityType());
         this.renderMode = renderMode;
     }
 

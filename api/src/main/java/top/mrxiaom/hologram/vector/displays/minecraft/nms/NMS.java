@@ -1,10 +1,13 @@
 package top.mrxiaom.hologram.vector.displays.minecraft.nms;
 
+import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
+import me.tofaa.entitylib.wrapper.WrapperEntity;
 import org.bukkit.Bukkit;
 
 public class NMS {
+    private static NMSFactory nmsFactory;
 
-    public static TextHandlerFactory getFactory() {
+    public static NMSFactory getFactory() {
         String[] version = Bukkit.getServer().getBukkitVersion().split("-")[0].split("\\.");
         int major = parse(version, 0, 1);
         int minor = parse(version, 1, 0);
@@ -25,12 +28,24 @@ public class NMS {
         String className = NMS.class.getPackageName() + "." + craft + ".Factory";
         try {
             Class<?> type = Class.forName(className);
-            return (TextHandlerFactory) type.getConstructor().newInstance();
+            return nmsFactory = (NMSFactory) type.getConstructor().newInstance();
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException("找不到版本支持类 " + className + "，这可能由插件开发者未使用 ':all' 包引起");
         } catch (Throwable e) {
             throw new IllegalStateException("当前版本不受支持", e);
         }
+    }
+
+    public static NMSFactory getLoadedFactory() {
+        return nmsFactory;
+    }
+
+    public static int nextEntityId(EntityType type) {
+        Integer id = nmsFactory == null ? null : nmsFactory.nextEntityId();
+        if (id == null) {
+            return new WrapperEntity(type).getEntityId();
+        }
+        return id;
     }
 
     private static int parse(String[] split, int index, int def) {

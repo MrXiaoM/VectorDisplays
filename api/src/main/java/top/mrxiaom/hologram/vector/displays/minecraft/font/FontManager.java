@@ -9,7 +9,7 @@ import top.mrxiaom.hologram.vector.displays.minecraft.font.api.Font;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.api.IFontManager;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.server.ServerFont;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.server.ServerGlyph;
-import top.mrxiaom.hologram.vector.displays.minecraft.nms.TextHandlerFactory;
+import top.mrxiaom.hologram.vector.displays.minecraft.nms.NMSFactory;
 
 import java.io.File;
 import java.io.FileReader;
@@ -25,20 +25,20 @@ public class FontManager implements IFontManager {
     private final Map<String, FontStorage> fontStorages = new HashMap<>();
     private final FontStorage missingStorage;
     private final List<Font> fonts = new ArrayList<>();
-    private TextHandlerFactory factory;
-    public FontManager(TextHandlerFactory factory) {
+    private NMSFactory factory;
+    public FontManager(NMSFactory factory) {
         this.factory = factory;
         this.missingStorage = new FontStorage(MISSING_STORAGE_ID);
         this.missingStorage.setFonts(Lists.newArrayList(EmptyGlyph.blank()));
     }
 
     @Override
-    public TextHandlerFactory getFactory() {
+    public NMSFactory getFactory() {
         return factory;
     }
 
     @Override
-    public void setFactory(TextHandlerFactory factory) {
+    public void setFactory(NMSFactory factory) {
         this.factory = factory;
     }
 

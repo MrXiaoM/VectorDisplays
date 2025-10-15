@@ -7,7 +7,7 @@ import top.mrxiaom.hologram.vector.displays.minecraft.font.FontManager;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.api.Font;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.api.IFontManager;
 import top.mrxiaom.hologram.vector.displays.minecraft.nms.NMS;
-import top.mrxiaom.hologram.vector.displays.minecraft.nms.TextHandlerFactory;
+import top.mrxiaom.hologram.vector.displays.minecraft.nms.NMSFactory;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 
 import java.io.File;
@@ -18,7 +18,7 @@ public class FontConfig implements IConfig {
     private final VectorDisplays plugin;
     private final IFontManager manager;
     public FontConfig(VectorDisplays plugin) {
-        TextHandlerFactory factory = NMS.getFactory();
+        NMSFactory factory = NMS.getFactory();
         this.plugin = plugin;
         this.manager = new FontManager(factory);
         HologramFont.setTextRenderer(manager.createTextRenderer());
