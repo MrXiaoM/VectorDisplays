@@ -88,12 +88,12 @@ publishing {
 
             pom {
                 name.set(artifactId)
-                description.set("MrXiaoM's Bukkit plugin basic core")
-                url.set("https://github.com/MrXiaoM/PluginBase")
+                description.set("Terminal UI in air implementation for Minecraft.")
+                url.set("https://github.com/MrXiaoM/VectorDisplays")
                 licenses {
                     license {
-                        name.set("MIT License")
-                        url.set("https://github.com/MrXiaoM/PluginBase/blob/main/LICENSE")
+                        name.set("AGPL-3.0")
+                        url.set("https://github.com/MrXiaoM/VectorDisplays/blob/main/LICENSE")
                     }
                 }
                 developers {
@@ -103,9 +103,9 @@ publishing {
                     }
                 }
                 scm {
-                    url.set("https://github.com/MrXiaoM/PluginBase")
-                    connection.set("scm:git:https://github.com/MrXiaoM/PluginBase.git")
-                    developerConnection.set("scm:git:https://github.com/MrXiaoM/PluginBase.git")
+                    url.set("https://github.com/MrXiaoM/VectorDisplays")
+                    connection.set("scm:git:https://github.com/MrXiaoM/VectorDisplays.git")
+                    developerConnection.set("scm:git:https://github.com/MrXiaoM/VectorDisplays.git")
                 }
             }
         }
