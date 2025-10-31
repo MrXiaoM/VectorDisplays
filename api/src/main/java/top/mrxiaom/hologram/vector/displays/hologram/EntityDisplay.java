@@ -2,7 +2,9 @@ package top.mrxiaom.hologram.vector.displays.hologram;
 
 import com.github.retrooper.packetevents.util.Quaternion4f;
 import me.tofaa.entitylib.meta.display.AbstractDisplayMeta;
+import org.bukkit.Location;
 import org.bukkit.entity.Display;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.hologram.utils.Vector3F;
 
@@ -33,6 +35,18 @@ public abstract class EntityDisplay<This extends AbstractEntity<This>> extends A
         meta.setBrightnessOverride(this.brightnessOverride);
         meta.setRightRotation(this.rightRotation);
         meta.setLeftRotation(this.leftRotation);
+    }
+
+    @Override
+    public void spawn(@NotNull Location location) {
+        // 去掉 yaw 和 pitch 信息，以防应用了错误的旋转变换
+        super.spawn(new Location(location.getWorld(), location.getX(), location.getY(), location.getZ()));
+    }
+
+    @Override
+    public This teleport(@NotNull Location location) {
+        // 去掉 yaw 和 pitch 信息，以防应用了错误的旋转变换
+        return super.teleport(new Location(location.getWorld(), location.getX(), location.getY(), location.getZ()));
     }
 
     public Vector3F getScale() {
