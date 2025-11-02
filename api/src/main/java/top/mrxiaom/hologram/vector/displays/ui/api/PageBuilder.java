@@ -1,5 +1,7 @@
 package top.mrxiaom.hologram.vector.displays.ui.api;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -51,6 +53,31 @@ public class PageBuilder {
         for (Element<?, ?> element : elements) {
             addElement(element);
         }
+    }
+
+    /**
+     * 从界面中删除元素
+     * @param id 元素ID
+     * @return 被删除的元素实例
+     */
+    @Nullable
+    public Element<?, ?> removeElement(String id) {
+        for (Object o : elements.toArray()) {
+            Element<?, ?> element = (Element<?, ?>) o;
+            if (element.getId().equals(id) && removeElement(element)) {
+                return element;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 从界面中删除元素
+     * @param element 元素实例
+     * @return 是否删除成功
+     */
+    public boolean removeElement(Element<?, ?> element) {
+        return elements.remove(element);
     }
 
     /**

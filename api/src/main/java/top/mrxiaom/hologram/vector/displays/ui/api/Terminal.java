@@ -172,7 +172,36 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
     }
 
     /**
-     * 获取已添加的元素列表
+     * 从界面中删除元素
+     * @param id 元素ID
+     * @return 被删除的元素实例
+     */
+    @Nullable
+    public Element<?, ?> removeElement(String id) {
+        for (Object o : elements.toArray()) {
+            Element<?, ?> element = (Element<?, ?>) o;
+            if (element.getId().equals(id) && removeElement(element)) {
+                return element;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 从界面中删除元素
+     * @param element 元素实例
+     * @return 是否删除成功
+     */
+    public boolean removeElement(Element<?, ?> element) {
+        if (elements.remove(element)) {
+            element.dispose();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 获取已添加的元素只读列表
      */
     public List<Element<?, ?>> getElements() {
         return Collections.unmodifiableList(elements);
