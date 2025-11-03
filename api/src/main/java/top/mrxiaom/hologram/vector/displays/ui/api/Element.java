@@ -276,6 +276,7 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
      * 界面元素初始化方法，在这里确定悬浮字位置，并生成悬浮字
      */
     public void init() {
+        if (terminal != null) hologram.setRenderMode(terminal.getRenderMode());
         calculateSize();
         HologramAPI.getHologram().spawn(hologram, decideLocation());
     }

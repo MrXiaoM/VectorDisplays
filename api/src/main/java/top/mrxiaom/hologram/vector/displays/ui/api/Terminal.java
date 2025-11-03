@@ -80,7 +80,6 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
      */
     public void init() {
         for (Element<?, ?> element : elements) {
-            element.getEntity().setRenderMode(getRenderMode());
             element.init();
         }
     }
