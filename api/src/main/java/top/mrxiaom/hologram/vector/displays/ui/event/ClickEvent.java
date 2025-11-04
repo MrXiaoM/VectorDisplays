@@ -5,7 +5,7 @@ import org.bukkit.event.block.Action;
 import top.mrxiaom.hologram.vector.displays.ui.api.Element;
 
 /**
- * 元素点击事件
+ * 元素点击事件，更推荐使用 ElementClickEvent 以获得更全面的参数
  */
 @FunctionalInterface
 public interface ClickEvent<E extends Element<E, ?>> {

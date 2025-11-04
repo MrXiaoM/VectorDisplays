@@ -298,10 +298,21 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
 
     /**
      * 当玩家点击悬浮字时执行的操作
+     * @param meta 点击事件传入参数
+     */
+    public void performClick(ClickMeta meta) {
+        performClick(meta.getPlayer(), meta.getAction());
+    }
+
+    /**
+     * 当玩家点击悬浮字时执行的操作
      * @param player 玩家
      * @param action 点击方式
      */
-    public abstract void performClick(Player player, Action action);
+    @Deprecated
+    @SuppressWarnings("DeprecatedIsStillUsed")
+    public void performClick(Player player, Action action) {
+    }
 
     /**
      * 当定时器遍历悬浮字时执行的操作

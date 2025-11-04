@@ -1,7 +1,5 @@
 package top.mrxiaom.hologram.vector.displays.ui.widget;
 
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.hologram.vector.displays.hologram.utils.AdventureHelper;
 import top.mrxiaom.hologram.vector.displays.ui.api.TextElement;
@@ -29,9 +27,5 @@ public class Label extends TextElement<Label> {
             this.updateLocation();
         }
         return this;
-    }
-
-    @Override
-    public void performClick(Player player, Action action) {
     }
 }

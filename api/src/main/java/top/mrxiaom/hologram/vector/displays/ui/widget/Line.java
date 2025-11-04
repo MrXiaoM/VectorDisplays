@@ -1,8 +1,6 @@
 package top.mrxiaom.hologram.vector.displays.ui.widget;
 
 import net.kyori.adventure.text.Component;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.hologram.vector.displays.ui.EnumAlign;
@@ -144,10 +142,6 @@ public class Line extends TextElement<Line> {
     public void init() {
         updatePos();
         super.init();
-    }
-
-    @Override
-    public void performClick(Player player, Action action) {
     }
 
     /**

@@ -541,7 +541,9 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
                 point = HologramUtils.raytraceHologram(this, element.getAdditionalRotation(), item, eyeLocation);
             }
             if (point != null && eyeLocation.distance(point) <= getInteractDistance()) {
-                element.performClick(player, action);
+                // TODO: 将 point 投影到 element 上，获取所点击的二维坐标
+                ClickMeta meta = new ClickMeta(player, action);
+                element.performClick(meta);
                 return true; // 一次只允许点击一个元素
             }
         }

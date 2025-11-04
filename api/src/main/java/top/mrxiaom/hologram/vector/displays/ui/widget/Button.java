@@ -1,13 +1,13 @@
 package top.mrxiaom.hologram.vector.displays.ui.widget;
 
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.hologram.vector.displays.hologram.utils.AdventureHelper;
+import top.mrxiaom.hologram.vector.displays.ui.api.ClickMeta;
 import top.mrxiaom.hologram.vector.displays.ui.api.Hoverable;
 import top.mrxiaom.hologram.vector.displays.ui.api.TextElement;
 import top.mrxiaom.hologram.vector.displays.ui.event.ClickEvent;
+import top.mrxiaom.hologram.vector.displays.ui.event.ElementClickEvent;
 import top.mrxiaom.hologram.vector.displays.ui.event.HoverStateChange;
 
 import java.util.function.Supplier;
@@ -15,7 +15,8 @@ import java.util.function.Supplier;
 public class Button extends TextElement<Button> implements Hoverable {
     private @NotNull String text = "";
     private boolean hoverState = false;
-    private ClickEvent<Button> clickEvent;
+    private ClickEvent<Button> oldClickEvent;
+    private ElementClickEvent<Button> clickEvent;
     private HoverStateChange<Button> hoverStateChange;
     public Button(@NotNull String id) {
         super(id);
@@ -51,8 +52,45 @@ public class Button extends TextElement<Button> implements Hoverable {
      * 设置当玩家点击这个元素时执行操作
      * @param clickEvent 点击事件
      */
+    @Deprecated
     public Button setOnClick(@Nullable ClickEvent<Button> clickEvent) {
+        this.oldClickEvent = clickEvent;
+        return this;
+    }
+
+    /**
+     * 设置当玩家点击这个元素时执行操作
+     * @param clickEvent 点击事件
+     */
+    public Button setOnClick(@Nullable ElementClickEvent<Button> clickEvent) {
         this.clickEvent = clickEvent;
+        return this;
+    }
+
+    /**
+     * 设置当玩家点击这个元素时执行操作
+     * @param clickEvent 点击事件
+     */
+    public Button setOnElementClick(@Nullable ElementClickEvent<Button> clickEvent) {
+        return setOnClick(clickEvent);
+    }
+
+    /**
+     * 设置当玩家点击这个元素时执行操作
+     * @param supplier 点击事件
+     */
+    @Deprecated
+    public Button setOnClick(@Nullable Supplier<ClickEvent<Button>> supplier) {
+        if (supplier == null) {
+            this.oldClickEvent = null;
+        } else {
+            this.oldClickEvent = (player, action, element) -> {
+                ClickEvent<Button> clickEvent = supplier.get();
+                if (clickEvent != null) {
+                    clickEvent.perform(player, action, element);
+                }
+            };
+        }
         return this;
     }
 
@@ -60,14 +98,14 @@ public class Button extends TextElement<Button> implements Hoverable {
      * 设置当玩家点击这个元素时执行操作
      * @param supplier 点击事件
      */
-    public Button setOnClick(@Nullable Supplier<ClickEvent<Button>> supplier) {
+    public Button setOnElementClick(@Nullable Supplier<ElementClickEvent<Button>> supplier) {
         if (supplier == null) {
             this.clickEvent = null;
         } else {
-            this.clickEvent = (player, action, element) -> {
-                ClickEvent<Button> clickEvent = supplier.get();
+            this.clickEvent = (meta, element) -> {
+                ElementClickEvent<Button> clickEvent = supplier.get();
                 if (clickEvent != null) {
-                    clickEvent.perform(player, action, element);
+                    clickEvent.perform(meta, element);
                 }
             };
         }
@@ -85,9 +123,12 @@ public class Button extends TextElement<Button> implements Hoverable {
     }
 
     @Override
-    public void performClick(Player player, Action action) {
+    public void performClick(ClickMeta meta) {
         if (clickEvent != null) {
-            clickEvent.perform(player, action, this);
+            clickEvent.perform(meta, this);
+        }
+        if (oldClickEvent != null) {
+            oldClickEvent.perform(meta.getPlayer(), meta.getAction(), this);
         }
     }
 
