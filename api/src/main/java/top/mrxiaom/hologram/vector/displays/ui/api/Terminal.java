@@ -1,6 +1,7 @@
 package top.mrxiaom.hologram.vector.displays.ui.api;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
@@ -9,6 +10,7 @@ import org.bukkit.event.block.Action;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.hologram.vector.displays.hologram.*;
+import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.api.wrapper.EntityTextDisplayWrapper;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
@@ -29,10 +31,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
     private double interactDistance = 2.5;
     private float[] rotation = { 0, 0, 0, 1 };
     private Consumer<This> actionPreTimerTick, actionPostTimerTick, actionPreDispose, actionPostDispose;
-    public Terminal(@NotNull String id, @NotNull Location location, int widthSpace, int heightLines) {
-        this(RenderMode.VIEWER_LIST, id, location, widthSpace, heightLines);
-    }
-    public Terminal(@NotNull RenderMode renderMode, @NotNull String id, @NotNull Location location, int widthSpace, int heightLines) {
+    private Terminal(@NotNull RenderMode renderMode, @NotNull String id, @NotNull Location location) {
         this.id = id;
         this.location = location;
         this.hologram = new EntityTextDisplay(renderMode)
@@ -43,7 +42,20 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
                 .setText(Component.text(""))
                 .setShadow(false)
                 .setBackgroundColor(0x30000000);
+    }
+    public Terminal(@NotNull String id, @NotNull Location location, int widthSpace, int heightLines) {
+        this(RenderMode.VIEWER_LIST, id, location, widthSpace, heightLines);
+    }
+    public Terminal(@NotNull RenderMode renderMode, @NotNull String id, @NotNull Location location, int widthSpace, int heightLines) {
+        this(renderMode, id, location);
         setSize(widthSpace, heightLines);
+    }
+    public Terminal(@NotNull String id, @NotNull Location location, double width, double height) {
+        this(RenderMode.VIEWER_LIST, id, location, width, height);
+    }
+    public Terminal(@NotNull RenderMode renderMode, @NotNull String id, @NotNull Location location, double width, double height) {
+        this(renderMode, id, location);
+        setSize(width, height);
     }
 
     /**
@@ -432,6 +444,25 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         hologram.setText(Component.text(joiner.toString()));
         width = HologramUtils.getWidth(hologram);
         height = HologramUtils.getHeight(hologram);
+    }
+
+    /**
+     * 设置终端面板尺寸
+     * <p>
+     * 注意，由于计算误差，最终设定的宽度和高度不一定与你传入的数值一致
+     * @param width 宽度，单位为像素
+     * @param height 高度，单位为像素
+     */
+    public void setSize(double width, double height) {
+        TextComponent component = Component.text(" ");
+        hologram.setText(component);
+        double oldWidth = HologramFont.getWidth(component);
+        double oldHeight = HologramUtils.LINE_HEIGHT;
+        float scaleX = HologramUtils.calculateScale(oldWidth, width);
+        float scaleY = HologramUtils.calculateScale(oldHeight, height);
+        hologram.setScale(scaleX, scaleY, 1.0f);
+        this.width = HologramUtils.getWidth(hologram);
+        this.height = HologramUtils.getHeight(hologram);
     }
 
     /**

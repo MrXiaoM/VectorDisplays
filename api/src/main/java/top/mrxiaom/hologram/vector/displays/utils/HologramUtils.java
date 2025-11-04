@@ -13,6 +13,8 @@ import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.api.ItemElement;
 import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
 
+import java.math.BigDecimal;
+
 public class HologramUtils {
     public static double LINE_HEIGHT = 12.5;
     private static final PlainTextComponentSerializer plainText = PlainTextComponentSerializer.plainText();
@@ -81,6 +83,18 @@ public class HologramUtils {
      */
     public static double getHeight(EntityItemDisplay hologram) {
         return ItemElement.scaleHeight * HologramFont.getCharScale() * hologram.getScale().y;
+    }
+
+    /**
+     * 根据旧尺寸和新尺寸，计算缩放
+     * @param oldLength 旧尺寸
+     * @param newLength 新尺寸
+     * @return 缩放大小
+     */
+    public static float calculateScale(double oldLength, double newLength) {
+        float vNew = BigDecimal.valueOf(newLength).floatValue();
+        float vOld = BigDecimal.valueOf(oldLength).floatValue();
+        return vNew / vOld;
     }
 
     /**
