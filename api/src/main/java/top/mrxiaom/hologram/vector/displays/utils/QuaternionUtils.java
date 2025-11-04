@@ -129,6 +129,14 @@ public class QuaternionUtils {
         return rotateChildren(pointO, rotate, pointA).toRawDouble();
     }
     /**
+     * @see QuaternionUtils#rotateChildren(Location, float[], Location)
+     */
+    public static double[] rotateChildrenToDouble(double[] origin, float[] rotate, double[] location) {
+        Point3D pointA = new Point3D(location);  // 点A的坐标
+        Point3D pointO = new Point3D(origin);  // 旋转中心O的坐标
+        return rotateChildren(pointO, rotate, pointA).toRawDouble();
+    }
+    /**
      * 作出旋转悬浮字后的坐标变换 (豆包AI 生成)
      *
      * @param origin 旋转原点

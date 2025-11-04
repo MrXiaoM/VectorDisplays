@@ -471,6 +471,11 @@ public class HologramUtils {
         double[] p2 = calc.decideLocation(x - 1, y + 1, true);
         double[] p3 = calc.decideLocation(x + 1, y + 1, true);
         double[] p4 = calc.decideLocation(x, y - 1, true, true);
+        // 处理额外旋转变换
+        float[] ar = element.getAdditionalRotation();
+        if (ar != null) {
+            p4 = QuaternionUtils.rotateChildrenToDouble(p1, ar, p4);
+        }
         // 计算投影
         double[] result = projectToPlane(p1, p2, p3, toVector(p1, p4), toArray(loc));
         // 将结果转换为文本坐标系
