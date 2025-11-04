@@ -19,7 +19,7 @@ import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
 public abstract class Element<This extends Element<This, Entity>, Entity extends AbstractEntity<Entity>> {
     private final @NotNull String id;
     private Terminal<?> terminal;
-    private EnumAlign align;
+    private EnumAlign align = EnumAlign.CENTER;
     private double x, y, zIndex = 1;
     protected float scaleX = 1.0f, scaleY = 1.0f;
     protected double width, height;
