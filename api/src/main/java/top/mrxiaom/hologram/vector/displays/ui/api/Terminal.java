@@ -13,6 +13,7 @@ import top.mrxiaom.hologram.vector.displays.hologram.*;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.api.wrapper.EntityTextDisplayWrapper;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
+import top.mrxiaom.hologram.vector.displays.utils.Point2D;
 import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
 
 import java.util.*;
@@ -533,16 +534,17 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
     public boolean tryPerformClick(Player player, Action action) {
         Location eyeLocation = player.getEyeLocation();
         for (Element<?, ?> element : elements) {
-            Location point = null;
+            Location clickPos = null;
             if (element.getEntity() instanceof EntityTextDisplay txt) {
-                point = HologramUtils.raytraceHologram(this, element.getAdditionalRotation(), txt, eyeLocation);
+                clickPos = HologramUtils.raytraceHologram(this, element.getAdditionalRotation(), txt, eyeLocation);
             }
             if (element.getEntity() instanceof EntityItemDisplay item) {
-                point = HologramUtils.raytraceHologram(this, element.getAdditionalRotation(), item, eyeLocation);
+                clickPos = HologramUtils.raytraceHologram(this, element.getAdditionalRotation(), item, eyeLocation);
             }
-            if (point != null && eyeLocation.distance(point) <= getInteractDistance()) {
-                // TODO: 将 point 投影到 element 上，获取所点击的二维坐标
-                ClickMeta meta = new ClickMeta(player, action);
+            if (clickPos != null && eyeLocation.distance(clickPos) <= getInteractDistance()) {
+                // 将 clickPos 投影到 element 上，获取所点击的二维坐标
+                Point2D whereClicked = HologramUtils.getPoint(element, clickPos);
+                ClickMeta meta = new ClickMeta(player, action, whereClicked);
                 element.performClick(meta);
                 return true; // 一次只允许点击一个元素
             }

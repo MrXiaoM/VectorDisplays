@@ -10,6 +10,8 @@ import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityItemDisplay;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
+import top.mrxiaom.hologram.vector.displays.ui.api.Calculator;
+import top.mrxiaom.hologram.vector.displays.ui.api.Element;
 import top.mrxiaom.hologram.vector.displays.ui.api.ItemElement;
 import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
 
@@ -454,4 +456,124 @@ public class HologramUtils {
         double angleRadians = Math.acos(cosTheta);
         return Math.toDegrees(angleRadians);
     }
+
+    /**
+     * 在元素坐标原点处建立平面直角坐标系，计算世界位置在元素上的投影坐标
+     * @param element 元素实例
+     * @param loc 世界位置
+     * @return 投影坐标 (使用文本坐标系)
+     */
+    public static Point2D getPoint(Element<?, ?> element, Location loc) {
+        Calculator calc = element.calc();
+        double x = element.getX();
+        double y = element.getY();
+        double[] p1 = calc.decideLocation(x, y, true);
+        double[] p2 = calc.decideLocation(x - 1, y + 1, true);
+        double[] p3 = calc.decideLocation(x + 1, y + 1, true);
+        double[] p4 = calc.decideLocation(x, y - 1, true, true);
+        // 计算投影
+        double[] result = projectToPlane(p1, p2, p3, toVector(p1, p4), toArray(loc));
+        // 将结果转换为文本坐标系
+        double charScale = HologramFont.getCharScale();
+        return new Point2D(result[0] / charScale, result[1] / charScale);
+    }
+
+    private static double[] toArray(Location loc) {
+        return new double[] { loc.getX(), loc.getY(), loc.getZ() };
+    }
+
+    private static double[] toVector(double[] start, double[] end) {
+        return new double[] { end[0] - start[0], end[1] - start[1], end[2] - start[2] };
+    }
+
+    /**
+     * 将三维空间中的点pA投影到由p1, p2, p3定义的平面坐标系中
+     *
+     * @param p1 平面上的点1，作为新坐标系的原点
+     * @param p2 平面上的点2
+     * @param p3 平面上的点3
+     * @param vY y轴方向向量
+     * @param pA 待投影的三维空间点
+     * @return double[2] 投影后在平面坐标系中的坐标 [x, y]
+     */
+    public static double[] projectToPlane(double[] p1, double[] p2, double[] p3,
+                                          double[] vY, double[] pA) {
+        // 步骤1: 计算平面的两个方向向量
+        double[] v1 = subtract(p2, p1);  // p1到p2的向量
+        double[] v2 = subtract(p3, p1);  // p1到p3的向量
+
+        // 步骤2: 计算平面的法向量 (v1 × v2)
+        double[] normal = crossProduct(v1, v2);
+        normal = normalize(normal);
+
+        // 步骤3: 将pA投影到平面上
+        // 投影公式: pA_projected = pA - ((pA - p1) · normal) * normal
+        double[] pA_minus_p1 = subtract(pA, p1);
+        double distance = dotProduct(pA_minus_p1, normal);
+        double[] projection = subtract(pA, scalarMultiply(normal, distance));
+
+        // 步骤4: 将vY投影到平面上，作为y轴方向
+        // vY_projected = vY - (vY · normal) * normal
+        double vY_dot_normal = dotProduct(vY, normal);
+        double[] vY_projected = subtract(vY, scalarMultiply(normal, vY_dot_normal));
+        vY_projected = normalize(vY_projected);
+
+        // 步骤5: 计算x轴方向 (垂直于y轴，在平面上)
+        // x轴 = y轴 × 法向量
+        double[] xAxis = crossProduct(vY_projected, normal);
+        xAxis = normalize(xAxis);
+
+        // 步骤6: 计算投影点相对于p1的向量
+        double[] relativePos = subtract(projection, p1);
+
+        // 步骤7: 计算在新坐标系中的坐标
+        double x = dotProduct(relativePos, xAxis);
+        double y = dotProduct(relativePos, vY_projected);
+
+        return new double[]{x, y};
+    }
+
+    /**
+     * 向量加法: a + b
+     */
+    private static double[] add(double[] a, double[] b) {
+        return new double[]{a[0] + b[0], a[1] + b[1], a[2] + b[2]};
+    }
+
+    /**
+     * 标量乘法: scalar * v
+     */
+    private static double[] scalarMultiply(double[] v, double scalar) {
+        return new double[]{v[0] * scalar, v[1] * scalar, v[2] * scalar};
+    }
+
+    /**
+     * 向量叉积: a × b
+     */
+    private static double[] crossProduct(double[] a, double[] b) {
+        return new double[]{
+                a[1] * b[2] - a[2] * b[1],
+                a[2] * b[0] - a[0] * b[2],
+                a[0] * b[1] - a[1] * b[0]
+        };
+    }
+
+    /**
+     * 向量归一化
+     */
+    private static double[] normalize(double[] v) {
+        double length = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+        if (length < 1e-10) {
+            throw new IllegalArgumentException("Cannot normalize zero vector");
+        }
+        return new double[]{v[0] / length, v[1] / length, v[2] / length};
+    }
+
+    /**
+     * 计算向量长度
+     */
+    private static double vectorLength(double[] v) {
+        return Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+    }
+
 }

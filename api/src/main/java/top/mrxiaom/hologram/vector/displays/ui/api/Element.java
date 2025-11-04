@@ -17,6 +17,7 @@ import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
  * 悬浮字界面元素
  */
 public abstract class Element<This extends Element<This, Entity>, Entity extends AbstractEntity<Entity>> {
+    private final Calculator calculator = new Calculator(this);
     private final @NotNull String id;
     private Terminal<?> terminal;
     private EnumAlign align = EnumAlign.CENTER;
@@ -29,6 +30,10 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
     public Element(@NotNull String id) {
         this.id = id;
         this.hologram = createHologram();
+    }
+
+    public Calculator calc() {
+        return calculator;
     }
 
     protected abstract Entity createHologram();

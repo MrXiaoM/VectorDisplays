@@ -70,6 +70,9 @@ public class QuaternionUtils {
             this.y = y;
             this.z = z;
         }
+        Point3D(double[] point) {
+            this(point[0], point[1], point[2]);
+        }
         Point3D(float[] point) {
             this(point[0], point[1], point[2]);
         }
@@ -87,6 +90,9 @@ public class QuaternionUtils {
         }
         float[] toRaw() {
             return new float[] { (float)x, (float)y, (float)z };
+        }
+        double[] toRawDouble() {
+            return new double[] { x, y, z };
         }
     }
 
@@ -112,6 +118,15 @@ public class QuaternionUtils {
         Point3D pointA = new Point3D(location);  // 点A的坐标
         Point3D pointO = new Point3D(origin);  // 旋转中心O的坐标
         return rotateChildren(pointO, rotate, pointA).toLocation(location.getWorld());
+    }
+
+    /**
+     * @see QuaternionUtils#rotateChildren(Location, float[], Location)
+     */
+    public static double[] rotateChildrenToDouble(Location origin, float[] rotate, double[] location) {
+        Point3D pointA = new Point3D(location);  // 点A的坐标
+        Point3D pointO = new Point3D(origin);  // 旋转中心O的坐标
+        return rotateChildren(pointO, rotate, pointA).toRawDouble();
     }
     /**
      * 作出旋转悬浮字后的坐标变换 (豆包AI 生成)
