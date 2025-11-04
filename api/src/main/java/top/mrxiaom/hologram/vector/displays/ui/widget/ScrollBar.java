@@ -3,6 +3,7 @@ package top.mrxiaom.hologram.vector.displays.ui.widget;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
 import top.mrxiaom.hologram.vector.displays.hologram.HologramAPI;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
@@ -10,8 +11,11 @@ import top.mrxiaom.hologram.vector.displays.ui.api.ClickMeta;
 import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
 import top.mrxiaom.hologram.vector.displays.ui.api.TextElement;
 import top.mrxiaom.hologram.vector.displays.ui.api.wrapper.EntityTextDisplayWrapper;
+import top.mrxiaom.hologram.vector.displays.ui.event.ValueChangedEvent;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
+
+import java.util.function.Supplier;
 
 /**
  * 滚动条控件
@@ -25,6 +29,7 @@ public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDispl
     private float markTextWidth;
     private double markWidth, markHeight;
     private final float spaceWidth;
+    private ValueChangedEvent<ScrollBar, Double> progressChanged;
 
     /**
      * 滚动条控件
@@ -37,7 +42,7 @@ public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDispl
     /**
      * 滚动条控件
      * @param id 元素ID
-     * @param division 分为多少块（确定滑动按钮大小） TODO: 这个参数对应的功能还没有做完
+     * @param division 分为多少块（确定滑动按钮大小）
      * @param sliderWidth 滚动条宽度
      * @param sliderHeight 滚动条高度
      */
@@ -186,7 +191,11 @@ public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDispl
     public void setProgress(double progress) {
         double newProgress = Math.max(0.0, Math.min(1.0, progress));
         if (newProgress != this.progress) {
+            double oldProgress = this.progress;
             this.progress = newProgress;
+            if (this.progressChanged != null) {
+                this.progressChanged.perform(oldProgress, newProgress, this);
+            }
             this.updateText();
             this.updateLocation();
         }
@@ -208,9 +217,34 @@ public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDispl
 
     @Override
     public void performClick(ClickMeta meta) {
-        // TODO: 需要解决一个问题，meta.getWhereClicked 没有应用额外旋转
-        meta.getPlayer().sendMessage("点击位置: " + meta.getWhereClicked());
         setProgress((meta.getWhereClicked().getX() + (getTextWidth() / 2.0)) / getTextWidth());
+    }
+
+    /**
+     * 设置当滚动条的进度出现变化时执行的操作
+     * @param progressChanged 数值改变事件
+     */
+    public ScrollBar setOnProgressChanged(@Nullable ValueChangedEvent<ScrollBar, Double> progressChanged) {
+        this.progressChanged = progressChanged;
+        return this;
+    }
+
+    /**
+     * 设置当滚动条的进度出现变化时执行的操作
+     * @param supplier 数值改变事件
+     */
+    public ScrollBar setOnProgressChanged(@Nullable Supplier<ValueChangedEvent<ScrollBar, Double>> supplier) {
+        if (supplier == null) {
+            this.progressChanged = null;
+        } else {
+            this.progressChanged = (oldValue, newValue, element) -> {
+                ValueChangedEvent<ScrollBar, Double> progressChanged = supplier.get();
+                if (progressChanged != null) {
+                    progressChanged.perform(oldValue, newValue, element);
+                }
+            };
+        }
+        return this;
     }
 
     @Override
