@@ -12,8 +12,19 @@ public class Calculator {
     }
 
     public double[] decideLocation(double pX, double pY, boolean rotate) {
+        return decideLocation(pX, pY, rotate, false);
+    }
+    public double[] decideLocation(double pX, double pY, boolean rotate, boolean additionalRotate) {
         double[] raw = element.decideLocationRaw(pX, pY);
         if (rotate) {
+            // 应用额外旋转
+            if (additionalRotate) {
+                float[] ar = element.getAdditionalRotation();
+                if (ar != null) {
+                    double[] origin = decideLocation(element.getX(), element.getY(), true);
+                    raw = QuaternionUtils.rotateChildrenToDouble(origin, ar, raw);
+                }
+            }
             Terminal<?> terminal = element.getTerminal();
             // TODO: 考虑 parent
             Location origin = terminal.getLocation();

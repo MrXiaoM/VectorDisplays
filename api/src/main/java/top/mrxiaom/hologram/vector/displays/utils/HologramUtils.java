@@ -487,16 +487,12 @@ public class HologramUtils {
         double x = element.getX();
         double y = element.getY();
         double[] p1 = calc.decideLocation(x, y, true);
-        double[] p2 = calc.decideLocation(x - 1, y + 1, true);
-        double[] p3 = calc.decideLocation(x + 1, y + 1, true);
-        double[] p4 = calc.decideLocation(x, y - 1, true, true);
-        // 处理额外旋转变换
-        float[] ar = element.getAdditionalRotation();
-        if (ar != null) {
-            p4 = QuaternionUtils.rotateChildrenToDouble(p1, ar, p4);
-        }
+        double[] p2 = calc.decideLocation(x - 100, y + 100, true);
+        double[] p3 = calc.decideLocation(x + 100, y + 100, true);
+        double[] p4 = calc.decideLocation(x, y - 100, true, true);
+        double[] p5 = calc.decideLocation(x + 100, y, true, true);
         // 计算投影
-        double[] result = projectToPlane(p1, p2, p3, toVector(p1, p4), toArray(loc));
+        double[] result = projectToPlane(p1, p2, p3, toVector(p1, p5), toVector(p1, p4), toArray(loc));
         // 将结果转换为文本坐标系
         double charScale = HologramFont.getCharScale();
         return new Point2D(result[0] / charScale, result[1] / charScale);
@@ -516,12 +512,13 @@ public class HologramUtils {
      * @param p1 平面上的点1，作为新坐标系的原点
      * @param p2 平面上的点2
      * @param p3 平面上的点3
+     * @param vX x轴方向向量
      * @param vY y轴方向向量
      * @param pA 待投影的三维空间点
      * @return double[2] 投影后在平面坐标系中的坐标 [x, y]
      */
     public static double[] projectToPlane(double[] p1, double[] p2, double[] p3,
-                                          double[] vY, double[] pA) {
+                                          double[] vX, double[] vY, double[] pA) {
         // 步骤1: 计算平面的两个方向向量
         double[] v1 = subtract(p2, p1);  // p1到p2的向量
         double[] v2 = subtract(p3, p1);  // p1到p3的向量
@@ -542,10 +539,17 @@ public class HologramUtils {
         double[] vY_projected = subtract(vY, scalarMultiply(normal, vY_dot_normal));
         vY_projected = normalize(vY_projected);
 
-        // 步骤5: 计算x轴方向 (垂直于y轴，在平面上)
-        // x轴 = y轴 × 法向量
-        double[] xAxis = crossProduct(vY_projected, normal);
-        xAxis = normalize(xAxis);
+        // 步骤5: 处理vX向量，计算x轴方向
+        // 5.1 将vX投影到平面上（确保x轴在平面内）
+        double vX_dot_normal = dotProduct(vX, normal);
+        double[] vX_projected = subtract(vX, scalarMultiply(normal, vX_dot_normal));
+        vX_projected = normalize(vX_projected);
+
+        // 5.2 正交化处理（确保x轴与y轴垂直）
+        // 公式：x轴 = vX投影 - (vX投影 · y轴) * y轴（格拉姆-施密特正交化）
+        double dotProductXV = dotProduct(vX_projected, vY_projected);
+        double[] xAxis = subtract(vX_projected, scalarMultiply(vY_projected, dotProductXV));
+        xAxis = normalize(xAxis);  // 归一化得到最终x轴
 
         // 步骤6: 计算投影点相对于p1的向量
         double[] relativePos = subtract(projection, p1);
