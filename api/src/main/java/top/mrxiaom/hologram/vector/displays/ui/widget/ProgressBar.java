@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 public class ProgressBar extends TextElement<ProgressBar> implements EntityTextDisplayWrapper<ProgressBar> {
     private double progress;
     private int foregroundColor;
-    private float progressWidth, progressHeight;
+    private float barWidth, barHeight;
     private final EntityTextDisplay hologramMark;
     private double markTextWidth;
     private double markWidth, markHeight;
@@ -41,10 +41,10 @@ public class ProgressBar extends TextElement<ProgressBar> implements EntityTextD
     /**
      * 进度条控件
      * @param id 元素ID
-     * @param progressWidth 进度条宽度
-     * @param progressHeight 进度条高度
+     * @param barWidth 进度条宽度
+     * @param barHeight 进度条高度
      */
-    public ProgressBar(@NotNull String id, float progressWidth, float progressHeight) {
+    public ProgressBar(@NotNull String id, float barWidth, float barHeight) {
         super(id);
         this.hologramMark = createHologram()
                 .setText(Component.text("                "))
@@ -55,7 +55,7 @@ public class ProgressBar extends TextElement<ProgressBar> implements EntityTextD
         this.setForegroundColor(0xFFFFFFFF);
         this.setShadow(false);
         this.setZIndex(15);
-        this.setProgressSize(progressWidth, progressHeight);
+        this.setBarSize(barWidth, barHeight);
     }
 
     @Override
@@ -122,25 +122,25 @@ public class ProgressBar extends TextElement<ProgressBar> implements EntityTextD
     /**
      * 获取进度条的宽度
      */
-    public float getProgressWidth() {
-        return progressWidth;
+    public float getBarWidth() {
+        return barWidth;
     }
 
     /**
      * 获取进度条的高度
      */
-    public float getProgressHeight() {
-        return progressHeight;
+    public float getBarHeight() {
+        return barHeight;
     }
 
     /**
      * 设置进度条的大小，使用文字参考系
-     * @param progressWidth 进度条宽度
-     * @param progressHeight 进度条高度
+     * @param barWidth 进度条宽度
+     * @param barHeight 进度条高度
      */
-    public ProgressBar setProgressSize(float progressWidth, float progressHeight) {
-        this.progressWidth = progressWidth;
-        this.progressHeight = progressHeight;
+    public ProgressBar setBarSize(float barWidth, float barHeight) {
+        this.barWidth = barWidth;
+        this.barHeight = barHeight;
         this.updateText();
         return this;
     }
@@ -191,11 +191,11 @@ public class ProgressBar extends TextElement<ProgressBar> implements EntityTextD
     private void updateText() {
         hologram.setText(hologramMark.getTextAsComponent());
 
-        float scaleX = HologramUtils.calculateScale(spaceWidth, this.progressWidth);
-        float scaleY = HologramUtils.calculateScale(HologramUtils.LINE_HEIGHT, this.progressHeight);
+        float scaleX = HologramUtils.calculateScale(spaceWidth, this.barWidth);
+        float scaleY = HologramUtils.calculateScale(HologramUtils.LINE_HEIGHT, this.barHeight);
         this.setScale(scaleX, scaleY);
 
-        this.markTextWidth = this.progressWidth * this.progress;
+        this.markTextWidth = this.barWidth * this.progress;
         System.out.printf("progress %.2f%% -> %.4f\n", this.progress * 100.0, markTextWidth);
         float spaceScaleX = HologramUtils.calculateScale(spaceWidth, this.markTextWidth);
         markWidth = HologramUtils.LINE_HEIGHT * HologramFont.getCharScale() * scaleY;
