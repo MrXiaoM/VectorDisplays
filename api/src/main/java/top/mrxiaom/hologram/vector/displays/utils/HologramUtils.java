@@ -100,15 +100,24 @@ public class HologramUtils {
     }
 
     /**
+     * @see HologramUtils#raytraceHologram(float[], float[], EntityTextDisplay, Location)
+     */
+    @Nullable
+    public static Location raytraceHologram(@NotNull Terminal<?> terminal, float @Nullable [] additionalRotation, @NotNull EntityTextDisplay hologram, @NotNull Location eyeLocation) {
+        return raytraceHologram(terminal.getRotation(), additionalRotation, hologram, eyeLocation);
+    }
+
+    /**
      * 获取玩家的视线落在了文本悬浮字上的世界坐标
      *
-     * @param terminal 终端面板
+     * @param rotation 终端面板旋转量
+     * @param additionalRotation 悬浮字的额外旋转量
      * @param hologram 悬浮字
      * @param eyeLocation 玩家视线位置，<code>player.getEyeLocation()</code>
      * @return 如果视线没有落在悬浮字上，返回 <code>null</code>
      */
     @Nullable
-    public static Location raytraceHologram(@NotNull Terminal<?> terminal, float @Nullable [] additionalRotation, @NotNull EntityTextDisplay hologram, @NotNull Location eyeLocation) {
+    public static Location raytraceHologram(float @NotNull [] rotation, float @Nullable [] additionalRotation, @NotNull EntityTextDisplay hologram, @NotNull Location eyeLocation) {
         // 计算悬浮字长宽
         double width = getWidth(hologram);
         double height = getHeight(hologram);
@@ -133,23 +142,33 @@ public class HologramUtils {
         // 获取终端面板的旋转四元数，进行变换后再输入计算交点
         float[] r;
         if (additionalRotation == null) {
-            r = terminal.getRotation();
+            r = rotation;
         } else {
-            r = QuaternionUtils.multiplyF(terminal.getRotation(), additionalRotation);
+            r = QuaternionUtils.multiplyF(rotation, additionalRotation);
         }
         // 计算交点
         return calculateIntersection(loc, r, loc1, loc2, loc3, loc4, eyeLocation);
     }
+
+    /**
+     * @see HologramUtils#raytraceHologram(float[], float[], EntityItemDisplay, Location)
+     */
+    @Nullable
+    public static Location raytraceHologram(@NotNull Terminal<?> terminal, float @Nullable [] additionalRotation, @NotNull EntityItemDisplay hologram, @NotNull Location eyeLocation) {
+        return raytraceHologram(terminal.getRotation(), additionalRotation, hologram, eyeLocation);
+    }
+
     /**
      * 获取玩家的视线落在了物品悬浮字上的世界坐标
      *
-     * @param terminal 终端面板
+     * @param rotation 终端面板旋转量
+     * @param additionalRotation 悬浮字的额外旋转量
      * @param hologram 悬浮字
      * @param eyeLocation 玩家视线位置，<code>player.getEyeLocation()</code>
      * @return 如果视线没有落在悬浮字上，返回 <code>null</code>
      */
     @Nullable
-    public static Location raytraceHologram(@NotNull Terminal<?> terminal, float @Nullable [] additionalRotation, @NotNull EntityItemDisplay hologram, @NotNull Location eyeLocation) {
+    public static Location raytraceHologram(float @NotNull [] rotation, float @Nullable [] additionalRotation, @NotNull EntityItemDisplay hologram, @NotNull Location eyeLocation) {
         // 计算悬浮字长宽
         double width = getWidth(hologram);
         double height = getHeight(hologram);
@@ -174,9 +193,9 @@ public class HologramUtils {
         // 获取终端面板的旋转四元数，进行变换后再输入计算交点
         float[] r;
         if (additionalRotation == null) {
-            r = terminal.getRotation();
+            r = rotation;
         } else {
-            r = QuaternionUtils.multiplyF(terminal.getRotation(), additionalRotation);
+            r = QuaternionUtils.multiplyF(rotation, additionalRotation);
         }
         // 计算交点
         return calculateIntersection(loc, r, loc1, loc2, loc3, loc4, eyeLocation);
