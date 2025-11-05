@@ -48,6 +48,7 @@ public class ProgressBar extends TextElement<ProgressBar> implements EntityTextD
     public ProgressBar(@NotNull String id, float barWidth, float barHeight) {
         super(id);
         this.hologramMark = createHologram()
+                .setInterpolationDurationTransformation(2)
                 .setText(Component.text("                "))
                 .setShadow(false);
         this.spaceWidth = HologramFont.getTextRenderer().getWidth(hologramMark.getTextAsComponent());
