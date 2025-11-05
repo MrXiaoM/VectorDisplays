@@ -19,7 +19,7 @@ public class EntityTextDisplay extends EntityDisplay<EntityTextDisplay> {
     protected Component text = Component.text("");
 
     private boolean shadow = true;
-    private int maxLineWidth = 200;
+    private int maxLineWidth = 10000;
     private int backgroundColor;
     private boolean seeThroughBlocks = false;
     private TextDisplay.TextAlignment alignment = TextDisplay.TextAlignment.CENTER;
