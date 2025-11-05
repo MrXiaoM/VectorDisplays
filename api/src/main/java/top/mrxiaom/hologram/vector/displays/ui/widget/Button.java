@@ -123,7 +123,7 @@ public class Button extends TextElement<Button> implements Hoverable {
      */
     public Button setOnHoverStateChange(HoverStateChange<Button> hoverStateChange) {
         this.hoverStateChange = hoverStateChange;
-        hoverStateChange.perform(false, this);
+        hoverStateChange.perform(hoverState, this);
         return this;
     }
 

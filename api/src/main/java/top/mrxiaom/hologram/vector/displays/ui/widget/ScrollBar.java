@@ -8,9 +8,11 @@ import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
 import top.mrxiaom.hologram.vector.displays.hologram.HologramAPI;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.api.ClickMeta;
+import top.mrxiaom.hologram.vector.displays.ui.api.Hoverable;
 import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
 import top.mrxiaom.hologram.vector.displays.ui.api.TextElement;
 import top.mrxiaom.hologram.vector.displays.ui.api.wrapper.EntityTextDisplayWrapper;
+import top.mrxiaom.hologram.vector.displays.ui.event.HoverStateChange;
 import top.mrxiaom.hologram.vector.displays.ui.event.ValueChangedEvent;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
@@ -21,7 +23,7 @@ import java.util.function.Supplier;
 /**
  * 滚动条控件
  */
-public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDisplayWrapper<ScrollBar> {
+public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDisplayWrapper<ScrollBar>, Hoverable {
     private int division;
     private double progress;
     private int foregroundColor;
@@ -30,7 +32,9 @@ public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDispl
     private float markTextWidth;
     private double markWidth, markHeight;
     private final float spaceWidth;
+    private boolean hoverState = false;
     private ValueChangedEvent<ScrollBar, Double> progressChanged;
+    private HoverStateChange<ScrollBar> hoverStateChange;
 
     /**
      * 滚动条控件
@@ -270,5 +274,31 @@ public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDispl
         hologramMark.removeAllViewers();
         HologramAPI.getHologram().remove(hologramMark);
         super.dispose();
+    }
+
+    /**
+     * 设置当有任意玩家的准心指向这个元素的状态更新时执行操作
+     * @param hoverStateChange 悬停状态变化事件
+     */
+    public ScrollBar setOnHoverStateChange(HoverStateChange<ScrollBar> hoverStateChange) {
+        this.hoverStateChange = hoverStateChange;
+        hoverStateChange.perform(hoverState, this);
+        return this;
+    }
+
+    @Override
+    public void onTimerTick() {
+        super.onTimerTick();
+
+        tryUpdateHoverState(Hoverable.handleHover(getTerminal(), getAdditionalRotation(), this));
+    }
+
+    @Override
+    public void tryUpdateHoverState(boolean hover) {
+        if (hover == hoverState) return;
+        hoverState = hover;
+        if (hoverStateChange != null) {
+            hoverStateChange.perform(hover, this);
+        }
     }
 }
