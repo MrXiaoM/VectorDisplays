@@ -2,6 +2,7 @@ package top.mrxiaom.hologram.vector.displays.ui.api;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.jetbrains.annotations.ApiStatus;
 import top.mrxiaom.hologram.vector.displays.utils.Point2D;
 
 /**
@@ -11,8 +12,11 @@ public class ClickMeta {
     private final Player player;
     private final Action action;
     private final Point2D whereClicked;
-
-    protected ClickMeta(Player player, Action action, Point2D whereClicked) {
+    /**
+     * 非必要情况下，非 VectorDisplays 内部方法，不要使用这个构造函数
+     */
+    @ApiStatus.Internal
+    public ClickMeta(Player player, Action action, Point2D whereClicked) {
         this.player = player;
         this.action = action;
         this.whereClicked = whereClicked;

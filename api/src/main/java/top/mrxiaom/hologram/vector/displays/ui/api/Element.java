@@ -11,7 +11,10 @@ import top.mrxiaom.hologram.vector.displays.hologram.HologramAPI;
 import top.mrxiaom.hologram.vector.displays.ui.EnumAlign;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.event.TimerTickEvent;
+import top.mrxiaom.hologram.vector.displays.ui.widget.Panel;
 import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
+
+import java.util.Objects;
 
 /**
  * 悬浮字界面元素
@@ -20,6 +23,7 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
     private final Calculator calculator = new Calculator(this);
     private final @NotNull String id;
     private Terminal<?> terminal;
+    private Element<?, ?> parent;
     private EnumAlign align = EnumAlign.CENTER;
     private double x, y, zIndex = 1;
     protected float scaleX = 1.0f, scaleY = 1.0f;
@@ -58,9 +62,16 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
      */
     @NotNull
     public Terminal<?> getTerminal() {
-        return terminal;
+        return Objects.requireNonNull(terminal);
     }
 
+    /**
+     * 与 <code>getTerminal()</code> 相同，仅在内部生命周期需要进行判定时使用
+     */
+    @Nullable
+    protected Terminal<?> terminal() {
+        return terminal;
+    }
 
     /**
      * 界面元素的ID
@@ -68,6 +79,21 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
     @NotNull
     public String getId() {
         return id;
+    }
+
+    /**
+     * 获取父元素
+     */
+    @Nullable
+    public Element<?, ?> getParent() {
+        return parent;
+    }
+
+    /**
+     * 设置父元素
+     */
+    public void setParent(@Nullable Element<?, ?> parent) {
+        this.parent = parent;
     }
 
     /**
@@ -251,16 +277,33 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
         double charScale = HologramFont.getCharScale();
         double x = pX * charScale;
         double y = pY * charScale;
-        // 获取终端背景的参数
-        double rootWidth = terminal.getWidth();
-        double rootHeight = terminal.getHeight();
-        Location rootLocation = terminal.getLocation();
-        double rootX = rootLocation.getX();
-        double rootY = rootLocation.getY();
-        double z = rootLocation.getZ() + (0.001 * zIndex);
+        // 获取 父元素 或 终端背景 的参数
+        double[] parentLoc;
+        double parentWidth, parentHeight;
+        float[] ar;
+        if (parent != null) {
+            parentWidth = parent.getWidth();
+            parentHeight = parent.getHeight();
+            parentLoc = parent.decideLocationRaw(parent.getX(), parent.getY());
+            ar = parent.additionalRotation;
+        } else {
+            parentWidth = terminal.getWidth();
+            parentHeight = terminal.getHeight();
+            Location loc = terminal.getLocation();
+            parentLoc = new double[] { loc.getX(), loc.getY(), loc.getZ() };
+            ar = null;
+        }
+        double parentX = parentLoc[0];
+        double parentY = parentLoc[1];
+        double z = parentLoc[2] + (0.001 * zIndex);
 
         // 根据排列方式的不同，计算在世界上的初始坐标
-        return align.get(rootX, rootY, z, rootWidth, rootHeight, x, y, width, height);
+        double[] result = align.get(parentX, parentY, z, parentWidth, parentHeight, x, y, width, height);
+        if (ar != null) {
+            return QuaternionUtils.rotateChildrenToDouble(parentLoc, ar, result);
+        } else {
+            return result;
+        }
     }
 
     /**
@@ -286,11 +329,17 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
         HologramAPI.getHologram().spawn(hologram, decideLocation());
     }
 
+    public float[] getParentRotation() {
+        return parent != null
+                ? parent.getRotation()
+                : terminal.getRotation();
+    }
+
     public float[] getRotation() {
         if (additionalRotation == null) {
-            return terminal.getRotation();
+            return getParentRotation();
         }
-        return QuaternionUtils.multiplyF(terminal.getRotation(), additionalRotation);
+        return QuaternionUtils.multiplyF(getParentRotation(), additionalRotation);
     }
 
     /**
@@ -299,6 +348,20 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
      */
     public void update() {
         hologram.update();
+    }
+
+    /**
+     * 预执行点击操作，在 <code>performClick</code> 之前执行。
+     * <p>
+     * 注意: 玩家进行的任何点击操作都会执行这个函数，不管他们是否已点击到这个元素上面。该方法仅供特殊用途使用，例如 Panel
+     * @see Panel#beforePerformClick(Player, Action, Location)
+     * @param player 玩家
+     * @param action 操作类型
+     * @param eyeLocation <code>player.getEyeLocation()</code>
+     * @return 是否已处理该操作
+     */
+    public boolean beforePerformClick(Player player, Action action, Location eyeLocation) {
+        return false;
     }
 
     /**

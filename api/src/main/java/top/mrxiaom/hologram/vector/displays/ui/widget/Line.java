@@ -124,7 +124,7 @@ public class Line extends TextElement<Line> {
         // 再根据 AB、CD 线段进行旋转 (calculateRotation)
         this.rotation = QuaternionUtils.multiplyF(
                 QuaternionUtils.calculateRotation(locA, locB, locC, locD),
-                terminal.getRotation()
+                getParentRotation()
         );
 
         // 根据 thickness (宽度) 与悬浮字单行标准高度的比值，计算缩放大小

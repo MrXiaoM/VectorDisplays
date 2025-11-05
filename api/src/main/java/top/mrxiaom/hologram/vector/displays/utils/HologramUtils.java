@@ -3,6 +3,7 @@ package top.mrxiaom.hologram.vector.displays.utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -10,12 +11,10 @@ import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityItemDisplay;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
-import top.mrxiaom.hologram.vector.displays.ui.api.Calculator;
-import top.mrxiaom.hologram.vector.displays.ui.api.Element;
-import top.mrxiaom.hologram.vector.displays.ui.api.ItemElement;
-import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
+import top.mrxiaom.hologram.vector.displays.ui.api.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class HologramUtils {
     public static double LINE_HEIGHT = 12.5;
@@ -28,6 +27,39 @@ public class HologramUtils {
 
     public static boolean isRightClick(Action action) {
         return action.equals(Action.RIGHT_CLICK_AIR) || action.equals(Action.RIGHT_CLICK_BLOCK);
+    }
+
+    /**
+     * 尝试执行点击元素操作
+     * @param player 玩家
+     * @param action 点击操作
+     * @param eyeLocation <code>player.getEyeLocation()</code>
+     * @param elements 待处理点击操作的元素列表
+     * @param rotation 父面板旋转变换
+     * @param interactDistance 可交互距离 (单位: 方块)
+     * @return <code>true</code> 代表已有元素处理点击事件
+     */
+    public static boolean commonPerformClick(Player player, Action action, Location eyeLocation, List<Element<?, ?>> elements, float[] rotation, double interactDistance) {
+        for (Element<?, ?> element : elements) {
+            if (element.beforePerformClick(player, action, eyeLocation)) {
+                return true;
+            }
+            Location clickPos = null;
+            if (element.getEntity() instanceof EntityTextDisplay txt) {
+                clickPos = HologramUtils.raytraceHologram(rotation, element.getAdditionalRotation(), txt, eyeLocation);
+            }
+            if (element.getEntity() instanceof EntityItemDisplay item) {
+                clickPos = HologramUtils.raytraceHologram(rotation, element.getAdditionalRotation(), item, eyeLocation);
+            }
+            if (clickPos != null && eyeLocation.distance(clickPos) <= interactDistance) {
+                // 将 clickPos 投影到 element 上，获取所点击的二维坐标
+                Point2D whereClicked = HologramUtils.getPoint(element, clickPos);
+                ClickMeta meta = new ClickMeta(player, action, whereClicked);
+                element.performClick(meta);
+                return true; // 一次只允许点击一个元素
+            }
+        }
+        return false;
     }
 
     public static float[] toFloat(double... doubles) {

@@ -3,6 +3,7 @@ package top.mrxiaom.hologram.vector.displays.ui.api;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
@@ -13,7 +14,6 @@ import top.mrxiaom.hologram.vector.displays.hologram.*;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.api.wrapper.EntityTextDisplayWrapper;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
-import top.mrxiaom.hologram.vector.displays.utils.Point2D;
 import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
 
 import java.util.*;
@@ -144,12 +144,16 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         return hologram;
     }
 
+    public void bindElement(@NotNull Element<?, ?> element) {
+        element.setTerminal(this);
+    }
+
     /**
      * 向界面添加元素，建议在 <code>init()</code> 之前将元素添加完成
      * @param element 元素实例
      */
     public void addElement(Element<?, ?> element) {
-        element.setTerminal(this);
+        bindElement(element);
         elements.add(element);
     }
 
@@ -319,6 +323,11 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         }
     }
 
+    @NotNull
+    public World getWorld() {
+        return Objects.requireNonNull(location.getWorld());
+    }
+
     /**
      * 获取悬浮字位置
      */
@@ -420,13 +429,14 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
     }
 
     public Location getRotatedLoc(double[] loc) {
-        return QuaternionUtils.rotateChildren(this, new Location(getLocation().getWorld(), loc[0], loc[1], loc[2]));
+        double[] result = QuaternionUtils.rotateChildrenToDouble(getLocation(), getRotation(), loc);
+        return new Location(getWorld(), result[0], result[1], result[2]);
     }
 
     public float[] getRotated(double[] loc) {
         return QuaternionUtils.rotateChildren(
                 HologramUtils.toFloat(location.getX(), location.getY(), location.getZ()),
-                rotation,
+                getRotation(),
                 HologramUtils.toFloat(loc)
         );
     }
@@ -533,22 +543,8 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
      */
     public boolean tryPerformClick(Player player, Action action) {
         Location eyeLocation = player.getEyeLocation();
-        for (Element<?, ?> element : elements) {
-            Location clickPos = null;
-            if (element.getEntity() instanceof EntityTextDisplay txt) {
-                clickPos = HologramUtils.raytraceHologram(this, element.getAdditionalRotation(), txt, eyeLocation);
-            }
-            if (element.getEntity() instanceof EntityItemDisplay item) {
-                clickPos = HologramUtils.raytraceHologram(this, element.getAdditionalRotation(), item, eyeLocation);
-            }
-            if (clickPos != null && eyeLocation.distance(clickPos) <= getInteractDistance()) {
-                // 将 clickPos 投影到 element 上，获取所点击的二维坐标
-                Point2D whereClicked = HologramUtils.getPoint(element, clickPos);
-                ClickMeta meta = new ClickMeta(player, action, whereClicked);
-                element.performClick(meta);
-                return true; // 一次只允许点击一个元素
-            }
-        }
-        return false;
+        float[] rotation = getRotation();
+        double interactDistance = getInteractDistance();
+        return HologramUtils.commonPerformClick(player, action, eyeLocation, elements, rotation, interactDistance);
     }
 }
