@@ -36,14 +36,14 @@ public abstract class TextElement<This extends Element<This, EntityTextDisplay>>
     }
 
     /**
-     * 获取该元素的悬浮字宽度
+     * 获取该元素的悬浮字在文本坐标系的宽度
      */
     public double getTextWidth() {
         return textWidth;
     }
 
     /**
-     * 获取该元素的悬浮字高度
+     * 获取该元素的悬浮字在文本坐标系的高度
      */
     public double getTextHeight() {
         return textHeight;

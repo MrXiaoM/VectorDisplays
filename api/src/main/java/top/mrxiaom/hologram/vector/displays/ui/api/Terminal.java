@@ -28,6 +28,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
     private final Map<String, List<Element<?, ?>>> pages = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private final List<Element<?, ?>> elements = new ArrayList<>();
     private final EntityTextDisplay hologram;
+    private double textWidth, textHeight;
     private double width, height;
     private double interactDistance = 2.5;
     private float[] rotation = { 0, 0, 0, 1 };
@@ -451,14 +452,18 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
      * @param heightLines 高度，单位为行数。大约一行是 12 单位
      */
     public void setSize(int widthSpace, int heightLines) {
-        String line = " ".repeat(widthSpace);
-        StringJoiner joiner = new StringJoiner("\n");
+        TextComponent line = Component.text(" ".repeat(widthSpace));
+        TextComponent.Builder builder = Component.text();
         for (int i = 0; i < heightLines; i++) {
-            joiner.add(line);
+            if (i > 0) builder.appendNewline();
+            builder.append(line);
         }
-        hologram.setText(Component.text(joiner.toString()));
-        width = HologramUtils.getWidth(hologram);
-        height = HologramUtils.getHeight(hologram);
+        hologram.setText(builder.build());
+
+        textWidth = HologramFont.getTextRenderer().getWidth(line) * hologram.getScale().x;
+        textHeight = HologramUtils.LINE_HEIGHT * heightLines * hologram.getScale().y;
+        width = textWidth * HologramFont.getCharScale();
+        height = textHeight * HologramFont.getCharScale();
         if (!hologram.isDead()) {
             hologram.update();
             for (Element<?, ?> element : elements) {
@@ -478,13 +483,15 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
     public void setSize(double width, double height) {
         TextComponent component = Component.text("                ");
         hologram.setText(component);
-        double oldWidth = HologramFont.getWidth(component);
+        double oldWidth = HologramFont.getTextRenderer().getWidth(component);
         double oldHeight = HologramUtils.LINE_HEIGHT;
         float scaleX = HologramUtils.calculateScale(oldWidth, width);
         float scaleY = HologramUtils.calculateScale(oldHeight, height);
         hologram.setScale(scaleX, scaleY, 1.0f);
-        this.width = HologramUtils.getWidth(hologram);
-        this.height = HologramUtils.getHeight(hologram);
+        this.textWidth = oldWidth * scaleX;
+        this.textHeight = oldHeight * scaleY;
+        this.width = textWidth * HologramFont.getCharScale();
+        this.height = textHeight * HologramFont.getCharScale();
         if (!hologram.isDead()) {
             hologram.update();
             for (Element<?, ?> element : elements) {
@@ -506,6 +513,20 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
      */
     public double getHeight() {
         return height;
+    }
+
+    /**
+     * 获取终端面板在文本坐标系上的宽度
+     */
+    public double getTextWidth() {
+        return textWidth;
+    }
+
+    /**
+     * 获取终端面板在文本坐标系上的高度
+     */
+    public double getTextHeight() {
+        return textHeight;
     }
 
     /**

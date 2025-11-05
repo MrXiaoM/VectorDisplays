@@ -113,7 +113,7 @@ public class Item extends ItemElement<Item> implements Hoverable {
     public void onTimerTick() {
         super.onTimerTick();
 
-        tryUpdateHoverState(Hoverable.handleHover(getTerminal(), getAdditionalRotation(), getEntity()));
+        tryUpdateHoverState(Hoverable.handleHover(getTerminal(), getAdditionalRotation(), this));
     }
 
     @Override
