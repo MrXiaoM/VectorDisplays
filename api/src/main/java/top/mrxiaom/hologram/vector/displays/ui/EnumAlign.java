@@ -85,16 +85,16 @@ public enum EnumAlign {
      */
 
     private static double left(double parentX, double parentWidth, double x, double width) {
-        return parentX - (parentWidth / 2) + x + (width / 2);
+        return parentX + (parentWidth / 2) + x - (width / 2);
     }
     private static double centerHorizontal(double parentX, double parentWidth, double x, double width) {
         return parentX + x;
     }
     private static double right(double parentX, double parentWidth, double x, double width) {
-        return parentX + (parentWidth / 2) + x - (width / 2);
+        return parentX - (parentWidth / 2) + x + (width / 2);
     }
     private static double top(double parentY, double parentHeight, double y, double height) {
-        return parentY + parentHeight - y;
+        return parentY + parentHeight - y - height;
     }
     private static double centerVertical(double parentY, double parentHeight, double y, double height) {
         return parentY + (parentHeight / 2) - y - (height / 2);
