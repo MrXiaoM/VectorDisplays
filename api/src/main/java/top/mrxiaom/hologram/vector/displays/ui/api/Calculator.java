@@ -12,17 +12,12 @@ public class Calculator {
     }
 
     public double[] decideLocation(double pX, double pY, boolean rotate) {
-        return decideLocation(pX, pY, rotate, false);
-    }
-    public double[] decideLocation(double pX, double pY, boolean rotate, boolean additionalRotate) {
         double[] raw = element.decideLocationRaw(pX, pY);
         if (rotate) {
             Terminal<?> terminal = element.getTerminal();
+            // TODO: 考虑 parent
             Location origin = terminal.getLocation();
-            float[] ar = element.getAdditionalRotation();
-            float[] rotation = additionalRotate && ar != null
-                    ? QuaternionUtils.multiplyF(terminal.getRotation(), ar)
-                    : terminal.getRotation();
+            float[] rotation = terminal.getRotation();
             return QuaternionUtils.rotateChildrenToDouble(origin, rotation, raw);
         } else {
             return raw;
