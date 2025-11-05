@@ -107,17 +107,14 @@ public class ProgressBar extends TextElement<ProgressBar> implements EntityTextD
             case CENTER_TOP, CENTER, CENTER_BOTTOM -> getX() - (getTextWidth() / 2.0) + (markTextWidth / 2.0);
             case RIGHT_TOP, RIGHT_CENTER, RIGHT_BOTTOM -> getX() - getTextWidth() - (markTextWidth / 2.0);
         };
-        System.out.printf("progress x: %.4f", x);
         double[] raw = decideMarkLocationRaw(x, getY());
 
         // 根据终端旋转量进行坐标变换
         float[] ar = getAdditionalRotation();
-        if (ar != null) {
-            double[] rotated = QuaternionUtils.rotateChildrenToDouble(decideLocationRaw(getX(), getY()), ar, raw);
-            return getTerminal().getRotatedLoc(rotated);
-        } else {
-            return getTerminal().getRotatedLoc(raw);
-        }
+        double[] loc = ar != null
+                ? QuaternionUtils.rotateChildrenToDouble(decideLocationRaw(getX(), getY()), ar, raw)
+                : raw;
+        return getTerminal().getRotatedLoc(loc);
     }
 
     /**
@@ -174,7 +171,6 @@ public class ProgressBar extends TextElement<ProgressBar> implements EntityTextD
      */
     public ProgressBar setProgress(double progress) {
         double newProgress = Math.max(0.0, Math.min(1.0, progress));
-        System.out.printf("set progress %.2f%%\n", newProgress * 100.0);
         if (newProgress != this.progress) {
             double oldProgress = this.progress;
             this.progress = newProgress;
@@ -197,7 +193,6 @@ public class ProgressBar extends TextElement<ProgressBar> implements EntityTextD
         this.setScale(scaleX, scaleY);
 
         this.markTextWidth = this.barWidth * this.progress;
-        System.out.printf("progress %.2f%% -> %.4f\n", this.progress * 100.0, markTextWidth);
         float spaceScaleX = HologramUtils.calculateScale(spaceWidth, this.markTextWidth);
         markWidth = HologramUtils.LINE_HEIGHT * HologramFont.getCharScale() * scaleY;
         markHeight = HologramUtils.LINE_HEIGHT * HologramFont.getCharScale() * scaleY;

@@ -114,12 +114,10 @@ public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDispl
 
         // 根据终端旋转量进行坐标变换
         float[] ar = getAdditionalRotation();
-        if (ar != null) {
-            double[] rotated = QuaternionUtils.rotateChildrenToDouble(decideLocationRaw(getX(), getY()), ar, raw);
-            return getTerminal().getRotatedLoc(rotated);
-        } else {
-            return getTerminal().getRotatedLoc(raw);
-        }
+        double[] loc = ar != null
+                ? QuaternionUtils.rotateChildrenToDouble(decideLocationRaw(getX(), getY()), ar, raw)
+                : raw;
+        return getTerminal().getRotatedLoc(loc);
     }
 
     /**
