@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class HologramUtils {
-    public static double LINE_HEIGHT = 12.5;
+    public static double LINE_HEIGHT = 13;
     private static final PlainTextComponentSerializer plainText = PlainTextComponentSerializer.plainText();
     private static final double EPSILON = 1e-10; // 用于处理浮点数精度问题
 
