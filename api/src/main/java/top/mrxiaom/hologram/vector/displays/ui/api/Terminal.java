@@ -455,7 +455,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
      * @param height 高度，单位为像素
      */
     public void setSize(double width, double height) {
-        TextComponent component = Component.text(" ");
+        TextComponent component = Component.text("                ");
         hologram.setText(component);
         double oldWidth = HologramFont.getWidth(component);
         double oldHeight = HologramUtils.LINE_HEIGHT;
