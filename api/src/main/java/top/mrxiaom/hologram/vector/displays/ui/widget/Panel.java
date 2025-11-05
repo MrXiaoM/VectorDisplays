@@ -33,8 +33,8 @@ public class Panel extends TextElement<Panel> {
     private final List<Element<?, ?>> elements = new ArrayList<>();
     public Panel(@NotNull String id, double width, double height) {
         super(id);
-        this.hologram.setText(Component.text("                "));
-        this.spaceWidth = HologramFont.getTextRenderer().getWidth(hologram.getTextAsComponent());
+        this.getEntity().setText(Component.text("                "));
+        this.spaceWidth = HologramFont.getTextRenderer().getWidth(getEntity().getTextAsComponent());
         this.setPanelSize(width, height);
     }
 
@@ -245,7 +245,7 @@ public class Panel extends TextElement<Panel> {
         this.scaleX = this.mainScale[0] * this.extraScale[0];
         this.scaleY = this.mainScale[1] * this.extraScale[1];
         float scaleZ = this.mainScale[2] * this.extraScale[2];
-        this.hologram.setScale(scaleX, scaleY, scaleZ);
+        this.getEntity().setScale(scaleX, scaleY, scaleZ);
     }
 
     @Override

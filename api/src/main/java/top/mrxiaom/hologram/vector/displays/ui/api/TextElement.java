@@ -34,7 +34,7 @@ public abstract class TextElement<This extends Element<This, EntityTextDisplay>>
     @NotNull
     @Override
     public EntityTextDisplay getHologram() {
-        return hologram;
+        return getEntity();
     }
 
     /**
@@ -53,7 +53,7 @@ public abstract class TextElement<This extends Element<This, EntityTextDisplay>>
 
     @Override
     public This setScale(float scaleX, float scaleY) {
-        this.hologram.setScale(scaleX, scaleY, 1.0f);
+        this.getEntity().setScale(scaleX, scaleY, 1.0f);
         return super.setScale(scaleX, scaleY);
     }
 
@@ -66,7 +66,7 @@ public abstract class TextElement<This extends Element<This, EntityTextDisplay>>
 
     protected void calculateSize(boolean addSpaces) {
         ITextRenderer textRenderer = HologramFont.getTextRenderer();
-        Component text = hologram.getTextAsComponent();
+        Component text = getEntity().getTextAsComponent();
         int maxWidth = 0, lines = 0;
         for (String s : HologramUtils.toPlain(text).split("\n")) {
             int width = textRenderer.getWidth(s) + (addSpaces ? s.length() : 0);
@@ -81,7 +81,7 @@ public abstract class TextElement<This extends Element<This, EntityTextDisplay>>
 
     @Override
     public void init() {
-        hologram.setLeftRotation(getRotation());
+        getEntity().setLeftRotation(getRotation());
         super.init();
     }
 }

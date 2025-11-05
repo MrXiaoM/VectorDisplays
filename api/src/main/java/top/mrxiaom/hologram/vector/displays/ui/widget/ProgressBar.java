@@ -179,7 +179,7 @@ public class ProgressBar extends TextElement<ProgressBar> implements EntityTextD
                 this.progressChanged.perform(oldProgress, newProgress, this);
             }
             this.updateText();
-            if (!hologram.isDead()) {
+            if (!getEntity().isDead()) {
                 this.updateLocation();
             }
         }
@@ -187,7 +187,7 @@ public class ProgressBar extends TextElement<ProgressBar> implements EntityTextD
     }
 
     private void updateText() {
-        hologram.setText(hologramMark.getTextAsComponent());
+        getEntity().setText(hologramMark.getTextAsComponent());
 
         float scaleX = HologramUtils.calculateScale(spaceWidth, this.barWidth);
         float scaleY = HologramUtils.calculateScale(HologramUtils.LINE_HEIGHT, this.barHeight);

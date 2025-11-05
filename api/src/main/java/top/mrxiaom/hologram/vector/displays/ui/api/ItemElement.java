@@ -28,7 +28,7 @@ public abstract class ItemElement<This extends Element<This, EntityItemDisplay>>
     @NotNull
     @Override
     public EntityItemDisplay getHologram() {
-        return hologram;
+        return getEntity();
     }
 
     @Override
@@ -37,7 +37,7 @@ public abstract class ItemElement<This extends Element<This, EntityItemDisplay>>
     }
 
     public This setScale(float scaleX, float scaleY, float scaleZ) {
-        this.hologram.setScale(scaleX, scaleY, scaleZ);
+        this.getEntity().setScale(scaleX, scaleY, scaleZ);
         this.scaleX = scaleX;
         this.scaleY = scaleY;
         this.scaleZ = scaleZ;
@@ -68,7 +68,7 @@ public abstract class ItemElement<This extends Element<This, EntityItemDisplay>>
 
     @Override
     public void init() {
-        hologram.setLeftRotation(getRotation());
+        getEntity().setLeftRotation(getRotation());
         super.init();
     }
 }

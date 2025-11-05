@@ -269,7 +269,9 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
      * @see Element#decideLocation()
      */
     public void updateLocation() {
-        getEntity().teleport(decideLocation());
+        if (!getEntity().isDead()) {
+            getEntity().teleport(decideLocation());
+        }
     }
 
     protected double[] decideLocationRaw(double pX, double pY) {
@@ -325,9 +327,9 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
      * 界面元素初始化方法，在这里确定悬浮字位置，并生成悬浮字
      */
     public void init() {
-        if (terminal != null) hologram.setRenderMode(terminal.getRenderMode());
+        if (terminal != null) getEntity().setRenderMode(terminal.getRenderMode());
         calculateSize();
-        HologramAPI.getHologram().spawn(hologram, decideLocation());
+        HologramAPI.getHologram().spawn(getEntity(), decideLocation());
     }
 
     public float[] getParentRotation() {
@@ -348,7 +350,7 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
      * @see EntityTextDisplay#update()
      */
     public void update() {
-        hologram.update();
+        if (!getEntity().isDead()) getEntity().update();
     }
 
     /**
@@ -405,7 +407,7 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
      * 销毁悬浮字
      */
     public void dispose() {
-        hologram.removeAllViewers();
-        HologramAPI.getHologram().remove(hologram);
+        getEntity().removeAllViewers();
+        HologramAPI.getHologram().remove(getEntity());
     }
 }

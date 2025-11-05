@@ -26,9 +26,9 @@ public class Label extends TextElement<Label> {
 
     public Label setText(@NotNull String text) {
         this.text = text;
-        this.hologram.setText(AdventureHelper.miniMessage(text));
+        this.getEntity().setText(AdventureHelper.miniMessage(text));
         this.calculateSize();
-        if (!this.hologram.isDead()) {
+        if (!this.getEntity().isDead()) {
             this.updateLocation();
         }
         return this;

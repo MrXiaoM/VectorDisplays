@@ -133,9 +133,9 @@ public class Line extends TextElement<Line> {
         // 计算最少需要的空格数量
         int spaceCount = (int) Math.floor(length / (this.spaceWidth * scale));
         // 最大长度管够
-        hologram.setMaxLineWidth(1000);
+        getEntity().setMaxLineWidth(1000);
         // 设置空格字符
-        hologram.setText(Component.text(" ".repeat(spaceCount)));
+        getEntity().setText(Component.text(" ".repeat(spaceCount)));
     }
 
     @Override
