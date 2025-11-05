@@ -24,7 +24,7 @@ public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDispl
     private int division;
     private double progress;
     private int foregroundColor;
-    private float sliderWidth, sliderHeight;
+    private float barWidth, barHeight;
     private final EntityTextDisplay hologramMark;
     private float markTextWidth;
     private double markWidth, markHeight;
@@ -43,10 +43,10 @@ public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDispl
      * 滚动条控件
      * @param id 元素ID
      * @param division 分为多少块（确定滑动按钮大小）
-     * @param sliderWidth 滚动条宽度
-     * @param sliderHeight 滚动条高度
+     * @param barWidth 滚动条宽度
+     * @param barHeight 滚动条高度
      */
-    public ScrollBar(@NotNull String id, int division, float sliderWidth, float sliderHeight) {
+    public ScrollBar(@NotNull String id, int division, float barWidth, float barHeight) {
         super(id);
         this.hologramMark = createHologram()
                 .setText(Component.text("                "))
@@ -58,7 +58,7 @@ public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDispl
         this.setForegroundColor(0xFFFFFFFF);
         this.setShadow(false);
         this.setZIndex(15);
-        this.setSliderSize(sliderWidth, sliderHeight);
+        this.setBarSize(barWidth, barHeight);
     }
 
     @Override
@@ -124,25 +124,25 @@ public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDispl
     /**
      * 获取滚动条的宽度
      */
-    public float getSliderWidth() {
-        return sliderWidth;
+    public float getBarWidth() {
+        return barWidth;
     }
 
     /**
      * 获取滚动条的高度
      */
-    public float getSliderHeight() {
-        return sliderHeight;
+    public float getBarHeight() {
+        return barHeight;
     }
 
     /**
      * 设置滚动条的大小，使用文字参考系
-     * @param sliderWidth 滚动条宽度
-     * @param sliderHeight 滚动条高度
+     * @param barWidth 滚动条宽度
+     * @param barHeight 滚动条高度
      */
-    public ScrollBar setSliderSize(float sliderWidth, float sliderHeight) {
-        this.sliderWidth = sliderWidth;
-        this.sliderHeight = sliderHeight;
+    public ScrollBar setBarSize(float barWidth, float barHeight) {
+        this.barWidth = barWidth;
+        this.barHeight = barHeight;
         this.updateText();
         return this;
     }
@@ -188,7 +188,7 @@ public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDispl
     /**
      * 获取当前滚动值
      */
-    public void setProgress(double progress) {
+    public ScrollBar setProgress(double progress) {
         double newProgress = Math.max(0.0, Math.min(1.0, progress));
         if (newProgress != this.progress) {
             double oldProgress = this.progress;
@@ -197,18 +197,21 @@ public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDispl
                 this.progressChanged.perform(oldProgress, newProgress, this);
             }
             this.updateText();
-            this.updateLocation();
+            if (!hologram.isDead()) {
+                this.updateLocation();
+            }
         }
+        return this;
     }
 
     private void updateText() {
         hologram.setText(hologramMark.getTextAsComponent());
 
-        float scaleX = HologramUtils.calculateScale(spaceWidth, this.sliderWidth);
-        float scaleY = HologramUtils.calculateScale(HologramUtils.LINE_HEIGHT, this.sliderHeight);
+        float scaleX = HologramUtils.calculateScale(spaceWidth, this.barWidth);
+        float scaleY = HologramUtils.calculateScale(HologramUtils.LINE_HEIGHT, this.barHeight);
         this.setScale(scaleX, scaleY);
 
-        this.markTextWidth = this.sliderWidth / this.division;
+        this.markTextWidth = this.barWidth / this.division;
         float spaceScaleX = HologramUtils.calculateScale(spaceWidth, this.markTextWidth);
         markWidth = HologramUtils.LINE_HEIGHT * HologramFont.getCharScale() * scaleY;
         markHeight = HologramUtils.LINE_HEIGHT * HologramFont.getCharScale() * scaleY;
