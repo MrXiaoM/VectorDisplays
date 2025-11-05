@@ -15,6 +15,7 @@ import top.mrxiaom.hologram.vector.displays.ui.event.ValueChangedEvent;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
 
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -234,6 +235,16 @@ public class ProgressBar extends TextElement<ProgressBar> implements EntityTextD
                 }
             };
         }
+        return this;
+    }
+
+    @NotNull
+    public EntityTextDisplay getHologramMark() {
+        return hologramMark;
+    }
+
+    public ProgressBar configureHologramMark(Consumer<EntityTextDisplay> consumer) {
+        consumer.accept(hologramMark);
         return this;
     }
 

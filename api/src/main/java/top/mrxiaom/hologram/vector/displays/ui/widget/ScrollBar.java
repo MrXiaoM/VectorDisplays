@@ -15,6 +15,7 @@ import top.mrxiaom.hologram.vector.displays.ui.event.ValueChangedEvent;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
 
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -247,6 +248,16 @@ public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDispl
                 }
             };
         }
+        return this;
+    }
+
+    @NotNull
+    public EntityTextDisplay getHologramMark() {
+        return hologramMark;
+    }
+
+    public ScrollBar configureHologramMark(Consumer<EntityTextDisplay> consumer) {
+        consumer.accept(hologramMark);
         return this;
     }
 
