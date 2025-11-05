@@ -114,14 +114,14 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
      * 设置元素在X方向上的缩放大小
      */
     public This setScaleX(float scaleX) {
-        return setScale(scaleX, scaleY);
+        return setScale(scaleX, getScaleY());
     }
 
     /**
      * 设置元素在Y方向上的缩放大小
      */
     public This setScaleY(float scaleY) {
-        return setScale(scaleX, scaleY);
+        return setScale(getScaleX(), scaleY);
     }
 
     /**
@@ -269,7 +269,7 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
      * @see Element#decideLocation()
      */
     public void updateLocation() {
-        hologram.teleport(decideLocation());
+        getEntity().teleport(decideLocation());
     }
 
     protected double[] decideLocationRaw(double pX, double pY) {
@@ -281,11 +281,12 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
         double[] parentLoc;
         double parentWidth, parentHeight;
         float[] ar;
+        Element<?, ?> parent = getParent();
         if (parent != null) {
             parentWidth = parent.getWidth();
             parentHeight = parent.getHeight();
             parentLoc = parent.decideLocationRaw(parent.getX(), parent.getY());
-            ar = parent.additionalRotation;
+            ar = parent.getAdditionalRotation();
         } else {
             parentWidth = terminal.getWidth();
             parentHeight = terminal.getHeight();
@@ -295,10 +296,10 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
         }
         double parentX = parentLoc[0];
         double parentY = parentLoc[1];
-        double z = parentLoc[2] + (0.001 * zIndex);
+        double z = parentLoc[2] + (0.001 * getZIndex());
 
         // 根据排列方式的不同，计算在世界上的初始坐标
-        double[] result = align.get(parentX, parentY, z, parentWidth, parentHeight, x, y, width, height);
+        double[] result = getAlign().get(parentX, parentY, z, parentWidth, parentHeight, x, y, getWidth(), getHeight());
         if (ar != null) {
             return QuaternionUtils.rotateChildrenToDouble(parentLoc, ar, result);
         } else {

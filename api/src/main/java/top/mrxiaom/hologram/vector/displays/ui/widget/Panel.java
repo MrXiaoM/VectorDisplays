@@ -242,11 +242,10 @@ public class Panel extends TextElement<Panel> {
      * 用于合并两组缩放数值，应用到悬浮字中
      */
     private void mergeScale() {
-        this.hologram.setScale(
-                this.mainScale[0] * this.extraScale[0],
-                this.mainScale[1] * this.extraScale[1],
-                this.mainScale[2] * this.extraScale[2]
-        );
+        this.scaleX = this.mainScale[0] * this.extraScale[0];
+        this.scaleY = this.mainScale[1] * this.extraScale[1];
+        float scaleZ = this.mainScale[2] * this.extraScale[2];
+        this.hologram.setScale(scaleX, scaleY, scaleZ);
     }
 
     @Override
