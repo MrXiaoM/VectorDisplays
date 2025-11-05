@@ -343,6 +343,10 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         this.location = location;
         if (!hologram.isDead()) {
             hologram.teleport(location);
+            for (Element<?, ?> element : elements) {
+                element.updateLocation();
+                element.update();
+            }
         }
     }
 
@@ -455,6 +459,13 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         hologram.setText(Component.text(joiner.toString()));
         width = HologramUtils.getWidth(hologram);
         height = HologramUtils.getHeight(hologram);
+        if (!hologram.isDead()) {
+            hologram.update();
+            for (Element<?, ?> element : elements) {
+                element.updateLocation();
+                element.update();
+            }
+        }
     }
 
     /**
@@ -474,6 +485,13 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         hologram.setScale(scaleX, scaleY, 1.0f);
         this.width = HologramUtils.getWidth(hologram);
         this.height = HologramUtils.getHeight(hologram);
+        if (!hologram.isDead()) {
+            hologram.update();
+            for (Element<?, ?> element : elements) {
+                element.updateLocation();
+                element.update();
+            }
+        }
     }
 
     /**
