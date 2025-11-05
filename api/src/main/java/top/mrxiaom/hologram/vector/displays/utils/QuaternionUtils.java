@@ -3,7 +3,6 @@ package top.mrxiaom.hologram.vector.displays.utils;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.joml.Math;
-import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
 
 public class QuaternionUtils {
     /**
@@ -32,7 +31,12 @@ public class QuaternionUtils {
         };
     }
 
-    // 四元数乘法
+    /**
+     * 执行四元数乘法操作 (合并旋转操作)
+     * @param a 后进行的旋转变换
+     * @param b 先进行的旋转变换
+     * @return 新的四元数
+     */
     public static float[] multiplyF(float[] a, float[] b) {
         float w = a[3] * b[3] - a[0] * b[0] - a[1] * b[1] - a[2] * b[2];
         float x = a[3] * b[0] + a[0] * b[3] + a[1] * b[2] - a[2] * b[1];
@@ -96,16 +100,6 @@ public class QuaternionUtils {
         }
     }
 
-    /**
-     * 作出旋转悬浮字后的坐标变换
-     *
-     * @param terminal 终端面板
-     * @param location 子元素坐标
-     * @return 变换后坐标
-     */
-    public static Location rotateChildren(Terminal<?> terminal, Location location) {
-        return rotateChildren(terminal.getLocation(), terminal.getRotation(), location);
-    }
     /**
      * 作出旋转悬浮字后的坐标变换 (豆包AI 生成)
      *
