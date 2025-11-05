@@ -14,7 +14,7 @@ import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
 import java.math.BigDecimal;
 
 public class Line extends TextElement<Line> {
-    private final double spaceWidth = HologramFont.getWidth(Component.text(" "));
+    private final double spaceWidth = HologramFont.getTextRenderer().getWidth(Component.text(" "));
     private double x1, y1, x2, y2;
     private double thickness = 0.5;
     private float[] rotation;

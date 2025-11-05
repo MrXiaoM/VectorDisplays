@@ -14,6 +14,11 @@ public class Label extends TextElement<Label> {
         setText(text);
     }
 
+    @Override
+    public void calculateSize() {
+        calculateSize(true);
+    }
+
     @NotNull
     public String getText() {
         return text;

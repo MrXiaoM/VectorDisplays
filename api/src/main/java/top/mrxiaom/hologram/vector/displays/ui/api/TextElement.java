@@ -1,10 +1,12 @@
 package top.mrxiaom.hologram.vector.displays.ui.api;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.TextDisplay;
 import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
 import top.mrxiaom.hologram.vector.displays.hologram.RenderMode;
+import top.mrxiaom.hologram.vector.displays.minecraft.font.api.ITextRenderer;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.api.wrapper.EntityTextDisplayWrapper;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
@@ -59,8 +61,20 @@ public abstract class TextElement<This extends Element<This, EntityTextDisplay>>
      * 根据悬浮字的文本，计算悬浮字在世界上的长宽尺寸
      */
     public void calculateSize() {
-        this.textWidth = HologramFont.getWidth(hologram.getTextAsComponent()) * scaleX;
-        this.textHeight = HologramUtils.getLines(hologram) * HologramUtils.LINE_HEIGHT * scaleY;
+        calculateSize(false);
+    }
+
+    protected void calculateSize(boolean addSpaces) {
+        ITextRenderer textRenderer = HologramFont.getTextRenderer();
+        Component text = hologram.getTextAsComponent();
+        int maxWidth = 0, lines = 0;
+        for (String s : HologramUtils.toPlain(text).split("\n")) {
+            int width = textRenderer.getWidth(s) + (addSpaces ? s.length() : 0);
+            if (width > maxWidth) maxWidth = width;
+            lines++;
+        }
+        this.textWidth = maxWidth * scaleX;
+        this.textHeight = lines * HologramUtils.LINE_HEIGHT * scaleY;
         this.width = textWidth * HologramFont.getCharScale();
         this.height = textHeight * HologramFont.getCharScale();
     }
