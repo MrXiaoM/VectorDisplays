@@ -8,6 +8,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.mrxiaom.hologram.vector.displays.hologram.EntityItemDisplay;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.api.*;
@@ -89,26 +90,38 @@ public class HologramUtils {
     }
 
     /**
-     * @see HologramUtils#raytraceElement(float[], float[], Element, Location)
+     * @see HologramUtils#raytraceElement(float[], float[], Location, double, double, Location)
      */
+    @Nullable
     public static Location raytraceElement(@NotNull Terminal<?> terminal, float @Nullable [] additionalRotation, @NotNull Element<?, ?> element, @NotNull Location eyeLocation) {
         return raytraceElement(terminal.getRotation(), additionalRotation, element, eyeLocation);
+    }
+
+    /**
+     * @see HologramUtils#raytraceElement(float[], float[], Location, double, double, Location)
+     */
+    @Nullable
+    public static Location raytraceElement(float @NotNull [] rotation, float @Nullable [] additionalRotation, @NotNull Element<?, ?> element, @NotNull Location eyeLocation) {
+        // 获取悬浮字宽高
+        double width = element.getWidth();
+        double height = element.getHeight();
+        // 悬浮字正下方坐标
+        Location loc = element.getEntity().getLocation();
+        return raytraceElement(rotation, additionalRotation, loc, width, height, eyeLocation);
     }
     /**
      * 获取玩家的视线落在了元素的实体上的世界坐标
      *
      * @param rotation 终端面板旋转量
      * @param additionalRotation 悬浮字的额外旋转量
-     * @param element 待判定的元素
+     * @param loc 待判定的悬浮字的正下方坐标
+     * @param width 悬浮字宽度
+     * @param height 悬浮字高度
      * @param eyeLocation 玩家视线位置，<code>player.getEyeLocation()</code>
      * @return 如果视线没有落在悬浮字上，返回 <code>null</code>
      */
-    public static Location raytraceElement(float @NotNull [] rotation, float @Nullable [] additionalRotation, @NotNull Element<?, ?> element, @NotNull Location eyeLocation) {
-        // 计算悬浮字长宽
-        double width = element.getWidth();
-        double height = element.getHeight();
-        // 悬浮字正下方坐标
-        Location loc = element.getEntity().getLocation();
+    @Nullable
+    public static Location raytraceElement(float @NotNull [] rotation, float @Nullable [] additionalRotation, @Nullable Location loc, double width, double height, @NotNull Location eyeLocation) {
         if (loc == null) return null;
         // 悬浮字四角顶点
         double paddingHorizontal = 0.02;
@@ -130,10 +143,40 @@ public class HologramUtils {
         if (additionalRotation == null) {
             r = rotation;
         } else {
+            // 如果有额外旋转，先进行额外旋转（悬浮字本地旋转），再进行父组件的旋转
             r = QuaternionUtils.multiplyF(rotation, additionalRotation);
         }
         // 计算交点
         return calculateIntersection(loc, r, loc1, loc2, loc3, loc4, eyeLocation);
+    }
+    /**
+     * 过时方法
+     * @see HologramUtils#raytraceElement(float[], float[], Location, double, double, Location)
+     */
+    @Nullable
+    public static Location raytraceHologram(@NotNull Terminal<?> terminal, float @Nullable [] additionalRotation, @NotNull EntityTextDisplay hologram, @NotNull Location eyeLocation) {
+        float[] rotation = terminal.getRotation();
+        // 计算悬浮字宽高
+        double width = HologramFont.getWidthToLocation(hologram.getTextAsComponent()) * hologram.getScale().x;
+        double height = getLines(hologram) * LINE_HEIGHT * HologramFont.getCharScale() * hologram.getScale().y;
+        // 悬浮字正下方坐标
+        Location loc = hologram.getLocation();
+        return raytraceElement(rotation, additionalRotation, loc, width, height, eyeLocation);
+    }
+
+    /**
+     * 过时方法
+     * @see HologramUtils#raytraceElement(float[], float[], Location, double, double, Location)
+     */
+    @Nullable
+    public static Location raytraceHologram(@NotNull Terminal<?> terminal, float @Nullable [] additionalRotation, @NotNull EntityItemDisplay hologram, @NotNull Location eyeLocation) {
+        float[] rotation = terminal.getRotation();
+        // 计算悬浮字宽高
+        double width = ItemElement.scaleWidth * HologramFont.getCharScale() * hologram.getScale().x;
+        double height = ItemElement.scaleHeight * HologramFont.getCharScale() * hologram.getScale().y;
+        // 悬浮字正下方坐标
+        Location loc = hologram.getLocation();
+        return raytraceElement(rotation, additionalRotation, loc, width, height, eyeLocation);
     }
 
     /**

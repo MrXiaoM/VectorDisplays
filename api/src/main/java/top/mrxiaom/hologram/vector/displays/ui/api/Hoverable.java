@@ -23,4 +23,26 @@ public interface Hoverable {
         }
         return false;
     }
+    @Deprecated
+    static boolean handleHover(Terminal<?> terminal, float[] additionalRotation, EntityTextDisplay entity) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            Location eyeLocation = player.getEyeLocation();
+            Location point = HologramUtils.raytraceHologram(terminal, additionalRotation, entity, eyeLocation);
+            if (point != null && eyeLocation.distance(point) <= terminal.getInteractDistance()) {
+                return true;
+            }
+        }
+        return false;
+    }
+    @Deprecated
+    static boolean handleHover(Terminal<?> terminal, float[] additionalRotation, EntityItemDisplay entity) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            Location eyeLocation = player.getEyeLocation();
+            Location point = HologramUtils.raytraceHologram(terminal, additionalRotation, entity, eyeLocation);
+            if (point != null && eyeLocation.distance(point) <= terminal.getInteractDistance()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
