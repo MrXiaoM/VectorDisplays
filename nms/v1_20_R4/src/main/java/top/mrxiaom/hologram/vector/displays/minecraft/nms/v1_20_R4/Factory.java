@@ -28,7 +28,7 @@ public class Factory implements NMSFactory {
 
     @Override
     public @NotNull String getName() {
-        return "v1_20_R4 (1.20.5 -- 1.21.4)";
+        return "v1_20_R4 (1.20.5 -- 1.21.3)";
     }
 
     @Override

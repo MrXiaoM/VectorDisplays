@@ -1,4 +1,4 @@
-package top.mrxiaom.hologram.vector.displays.minecraft.nms.v1_21_R4;
+package top.mrxiaom.hologram.vector.displays.minecraft.nms.v1_21_R5;
 
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +28,7 @@ public class Factory implements NMSFactory {
 
     @Override
     public @NotNull String getName() {
-        return "v1_21_R4 (1.21.5)";
+        return "v1_21_R5 (1.21.6 - 1.21.8)";
     }
 
     @Override
