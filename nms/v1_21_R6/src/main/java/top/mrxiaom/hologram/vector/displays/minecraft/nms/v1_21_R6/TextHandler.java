@@ -3,10 +3,9 @@ package top.mrxiaom.hologram.vector.displays.minecraft.nms.v1_21_R6;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.network.chat.*;
-import net.minecraft.resources.RegistryOps;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.FormattedString;
 import net.minecraft.util.FormattedStringEmpty;
 import net.minecraft.util.StringDecomposer;
@@ -71,7 +70,7 @@ public class TextHandler implements ITextHandler {
 
     @Override
     public List<JsonElement> wrapLines(JsonElement json, int maxWidth) {
-        IChatMutableComponent formatted = fromJson(json);
+        IChatBaseComponent formatted = fromJson(json);
         List<IChatBaseComponent> lines = wrapLines(formatted, maxWidth, ChatModifier.a);
         List<JsonElement> result = new ArrayList<>();
         for (IChatBaseComponent line : lines) {
@@ -239,16 +238,12 @@ public class TextHandler implements ITextHandler {
         }
     }
 
-    @SuppressWarnings({"deprecation"})
-    public static IChatMutableComponent fromJson(JsonElement element) {
-        RegistryOps<JsonElement> ops = MinecraftServer.getDefaultRegistryAccess().a(JsonOps.INSTANCE);
-        return (IChatMutableComponent) ComponentSerialization.a.parse(ops, element).getOrThrow(JsonParseException::new);
+    public static IChatBaseComponent fromJson(JsonElement element) {
+        return ComponentSerialization.a.decode(JsonOps.INSTANCE, element).getOrThrow(JsonParseException::new).getFirst();
     }
 
-    @SuppressWarnings({"deprecation"})
     public static JsonElement toJson(IChatBaseComponent text) {
-        RegistryOps<JsonElement> ops = MinecraftServer.getDefaultRegistryAccess().a(JsonOps.INSTANCE);
-        return ComponentSerialization.a.encodeStart(ops, text).getOrThrow(JsonParseException::new);
+        return ComponentSerialization.a.encodeStart(JsonOps.INSTANCE, text).getOrThrow(JsonParseException::new);
     }
 
     @FunctionalInterface
