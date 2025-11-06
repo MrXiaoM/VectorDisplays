@@ -6,6 +6,8 @@ font-char-scale:
   sample-char: ' '
   # 多少个字符代表一个完整方块的边长 9+(20/27)
   location-scale: 9.7407407407407407
+# 指定文本悬浮字每一行的高度，用于界面高度运算
+line-height: 12.5
 # 准心悬停检查定时器的运行周期 (tick)
 # 数值越小，对服务器压力越大，但菜单更新也越流畅
 timer-period: 1

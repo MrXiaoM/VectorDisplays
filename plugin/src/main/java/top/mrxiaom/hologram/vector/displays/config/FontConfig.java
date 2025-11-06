@@ -9,6 +9,7 @@ import top.mrxiaom.hologram.vector.displays.minecraft.font.api.IFontManager;
 import top.mrxiaom.hologram.vector.displays.minecraft.nms.NMS;
 import top.mrxiaom.hologram.vector.displays.minecraft.nms.NMSFactory;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
+import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 
 import java.io.File;
 import java.io.InputStream;
@@ -29,6 +30,8 @@ public class FontConfig implements IConfig {
     public void reloadConfig(FileConfiguration config) {
         long timerPeriod = config.getLong("timer-period", 1L);
         TerminalManager.inst().setTimerPeriod(Math.max(1L, timerPeriod));
+
+        HologramUtils.LINE_HEIGHT = config.getDouble("line-height", 13);
 
         String path = config.getString("fonts-file", "font.json");
         File file = new File(plugin.getDataFolder(), path);
