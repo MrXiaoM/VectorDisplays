@@ -1,9 +1,12 @@
 package top.mrxiaom.hologram.vector.displays;
 
+import com.google.common.collect.Lists;
 import org.bukkit.command.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,6 +33,24 @@ public class Commands implements CommandExecutor, TabCompleter {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if (args.length == 1) {
+            List<String> list = new ArrayList<>();
+            if (sender.isOp()) {
+                list.add("reload");
+            }
+            return startsWith(list, args[0]);
+        }
         return Collections.emptyList();
+    }
+    public List<String> startsWith(Collection<String> list, String s) {
+        return startsWith(null, list, s);
+    }
+    public List<String> startsWith(String[] addition, Collection<String> list, String s) {
+        if (list.isEmpty()) return Collections.emptyList();
+        String s1 = s.toLowerCase();
+        List<String> stringList = new ArrayList<>(list);
+        if (addition != null) stringList.addAll(0, Lists.newArrayList(addition));
+        stringList.removeIf(it -> !it.toLowerCase().startsWith(s1));
+        return stringList;
     }
 }
