@@ -49,6 +49,7 @@ public class EntityTextDisplay extends EntityDisplay<EntityTextDisplay> {
 
     protected TextDisplayMeta createMeta() {
         TextDisplayMeta meta = (TextDisplayMeta) EntityMeta.createMeta(this.entityID, getEntityType());
+        applyCommonMeta(meta);
         applyDisplayMeta(meta);
         meta.setText(getTextAsComponent());
         meta.setLineWidth(this.maxLineWidth);

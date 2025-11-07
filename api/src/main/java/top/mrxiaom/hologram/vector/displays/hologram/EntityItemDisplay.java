@@ -45,6 +45,7 @@ public class EntityItemDisplay extends EntityDisplay<EntityItemDisplay> {
 
     protected ItemDisplayMeta createMeta() {
         ItemDisplayMeta meta = (ItemDisplayMeta) EntityMeta.createMeta(this.entityID, getEntityType());
+        applyCommonMeta(meta);
         applyDisplayMeta(meta);
         meta.setItem(itemAsPacket);
         meta.setDisplayType(displayType.toEntityLib());
