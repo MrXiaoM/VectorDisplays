@@ -1,9 +1,9 @@
 package top.mrxiaom.hologram.vector.displays.hologram;
 
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
+import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityTeleport;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import me.tofaa.entitylib.meta.EntityMeta;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 import org.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.api.IRunTask;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
@@ -124,6 +125,58 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     public This teleport(@NotNull Location location) {
         PacketWrapper<?> packet = new WrapperPlayServerEntityTeleport(this.entityID, SpigotConversionUtil.fromBukkitLocation(location), false);
         this.location = location;
+        sendPacket(packet);
+        return $this();
+    }
+
+    /**
+     * 为实体添加/清除药水效果。注意，这个方法仅会发包，服务端不会储存药水效果状态
+     * @see AbstractEntity#potion(PotionType, int, Integer, byte)
+     */
+    public This potion(@NotNull PotionType type, @Nullable Integer duration) {
+        return potion(type, 1, duration, (byte) 0);
+    }
+    /**
+     * 为实体添加/清除药水效果。注意，这个方法仅会发包，服务端不会储存药水效果状态
+     * @see AbstractEntity#potion(PotionType, int, Integer, byte)
+     */
+    public This potion(@NotNull PotionType type, @Nullable Integer duration, byte flags) {
+        return potion(type, 0, duration, flags);
+    }
+    /**
+     * 为实体添加/清除药水效果。注意，这个方法仅会发包，服务端不会储存药水效果状态
+     * @see AbstractEntity#potion(PotionType, int, Integer, byte)
+     */
+    public This potion(@NotNull PotionType type, @Range(from=0, to=Byte.MAX_VALUE) int amplifier, @Range(from=-1, to=Integer.MAX_VALUE) int duration) {
+        return potion(type, amplifier, duration, (byte) 0);
+    }
+    /**
+     * 为实体添加/清除药水效果。注意，这个方法仅会发包，服务端不会储存药水效果状态
+     * @param type 药水效果类型
+     * @param amplifier 效果放大器，客户端显示的等级是 <code>amplifier + 1</code>
+     * @param duration 效果持续时间，设置 <code>-1</code> 代表无限时间，设置 <code>null</code> 则清除药水效果
+     * @param flags 药水效果标记，可用标记如下，需要多个标记可使用与运算 (<code>&amp;</code>) 来合并
+     * <ul>
+     *     <li><code>FLAG_AMBIENT</code> = <code>0x01</code></li>
+     *     <li><code>FLAG_VISIBLE</code> = <code>0x02</code></li>
+     *     <li><code>FLAG_SHOW_ICONS</code> = <code>0x04</code></li>
+     * </ul>
+     */
+    public This potion(
+            @NotNull PotionType type,
+            @Range(from=0, to=Byte.MAX_VALUE) int amplifier,
+            @Nullable Integer duration,
+            byte flags
+    ) {
+        PacketWrapper<?> packet;
+        if (duration == null) {
+            packet = new WrapperPlayServerRemoveEntityEffect(this.entityID, type);
+            System.out.printf("为实体 %d 移除药水效果 %s\n", this.entityID, type.getName());
+        } else {
+            int d = Math.max(-1, duration);
+            packet = new WrapperPlayServerEntityEffect(this.entityID, type, amplifier, d, flags);
+            System.out.printf("为实体 %d 添加药水效果 %s %d %d\n", this.entityID, type.getName(), amplifier, d);
+        }
         sendPacket(packet);
         return $this();
     }
