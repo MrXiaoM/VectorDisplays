@@ -9,6 +9,7 @@ import top.mrxiaom.hologram.vector.displays.ui.api.ItemElement;
 import top.mrxiaom.hologram.vector.displays.ui.event.ClickEvent;
 import top.mrxiaom.hologram.vector.displays.ui.event.ElementClickEvent;
 import top.mrxiaom.hologram.vector.displays.ui.event.HoverStateChange;
+import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
 
 import java.util.function.Supplier;
 
@@ -19,6 +20,7 @@ public class Item extends ItemElement<Item> implements Hoverable {
     private HoverStateChange<Item> hoverStateChange;
     public Item(@NotNull String id) {
         this(id, null);
+        this.setAdditionalRotation(QuaternionUtils.fromEulerYXZtoQuaternion(180.0f, 0.0f, 0.0f));
     }
     public Item(@NotNull String id, @Nullable ItemStack itemStack) {
         super(id);
