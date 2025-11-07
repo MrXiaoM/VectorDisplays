@@ -24,7 +24,7 @@ dependencies {
     compileOnly("com.github.retrooper:packetevents-spigot:2.9.5")
 
     implementation("com.github.technicallycoded:FoliaLib:0.4.4")
-    implementation("com.github.Tofaa2.EntityLib:spigot:2.4.11")
+    implementation("com.github.Tofaa2.EntityLib:spigot:df6fe0f084")
     implementation(project(":api"))
     for (item in project.project(":nms").subprojects) {
         if (item.name == "shared") {
