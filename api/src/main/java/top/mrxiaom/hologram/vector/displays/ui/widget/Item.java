@@ -20,7 +20,7 @@ public class Item extends ItemElement<Item> implements Hoverable {
     private HoverStateChange<Item> hoverStateChange;
     public Item(@NotNull String id) {
         this(id, null);
-        this.setAdditionalRotation(QuaternionUtils.fromEulerYXZtoQuaternion(180.0f, 0.0f, 0.0f));
+        this.getEntity().setRightRotation(QuaternionUtils.fromEulerYXZtoQuaternion(180.0f, 0.0f, 0.0f));
     }
     public Item(@NotNull String id, @Nullable ItemStack itemStack) {
         super(id);
