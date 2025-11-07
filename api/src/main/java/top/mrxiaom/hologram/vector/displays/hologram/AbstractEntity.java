@@ -1,5 +1,6 @@
 package top.mrxiaom.hologram.vector.displays.hologram;
 
+import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -34,6 +35,9 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     protected double nearbyEntityScanningDistance = 40.0;
 
     protected int entityID;
+    protected boolean glowing = false;
+    protected boolean silent = true;
+    protected EntityPose pose = EntityPose.STANDING;
 
     protected RenderMode renderMode;
     protected Location location;
@@ -96,6 +100,11 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
 
     protected abstract PacketWrapper<?> buildSpawnPacket();
 
+    protected void applyCommonMeta(EntityMeta meta) {
+        meta.setSilent(isSilent());
+        meta.setGlowing(isGlowing());
+        meta.setPose(getPose());
+    }
 
     public void update() {
         plugin.getScheduler().runTask(() -> {
@@ -330,6 +339,31 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
 
     public int getEntityID() {
         return entityID;
+    }
+
+    public boolean isGlowing() {
+        return glowing;
+    }
+
+    public void setGlowing(boolean glowing) {
+        this.glowing = glowing;
+    }
+
+    public boolean isSilent() {
+        return silent;
+    }
+
+    public void setSilent(boolean silent) {
+        this.silent = silent;
+    }
+
+    @NotNull
+    public EntityPose getPose() {
+        return pose;
+    }
+
+    public void setPose(@Nullable EntityPose pose) {
+        this.pose = pose == null ? EntityPose.STANDING : pose;
     }
 
     @NotNull
