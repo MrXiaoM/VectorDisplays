@@ -87,4 +87,20 @@ public interface HoverStateChange<E extends Element<E, ?>> {
         return (newState, element) -> element.update();
     }
 
+    static <E extends Element<E, ?>> HoverStateChange<E> hoverGlow() {
+        return hoverGlow(HoverStateChange.<E>updateEntity());
+    }
+    static <E extends Element<E, ?>> HoverStateChange<E> hoverGlow(boolean reverse) {
+        return hoverGlow(reverse, HoverStateChange.<E>updateEntity());
+    }
+    static <E extends Element<E, ?>> HoverStateChange<E> hoverGlow(@Nullable HoverStateChange<E> action) {
+        return hoverGlow(false, action);
+    }
+    static <E extends Element<E, ?>> HoverStateChange<E> hoverGlow(boolean reverse, @Nullable HoverStateChange<E> action) {
+        return (newState, element) -> {
+            AbstractEntity<?> entity = element.getEntity();
+            entity.setGlowing(newState != reverse);
+            if (action != null) action.perform(newState, element);
+        };
+    }
 }
