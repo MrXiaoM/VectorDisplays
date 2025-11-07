@@ -16,6 +16,7 @@ import java.util.UUID;
 
 public class EntityTextDisplay extends EntityDisplay<EntityTextDisplay> {
 
+    private final TextDisplayMeta meta;
     protected Component text = Component.text("");
 
     private boolean shadow = true;
@@ -27,6 +28,7 @@ public class EntityTextDisplay extends EntityDisplay<EntityTextDisplay> {
 
     public EntityTextDisplay(RenderMode renderMode) {
         super(renderMode);
+        this.meta = (TextDisplayMeta) EntityMeta.createMeta(this.entityID, getEntityType());
         startRunnable();
     }
 
@@ -48,7 +50,6 @@ public class EntityTextDisplay extends EntityDisplay<EntityTextDisplay> {
     }
 
     protected TextDisplayMeta createMeta() {
-        TextDisplayMeta meta = (TextDisplayMeta) EntityMeta.createMeta(this.entityID, getEntityType());
         applyCommonMeta(meta);
         applyDisplayMeta(meta);
         meta.setText(getTextAsComponent());

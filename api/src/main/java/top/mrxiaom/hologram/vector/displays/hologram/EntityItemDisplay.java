@@ -17,12 +17,14 @@ import java.util.UUID;
 
 public class EntityItemDisplay extends EntityDisplay<EntityItemDisplay> {
 
+    private final ItemDisplayMeta meta;
     private ItemStack itemStack = null;
     private com.github.retrooper.packetevents.protocol.item.ItemStack itemAsPacket = com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY;
     private DisplayType displayType = DisplayType.NONE;
 
     public EntityItemDisplay(RenderMode renderMode) {
         super(renderMode);
+        this.meta = (ItemDisplayMeta) EntityMeta.createMeta(this.entityID, getEntityType());
         startRunnable();
     }
 
@@ -44,7 +46,6 @@ public class EntityItemDisplay extends EntityDisplay<EntityItemDisplay> {
     }
 
     protected ItemDisplayMeta createMeta() {
-        ItemDisplayMeta meta = (ItemDisplayMeta) EntityMeta.createMeta(this.entityID, getEntityType());
         applyCommonMeta(meta);
         applyDisplayMeta(meta);
         meta.setItem(itemAsPacket);
