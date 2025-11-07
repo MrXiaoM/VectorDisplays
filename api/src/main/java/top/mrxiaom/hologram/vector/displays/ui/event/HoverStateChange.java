@@ -3,9 +3,12 @@ package top.mrxiaom.hologram.vector.displays.ui.event;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
+import top.mrxiaom.hologram.vector.displays.hologram.AbstractEntity;
+import top.mrxiaom.hologram.vector.displays.hologram.EntityDisplay;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityItemDisplay;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
 import top.mrxiaom.hologram.vector.displays.ui.api.Element;
+import top.mrxiaom.hologram.vector.displays.ui.api.ItemElement;
 
 /**
  * 元素悬停状态变更事件
@@ -23,7 +26,7 @@ public interface HoverStateChange<E extends Element<E, ?>> {
                 txt.setBackgroundColor(newState ? hover : normal);
             }
             if (action != null) action.perform(newState, element);
-            element.update();
+            else element.update();
         };
     }
     static <E extends Element<E, ?>> HoverStateChange<E> hoverBg(Material hover, Material normal) {
@@ -41,7 +44,37 @@ public interface HoverStateChange<E extends Element<E, ?>> {
                 txt.setItemStack(newState ? hover : normal);
             }
             if (action != null) action.perform(newState, element);
-            element.update();
+            else element.update();
         };
     }
+
+    static <E extends Element<E, ?>> HoverStateChange<E> hoverScale(float hover) {
+        return hoverScale(hover,null);
+    }
+    static <E extends Element<E, ?>> HoverStateChange<E> hoverScale(float hover, float normal) {
+        return hoverScale(hover, normal, null);
+    }
+    static <E extends Element<E, ?>> HoverStateChange<E> hoverScale(float hover, @Nullable HoverStateChange<E> action) {
+        return hoverScale(hover, 1.0f, action);
+    }
+    static <E extends Element<E, ?>> HoverStateChange<E> hoverScale(float hover, float normal, @Nullable HoverStateChange<E> action) {
+        return (newState, element) -> {
+            AbstractEntity<?> entity = element.getEntity();
+            if (entity instanceof EntityDisplay<?> display) {
+                float scale = newState ? hover : normal;
+                float scaleX = element.getScaleX();
+                float scaleY = element.getScaleY();
+                float scaleZ;
+                if (element instanceof ItemElement<?> item) {
+                    scaleZ = item.getScaleZ();
+                } else {
+                    scaleZ = 1.0f;
+                }
+                display.setScale(scaleX * scale, scaleY * scale, scaleZ * scale);
+            }
+            if (action != null) action.perform(newState, element);
+            else element.update();
+        };
+    }
+
 }
