@@ -90,7 +90,7 @@ public class HologramUtils {
     }
 
     /**
-     * @see HologramUtils#raytraceElement(float[], float[], Location, double, double, Location)
+     * @see HologramUtils#raytraceElement(float[], float[], Location, double, double, double, double, Location)
      */
     @Nullable
     public static Location raytraceElement(@NotNull Terminal<?> terminal, float @Nullable [] additionalRotation, @NotNull Element<?, ?> element, @NotNull Location eyeLocation) {
@@ -98,16 +98,32 @@ public class HologramUtils {
     }
 
     /**
-     * @see HologramUtils#raytraceElement(float[], float[], Location, double, double, Location)
+     * @see HologramUtils#raytraceElement(float[], float[], Location, double, double, double, double, Location)
      */
     @Nullable
     public static Location raytraceElement(float @NotNull [] rotation, float @Nullable [] additionalRotation, @NotNull Element<?, ?> element, @NotNull Location eyeLocation) {
         // 获取悬浮字宽高
         double width = element.getWidth();
         double height = element.getHeight();
+        // 根据悬浮字类型，计算偏移值
+        double offsetX, offsetY;
+        if (element instanceof ItemElement<?>) {
+            offsetX = 0.0;
+            offsetY = -height / 2.0;
+        } else {
+            offsetX = offsetY = 0.0;
+        }
         // 悬浮字正下方坐标
         Location loc = element.getEntity().getLocation();
-        return raytraceElement(rotation, additionalRotation, loc, width, height, eyeLocation);
+        return raytraceElement(rotation, additionalRotation, loc, offsetX, offsetY, width, height, eyeLocation);
+    }
+
+    /**
+     * @see HologramUtils#raytraceElement(float[], float[], Location, double, double, double, double, Location)
+     */
+    @Nullable
+    public static Location raytraceElement(float @NotNull [] rotation, float @Nullable [] additionalRotation, @Nullable Location loc, double width, double height, @NotNull Location eyeLocation) {
+        return raytraceElement(rotation, additionalRotation, loc, 0, 0, width, height, eyeLocation);
     }
     /**
      * 获取玩家的视线落在了元素的实体上的世界坐标
@@ -115,29 +131,31 @@ public class HologramUtils {
      * @param rotation 终端面板旋转量
      * @param additionalRotation 悬浮字的额外旋转量
      * @param loc 待判定的悬浮字的正下方坐标
+     * @param offsetX 元素X位置偏移值
+     * @param offsetY 元素Y位置偏移值
      * @param width 悬浮字宽度
      * @param height 悬浮字高度
      * @param eyeLocation 玩家视线位置，<code>player.getEyeLocation()</code>
      * @return 如果视线没有落在悬浮字上，返回 <code>null</code>
      */
     @Nullable
-    public static Location raytraceElement(float @NotNull [] rotation, float @Nullable [] additionalRotation, @Nullable Location loc, double width, double height, @NotNull Location eyeLocation) {
+    public static Location raytraceElement(float @NotNull [] rotation, float @Nullable [] additionalRotation, @Nullable Location loc, double offsetX, double offsetY, double width, double height, @NotNull Location eyeLocation) {
         if (loc == null) return null;
         // 悬浮字四角顶点
         double paddingHorizontal = 0.02;
         double paddingVertical = 0.01;
         Location loc1 = loc.clone(); // 左上角
-        loc1.setX(loc1.getX() - (width / 2.0) - paddingHorizontal);
-        loc1.setY(loc1.getY() + height + paddingVertical);
+        loc1.setX(loc1.getX() + offsetX - (width / 2.0) - paddingHorizontal);
+        loc1.setY(loc1.getY() + offsetY + height + paddingVertical);
         Location loc2 = loc.clone(); // 右上角
-        loc2.setX(loc2.getX() + (width / 2.0) + paddingHorizontal);
-        loc2.setY(loc2.getY() + height + paddingVertical);
+        loc2.setX(loc2.getX() + offsetX + (width / 2.0) + paddingHorizontal);
+        loc2.setY(loc2.getY() + offsetY + height + paddingVertical);
         Location loc3 = loc.clone(); // 左下角
-        loc3.setX(loc3.getX() - (width / 2.0) - paddingHorizontal);
-        loc3.setY(loc3.getY() - paddingVertical);
+        loc3.setX(loc3.getX() + offsetX - (width / 2.0) - paddingHorizontal);
+        loc3.setY(loc3.getY() + offsetY - paddingVertical);
         Location loc4 = loc.clone(); // 右下角
-        loc4.setX(loc4.getX() + (width / 2.0) + paddingHorizontal);
-        loc4.setY(loc3.getY() - paddingVertical);
+        loc4.setX(loc4.getX() + offsetX + (width / 2.0) + paddingHorizontal);
+        loc4.setY(loc3.getY() + offsetY - paddingVertical);
         // 获取终端面板的旋转四元数，进行变换后再输入计算交点
         float[] r;
         if (additionalRotation == null) {
@@ -151,7 +169,7 @@ public class HologramUtils {
     }
     /**
      * 过时方法
-     * @see HologramUtils#raytraceElement(float[], float[], Location, double, double, Location)
+     * @see HologramUtils#raytraceElement(float[], float[], Location, double, double, double, double, Location)
      */
     @Nullable
     public static Location raytraceHologram(@NotNull Terminal<?> terminal, float @Nullable [] additionalRotation, @NotNull EntityTextDisplay hologram, @NotNull Location eyeLocation) {
@@ -166,7 +184,7 @@ public class HologramUtils {
 
     /**
      * 过时方法
-     * @see HologramUtils#raytraceElement(float[], float[], Location, double, double, Location)
+     * @see HologramUtils#raytraceElement(float[], float[], Location, double, double, double, double, Location)
      */
     @Nullable
     public static Location raytraceHologram(@NotNull Terminal<?> terminal, float @Nullable [] additionalRotation, @NotNull EntityItemDisplay hologram, @NotNull Location eyeLocation) {
