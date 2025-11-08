@@ -16,6 +16,7 @@ import top.mrxiaom.hologram.vector.displays.hologram.HologramAPI;
 import top.mrxiaom.hologram.vector.displays.hologram.RenderMode;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.api.wrapper.EntityTextDisplayWrapper;
+import top.mrxiaom.hologram.vector.displays.ui.widget.Panel;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
 
@@ -588,5 +589,30 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         float[] rotation = getRotation();
         double interactDistance = getInteractDistance();
         return HologramUtils.commonPerformClick(player, action, eyeLocation, elements, rotation, interactDistance);
+    }
+
+    /**
+     * 根据 Terminal 的 Element 列表解析所有子 Element，平铺到一张列表上
+     */
+    public static List<Element<?, ?>> resolveAllElements(Terminal<?> terminal) {
+        return resolveAllElements(terminal.getElements());
+    }
+
+    /**
+     * 根据 Element 列表解析所有子 Element，平铺到一张列表上
+     */
+    public static List<Element<?, ?>> resolveAllElements(List<Element<?, ?>> elements) {
+        List<Element<?, ?>> list = new ArrayList<>();
+        resolveAllElements(list, elements);
+        return list;
+    }
+
+    private static void resolveAllElements(List<Element<?, ?>> list, List<Element<?, ?>> elements) {
+        for (Element<?, ?> element : elements) {
+            list.add(element);
+            if (element instanceof Panel panel) {
+                resolveAllElements(list, panel.getElements());
+            }
+        }
     }
 }
