@@ -90,12 +90,10 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         if (!dead) kill();
         this.location = location;
         PacketWrapper<?> packet = buildSpawnPacket();
-        plugin.getScheduler().runTask(() -> {
-            updateAffectedPlayers();
-            sendPacket(packet);
-            this.dead = false;
-            update();
-        });
+        updateAffectedPlayers();
+        sendPacket(packet);
+        this.dead = false;
+        update();
     }
 
     protected abstract PacketWrapper<?> buildSpawnPacket();
@@ -107,11 +105,9 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     }
 
     public void update() {
-        plugin.getScheduler().runTask(() -> {
-            updateAffectedPlayers();
-            EntityMeta meta = createMeta();
-            sendPacket(meta.createPacket());
-        });
+        updateAffectedPlayers();
+        EntityMeta meta = createMeta();
+        sendPacket(meta.createPacket());
     }
 
     protected abstract EntityMeta createMeta();
@@ -215,11 +211,9 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     private void respawnFor(@NotNull Player player) {
         PacketWrapper<?> packet = buildSpawnPacket();
         sendPacket(player, packet);
-        plugin.getScheduler().runTask(() -> {
-            updateAffectedPlayers();
-            EntityMeta meta = createMeta();
-            sendPacket(player, meta.createPacket());
-        });
+        updateAffectedPlayers();
+        EntityMeta meta = createMeta();
+        sendPacket(player, meta.createPacket());
     }
 
     public This removeViewer(@NotNull Player player) {
