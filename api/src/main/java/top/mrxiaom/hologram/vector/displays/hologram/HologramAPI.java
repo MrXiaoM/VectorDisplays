@@ -77,7 +77,7 @@ public class HologramAPI {
     }
 
     public void onDisable() {
-        hologram.removeAll();
+        hologram.onDisable();
         if (!PacketEvents.class.getName().startsWith(apiPackage)) {
             PacketEvents.getAPI().terminate();
         }

@@ -29,7 +29,6 @@ public class EntityTextDisplay extends EntityDisplay<EntityTextDisplay> {
     public EntityTextDisplay(RenderMode renderMode) {
         super(renderMode);
         this.meta = (TextDisplayMeta) EntityMeta.createMeta(this.entityID, getEntityType());
-        startRunnable();
     }
 
     public EntityTextDisplay() {

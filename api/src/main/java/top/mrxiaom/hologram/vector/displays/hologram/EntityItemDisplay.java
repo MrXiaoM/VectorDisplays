@@ -25,7 +25,6 @@ public class EntityItemDisplay extends EntityDisplay<EntityItemDisplay> {
     public EntityItemDisplay(RenderMode renderMode) {
         super(renderMode);
         this.meta = (ItemDisplayMeta) EntityMeta.createMeta(this.entityID, getEntityType());
-        startRunnable();
     }
 
     public EntityItemDisplay() {

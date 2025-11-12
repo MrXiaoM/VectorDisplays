@@ -31,7 +31,6 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
 
     protected AbstractEntity<?> parent = null;
 
-    protected long updateTaskPeriod = 20L * 3;
     protected double nearbyEntityScanningDistance = 40.0;
 
     protected int entityID;
@@ -44,7 +43,6 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     protected final List<Player> viewers = new ArrayList<>();
     protected final List<Player> leftViewers = new ArrayList<>();
     protected boolean dead = true;
-    protected IRunTask task;
 
     protected AbstractEntity(RenderMode renderMode) {
         PluginWrapper plugin = HologramAPI.getHologram().getPlugin();
@@ -70,14 +68,20 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         return (This) this;
     }
 
+    /**
+     * 请使用 <code>HologramAPI.getHologram().restartUpdateTimer(long)</code>
+     * @see HologramManager#restartUpdateTimer(long)
+     */
+    @Deprecated(forRemoval = true)
     protected void startRunnable() {
-        if (task != null) return;
-        startRunnable(20L);
     }
 
+    /**
+     * 请使用 <code>HologramAPI.getHologram().restartUpdateTimer(long)</code>
+     * @see HologramManager#restartUpdateTimer(long)
+     */
+    @Deprecated(forRemoval = true)
     protected void startRunnable(long delay) {
-        if (task != null) return;
-        task = plugin.getScheduler().runTaskTimer(this::updateAffectedPlayers, delay, updateTaskPeriod);
     }
 
     protected abstract EntityType getEntityType();
@@ -117,14 +121,10 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
      * Only if you want to manage the holograms yourself and don't want to use the animation system use this
      */
     public void kill() {
-        if (task != null) {
-            task.cancel();
-            task = null;
-        }
-        PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
-        sendPacket(packet);
         this.dead = true;
         this.location = null;
+        PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
+        sendPacket(packet);
     }
 
     public This teleport(@NotNull Location location) {
@@ -234,8 +234,8 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         return $this();
     }
 
-    private void updateAffectedPlayers() {
-        if (this.location == null) return;
+    protected void updateAffectedPlayers() {
+        if (this.dead || this.location == null) return;
         // 如果这个实体有父实体
         if (parent != null) {
             // 获取父实体的可视玩家列表
@@ -302,24 +302,24 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         HologramAPI.getPlayerManager().sendPacket(player, packet);
     }
 
+    /**
+     * @see HologramManager#getUpdatePeriod()
+     */
+    @Deprecated(forRemoval = true)
     public long getUpdateTaskPeriod() {
-        return updateTaskPeriod;
+        return 3 * 20L;
     }
 
     public double getNearbyEntityScanningDistance() {
         return nearbyEntityScanningDistance;
     }
 
+    /**
+     * 请使用 <code>HologramAPI.getHologram().restartUpdateTimer(long)</code>
+     * @see HologramManager#restartUpdateTimer(long)
+     */
+    @Deprecated(forRemoval = true)
     public This setUpdateTaskPeriod(long updateTaskPeriod) {
-        if (updateTaskPeriod <= 0) {
-            throw new IllegalArgumentException("updateTaskPeriod can't equals or less than zero!");
-        }
-        this.updateTaskPeriod = updateTaskPeriod;
-        if (task != null) {
-            task.cancel();
-            task = null;
-            startRunnable(updateTaskPeriod);
-        }
         return $this();
     }
 
@@ -380,8 +380,9 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     }
 
     @Nullable
+    @Deprecated
     public IRunTask getTask() {
-        return task;
+        return null;
     }
 
     public static com.github.retrooper.packetevents.util.Vector3f toVector3f(Vector3f vector) {
