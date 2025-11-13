@@ -10,10 +10,7 @@ import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.block.Action;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import top.mrxiaom.hologram.vector.displays.hologram.AbstractEntity;
-import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
-import top.mrxiaom.hologram.vector.displays.hologram.HologramAPI;
-import top.mrxiaom.hologram.vector.displays.hologram.RenderMode;
+import top.mrxiaom.hologram.vector.displays.hologram.*;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.api.wrapper.EntityTextDisplayWrapper;
 import top.mrxiaom.hologram.vector.displays.ui.widget.Panel;
@@ -591,6 +588,28 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         float[] rotation = getRotation();
         double interactDistance = getInteractDistance();
         return HologramUtils.commonPerformClick(player, action, eyeLocation, elements, rotation, interactDistance);
+    }
+
+    /**
+     * 根据 Terminal 的 Element 列表解析所有展示实体，平铺到一张列表上
+     */
+    public static List<EntityDisplay<?>> resolveAllEntityDisplay(Terminal<?> terminal) {
+        return resolveAllEntityDisplay(terminal.getElements());
+    }
+
+    /**
+     * 根据 Element 列表解析所有展示实体，平铺到一张列表上
+     */
+    public static List<EntityDisplay<?>> resolveAllEntityDisplay(List<Element<?, ?>> elements) {
+        List<EntityDisplay<?>> list = new ArrayList<>();
+        for (Element<?, ?> element : elements) {
+            for (AbstractEntity<?> entity : element.collectEntities()) {
+                if (entity instanceof EntityDisplay<?> display) {
+                    list.add(display);
+                }
+            }
+        }
+        return list;
     }
 
     /**
