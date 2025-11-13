@@ -14,6 +14,8 @@ import top.mrxiaom.hologram.vector.displays.ui.event.TimerTickEvent;
 import top.mrxiaom.hologram.vector.displays.ui.widget.Panel;
 import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 
 /**
@@ -46,6 +48,11 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
     @NotNull
     public Entity getEntity() {
         return hologram;
+    }
+
+    @NotNull
+    public Collection<AbstractEntity<?>> collectEntities() {
+        return Collections.singleton(hologram);
     }
 
     @SuppressWarnings({"unchecked"})

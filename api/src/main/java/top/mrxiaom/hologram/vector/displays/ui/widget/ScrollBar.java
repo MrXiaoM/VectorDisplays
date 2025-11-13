@@ -1,9 +1,11 @@
 package top.mrxiaom.hologram.vector.displays.ui.widget;
 
+import com.google.common.collect.Lists;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.mrxiaom.hologram.vector.displays.hologram.AbstractEntity;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
 import top.mrxiaom.hologram.vector.displays.hologram.HologramAPI;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
@@ -17,6 +19,8 @@ import top.mrxiaom.hologram.vector.displays.ui.event.ValueChangedEvent;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -64,6 +68,11 @@ public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDispl
         this.setShadow(false);
         this.setZIndex(15);
         this.setBarSize(barWidth, barHeight);
+    }
+
+    @Override
+    public @NotNull Collection<AbstractEntity<?>> collectEntities() {
+        return Collections.unmodifiableList(Lists.newArrayList(hologram, hologramMark));
     }
 
     @Override
