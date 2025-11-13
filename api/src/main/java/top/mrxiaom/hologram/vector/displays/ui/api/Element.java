@@ -24,7 +24,7 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
     private final @NotNull String id;
     private Terminal<?> terminal;
     private Element<?, ?> parent;
-    private boolean enabled;
+    private boolean enabled = true;
     private EnumAlign align = EnumAlign.CENTER;
     private double x, y, zIndex = 1;
     protected float scaleX = 1.0f, scaleY = 1.0f;
