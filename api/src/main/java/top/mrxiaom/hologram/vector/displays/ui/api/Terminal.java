@@ -571,7 +571,9 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
             actionPreTimerTick.accept($this());
         }
         for (Element<?, ?> element : getElements()) {
-            element.onTimerTick();
+            if (element.isEnabled()) {
+                element.onTimerTick();
+            }
         }
         if (actionPostTimerTick != null) {
             actionPostTimerTick.accept($this());

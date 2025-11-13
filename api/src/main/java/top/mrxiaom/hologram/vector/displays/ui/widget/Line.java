@@ -20,6 +20,7 @@ public class Line extends TextElement<Line> {
     private float[] rotation;
     public Line(@NotNull String id) {
         super(id);
+        setEnabled(false);
         setShadow(false);
         setBackgroundColor(0x80FFFFFF);
     }

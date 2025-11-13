@@ -58,7 +58,9 @@ public class Panel extends TextElement<Panel> {
     public void onTimerTick() {
         super.onTimerTick();
         for (Element<?, ?> element : elements) {
-            element.onTimerTick();
+            if (element.isEnabled()) {
+                element.onTimerTick();
+            }
         }
     }
 

@@ -24,6 +24,7 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
     private final @NotNull String id;
     private Terminal<?> terminal;
     private Element<?, ?> parent;
+    private boolean enabled;
     private EnumAlign align = EnumAlign.CENTER;
     private double x, y, zIndex = 1;
     protected float scaleX = 1.0f, scaleY = 1.0f;
@@ -50,6 +51,24 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
     @SuppressWarnings({"unchecked"})
     public This $this() {
         return (This) this;
+    }
+
+    /**
+     * 获取当前元素是否启用，当元素未启用时，不会计算并响应 tick 事件（包括悬停事件）和点击事件。
+     * <p>
+     * 对于一些纯显示的控件来说，建议关闭此项以节省性能。
+     */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * 设置当前元素是否启用，当元素未启用时，不会计算并响应 tick 事件（包括悬停事件）和点击事件。
+     * <p>
+     * 对于一些纯显示的控件来说，建议关闭此项以节省性能。
+     */
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     protected void setTerminal(@NotNull Terminal<?> terminal) {
