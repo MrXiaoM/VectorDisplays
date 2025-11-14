@@ -1,5 +1,6 @@
 package top.mrxiaom.hologram.vector.displays.ui.widget;
 
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.hologram.vector.displays.hologram.IEntityIdProvider;
@@ -53,6 +54,20 @@ public class Button extends TextElement<Button> implements Hoverable {
     public Button setText(@NotNull String text) {
         this.text = text;
         this.getEntity().setText(AdventureHelper.miniMessage(text));
+        return postSetText();
+    }
+
+    /**
+     * 设置悬浮字文本，并重新计算悬浮字大小
+     * @param text 文本内容
+     */
+    public Button setText(@NotNull Component text) {
+        this.text = AdventureHelper.miniMessage(text);
+        this.getEntity().setText(text);
+        return postSetText();
+    }
+
+    private Button postSetText() {
         this.calculateSize();
         if (!this.getEntity().isDead()) {
             this.updateLocation();
