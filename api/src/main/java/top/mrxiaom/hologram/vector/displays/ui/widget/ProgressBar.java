@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.hologram.vector.displays.hologram.AbstractEntity;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
 import top.mrxiaom.hologram.vector.displays.hologram.HologramAPI;
+import top.mrxiaom.hologram.vector.displays.hologram.IEntityIdProvider;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.api.ClickMeta;
 import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
@@ -46,11 +47,31 @@ public class ProgressBar extends TextElement<ProgressBar> implements EntityTextD
     /**
      * 进度条控件
      * @param id 元素ID
+     * @param entityIdProvider 虚拟实体ID提供器，用于复用实体ID
+     */
+    public ProgressBar(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider) {
+        this(id, entityIdProvider, 10.0f, 1f);
+    }
+
+    /**
+     * 进度条控件
+     * @param id 元素ID
      * @param barWidth 进度条宽度
      * @param barHeight 进度条高度
      */
     public ProgressBar(@NotNull String id, float barWidth, float barHeight) {
-        super(id);
+        this(id, IEntityIdProvider.DEFAULT, barWidth, barHeight);
+    }
+
+    /**
+     * 进度条控件
+     * @param id 元素ID
+     * @param entityIdProvider 虚拟实体ID提供器，用于复用实体ID
+     * @param barWidth 进度条宽度
+     * @param barHeight 进度条高度
+     */
+    public ProgressBar(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, float barWidth, float barHeight) {
+        super(id, entityIdProvider);
         this.hologramMark = createHologram()
                 .setInterpolationDurationTransformation(2)
                 .setText(Component.text("                "))

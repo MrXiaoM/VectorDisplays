@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.hologram.vector.displays.hologram.AbstractEntity;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
 import top.mrxiaom.hologram.vector.displays.hologram.HologramAPI;
+import top.mrxiaom.hologram.vector.displays.hologram.IEntityIdProvider;
 import top.mrxiaom.hologram.vector.displays.ui.EnumAlign;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.event.TimerTickEvent;
@@ -33,9 +34,14 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
     protected double width, height;
     private TimerTickEvent<This> timerTickEvent;
     protected final @NotNull Entity hologram;
+    protected final IEntityIdProvider entityIdProvider;
     private float @Nullable [] additionalRotation = null;
     public Element(@NotNull String id) {
+        this(id, IEntityIdProvider.DEFAULT);
+    }
+    public Element(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider) {
         this.id = id;
+        this.entityIdProvider = entityIdProvider;
         this.hologram = createHologram();
     }
 

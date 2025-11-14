@@ -21,7 +21,10 @@ public abstract class EntityDisplay<This extends AbstractEntity<This>> extends A
     protected Display.Billboard billboard = Display.Billboard.CENTER;
     protected int brightnessOverride = -1;
     protected EntityDisplay(RenderMode renderMode) {
-        super(renderMode);
+        this(renderMode, IEntityIdProvider.DEFAULT);
+    }
+    protected EntityDisplay(RenderMode renderMode, IEntityIdProvider provider) {
+        super(renderMode, provider);
     }
 
     protected void applyDisplayMeta(AbstractDisplayMeta meta) {

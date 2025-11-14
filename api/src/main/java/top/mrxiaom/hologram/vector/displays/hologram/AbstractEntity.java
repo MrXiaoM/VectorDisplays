@@ -45,12 +45,15 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     protected boolean dead = true;
 
     protected AbstractEntity(RenderMode renderMode) {
+        this(renderMode, IEntityIdProvider.DEFAULT);
+    }
+    protected AbstractEntity(RenderMode renderMode, IEntityIdProvider provider) {
         PluginWrapper plugin = HologramAPI.getHologram().getPlugin();
         if (plugin == null) {
             throw new IllegalStateException("HologramAPI is not initialized!");
         }
         this.plugin = plugin;
-        this.entityID = NMS.nextEntityId(getEntityType());
+        this.entityID = provider.nextId(getEntityType());
         this.renderMode = renderMode;
     }
 

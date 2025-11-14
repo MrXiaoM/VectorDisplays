@@ -3,20 +3,27 @@ package top.mrxiaom.hologram.vector.displays.ui.api;
 import org.bukkit.entity.Display;
 import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityItemDisplay;
+import top.mrxiaom.hologram.vector.displays.hologram.IEntityIdProvider;
 import top.mrxiaom.hologram.vector.displays.hologram.RenderMode;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.api.wrapper.EntityItemDisplayWrapper;
 
 public abstract class ItemElement<This extends Element<This, EntityItemDisplay>> extends Element<This, EntityItemDisplay> implements EntityItemDisplayWrapper<This> {
     public static final double scaleWidth = 48, scaleHeight = 48;
+
     protected float scaleZ = 1.0f;
+
     public ItemElement(@NotNull String id) {
-        super(id);
+        this(id, IEntityIdProvider.DEFAULT);
+    }
+
+    public ItemElement(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider) {
+        super(id, entityIdProvider);
     }
 
     @Override
     protected EntityItemDisplay createHologram() {
-        return new EntityItemDisplay(RenderMode.VIEWER_LIST)
+        return new EntityItemDisplay(RenderMode.VIEWER_LIST, entityIdProvider)
                 .setInterpolationDurationTransformation(3)
                 .setInterpolationDurationRotation(0)
                 .setBillboard(Display.Billboard.FIXED);

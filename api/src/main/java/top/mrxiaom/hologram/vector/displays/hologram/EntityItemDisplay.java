@@ -22,9 +22,13 @@ public class EntityItemDisplay extends EntityDisplay<EntityItemDisplay> {
     private com.github.retrooper.packetevents.protocol.item.ItemStack itemAsPacket = com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY;
     private DisplayType displayType = DisplayType.NONE;
 
-    public EntityItemDisplay(RenderMode renderMode) {
-        super(renderMode);
+    public EntityItemDisplay(RenderMode renderMode, IEntityIdProvider provider) {
+        super(renderMode, provider);
         this.meta = (ItemDisplayMeta) EntityMeta.createMeta(this.entityID, getEntityType());
+    }
+
+    public EntityItemDisplay(RenderMode renderMode) {
+        this(renderMode, IEntityIdProvider.DEFAULT);
     }
 
     public EntityItemDisplay() {

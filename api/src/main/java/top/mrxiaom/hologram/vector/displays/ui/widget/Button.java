@@ -2,6 +2,7 @@ package top.mrxiaom.hologram.vector.displays.ui.widget;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.mrxiaom.hologram.vector.displays.hologram.IEntityIdProvider;
 import top.mrxiaom.hologram.vector.displays.hologram.utils.AdventureHelper;
 import top.mrxiaom.hologram.vector.displays.ui.api.ClickMeta;
 import top.mrxiaom.hologram.vector.displays.ui.api.Hoverable;
@@ -22,7 +23,13 @@ public class Button extends TextElement<Button> implements Hoverable {
         super(id);
     }
     public Button(@NotNull String id, @NotNull String text) {
-        this(id);
+        this(id, IEntityIdProvider.DEFAULT, text);
+    }
+    public Button(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider) {
+        super(id, entityIdProvider);
+    }
+    public Button(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, @NotNull String text) {
+        this(id, entityIdProvider);
         setText(text);
     }
 

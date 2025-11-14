@@ -5,6 +5,7 @@ import org.bukkit.entity.Display;
 import org.bukkit.entity.TextDisplay;
 import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
+import top.mrxiaom.hologram.vector.displays.hologram.IEntityIdProvider;
 import top.mrxiaom.hologram.vector.displays.hologram.RenderMode;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.api.ITextRenderer;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
@@ -16,12 +17,16 @@ public abstract class TextElement<This extends Element<This, EntityTextDisplay>>
     private double textWidth, textHeight;
 
     public TextElement(@NotNull String id) {
-        super(id);
+        this(id, IEntityIdProvider.DEFAULT);
+    }
+
+    public TextElement(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider) {
+        super(id, entityIdProvider);
     }
 
     @Override
     protected EntityTextDisplay createHologram() {
-        return new EntityTextDisplay(RenderMode.VIEWER_LIST)
+        return new EntityTextDisplay(RenderMode.VIEWER_LIST, entityIdProvider)
                 .setInterpolationDurationTransformation(3)
                 .setInterpolationDurationRotation(0)
                 .setAlignment(TextDisplay.TextAlignment.LEFT)

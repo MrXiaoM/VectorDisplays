@@ -3,6 +3,7 @@ package top.mrxiaom.hologram.vector.displays.ui.widget;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.mrxiaom.hologram.vector.displays.hologram.IEntityIdProvider;
 import top.mrxiaom.hologram.vector.displays.ui.api.ClickMeta;
 import top.mrxiaom.hologram.vector.displays.ui.api.Hoverable;
 import top.mrxiaom.hologram.vector.displays.ui.api.ItemElement;
@@ -19,12 +20,18 @@ public class Item extends ItemElement<Item> implements Hoverable {
     private ElementClickEvent<Item> clickEvent;
     private HoverStateChange<Item> hoverStateChange;
     public Item(@NotNull String id) {
-        this(id, null);
-        this.getEntity().setRightRotation(QuaternionUtils.fromEulerYXZtoQuaternion(180.0f, 0.0f, 0.0f));
+        this(id, IEntityIdProvider.DEFAULT);
     }
     public Item(@NotNull String id, @Nullable ItemStack itemStack) {
-        super(id);
-        setItemStack(itemStack);
+        this(id, IEntityIdProvider.DEFAULT, itemStack);
+    }
+    public Item(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider) {
+        this(id, entityIdProvider, null);
+    }
+    public Item(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, @Nullable ItemStack itemStack) {
+        super(id, entityIdProvider);
+        this.getEntity().setRightRotation(QuaternionUtils.fromEulerYXZtoQuaternion(180.0f, 0.0f, 0.0f));
+        this.setItemStack(itemStack);
     }
 
     /**

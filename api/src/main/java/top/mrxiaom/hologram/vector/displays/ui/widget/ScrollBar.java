@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.hologram.vector.displays.hologram.AbstractEntity;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
 import top.mrxiaom.hologram.vector.displays.hologram.HologramAPI;
+import top.mrxiaom.hologram.vector.displays.hologram.IEntityIdProvider;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.api.ClickMeta;
 import top.mrxiaom.hologram.vector.displays.ui.api.Hoverable;
@@ -51,12 +52,32 @@ public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDispl
     /**
      * 滚动条控件
      * @param id 元素ID
+     * @param entityIdProvider 虚拟实体ID提供器，用于复用实体ID
+     */
+    public ScrollBar(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider) {
+        this(id, entityIdProvider, 10, 10.0f, 1f);
+    }
+
+    /**
+     * 滚动条控件
+     * @param id 元素ID
      * @param division 分为多少块（确定滑动按钮大小）
      * @param barWidth 滚动条宽度
      * @param barHeight 滚动条高度
      */
     public ScrollBar(@NotNull String id, int division, float barWidth, float barHeight) {
-        super(id);
+        this(id, IEntityIdProvider.DEFAULT, division, barWidth, barHeight);
+    }
+    /**
+     * 滚动条控件
+     * @param id 元素ID
+     * @param entityIdProvider 虚拟实体ID提供器，用于复用实体ID
+     * @param division 分为多少块（确定滑动按钮大小）
+     * @param barWidth 滚动条宽度
+     * @param barHeight 滚动条高度
+     */
+    public ScrollBar(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, int division, float barWidth, float barHeight) {
+        super(id, entityIdProvider);
         this.hologramMark = createHologram()
                 .setText(Component.text("                "))
                 .setShadow(false);

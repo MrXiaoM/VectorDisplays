@@ -26,9 +26,13 @@ public class EntityTextDisplay extends EntityDisplay<EntityTextDisplay> {
     private TextDisplay.TextAlignment alignment = TextDisplay.TextAlignment.CENTER;
     private byte textOpacity = (byte) -1;
 
-    public EntityTextDisplay(RenderMode renderMode) {
-        super(renderMode);
+    public EntityTextDisplay(RenderMode renderMode, IEntityIdProvider provider) {
+        super(renderMode, provider);
         this.meta = (TextDisplayMeta) EntityMeta.createMeta(this.entityID, getEntityType());
+    }
+
+    public EntityTextDisplay(RenderMode renderMode) {
+        this(renderMode, IEntityIdProvider.DEFAULT);
     }
 
     public EntityTextDisplay() {

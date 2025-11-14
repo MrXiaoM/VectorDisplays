@@ -3,6 +3,7 @@ package top.mrxiaom.hologram.vector.displays.ui.widget;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.mrxiaom.hologram.vector.displays.hologram.IEntityIdProvider;
 import top.mrxiaom.hologram.vector.displays.ui.EnumAlign;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.api.Element;
@@ -19,7 +20,10 @@ public class Line extends TextElement<Line> {
     private double thickness = 0.5;
     private float[] rotation;
     public Line(@NotNull String id) {
-        super(id);
+        this(id, IEntityIdProvider.DEFAULT);
+    }
+    public Line(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider) {
+        super(id, entityIdProvider);
         setEnabled(false);
         setShadow(false);
         setBackgroundColor(0x80FFFFFF);

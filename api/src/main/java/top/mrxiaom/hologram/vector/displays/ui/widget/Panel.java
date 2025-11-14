@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.mrxiaom.hologram.vector.displays.hologram.IEntityIdProvider;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.api.Element;
 import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
@@ -32,7 +33,10 @@ public class Panel extends TextElement<Panel> {
     private Double interactDistance = null;
     private final List<Element<?, ?>> elements = new ArrayList<>();
     public Panel(@NotNull String id, double width, double height) {
-        super(id);
+        this(id, IEntityIdProvider.DEFAULT, width, height);
+    }
+    public Panel(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, double width, double height) {
+        super(id, entityIdProvider);
         this.getEntity().setText(Component.text("                "));
         this.spaceWidth = HologramFont.getTextRenderer().getWidth(getEntity().getTextAsComponent());
         this.setPanelSize(width, height);
