@@ -5,12 +5,15 @@ import top.mrxiaom.hologram.vector.displays.api.IRunTask;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class HologramManager {
     private final PluginWrapper plugin;
     private final List<AbstractEntity<?>> virtualEntities = new CopyOnWriteArrayList<>();
+    private final Set<Integer> virtualEntityIds = new HashSet<>();
     private IRunTask updateTask;
     private long updatePeriod;
     public HologramManager(PluginWrapper plugin) {
@@ -46,12 +49,17 @@ public class HologramManager {
         return Collections.unmodifiableList(this.virtualEntities);
     }
 
+    public Set<Integer> getVirtualEntityIds() {
+        return Collections.unmodifiableSet(this.virtualEntityIds);
+    }
+
     @Deprecated
     public List<AbstractEntity<?>> getHolograms() {
         return getVirtualEntities();
     }
 
     public void spawn(AbstractEntity<?> entity, Location location) {
+        this.virtualEntityIds.add(entity.getEntityID());
         entity.spawn(location);
         if (!this.virtualEntities.contains(entity)) {
             this.virtualEntities.add(entity);
@@ -59,18 +67,21 @@ public class HologramManager {
     }
 
     public void register(AbstractEntity<?> entity) {
+        this.virtualEntityIds.add(entity.getEntityID());
         if (!this.virtualEntities.contains(entity)) {
             this.virtualEntities.add(entity);
         }
     }
 
     public void remove(AbstractEntity<?> entity) {
+        this.virtualEntityIds.remove(entity.getEntityID());
         this.virtualEntities.remove(entity);
         entity.kill();
     }
 
     public void removeAll() {
         this.virtualEntities.forEach(AbstractEntity::kill);
+        this.virtualEntityIds.clear();
         this.virtualEntities.clear();
     }
 
