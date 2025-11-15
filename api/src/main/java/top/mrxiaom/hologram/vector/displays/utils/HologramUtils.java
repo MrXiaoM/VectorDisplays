@@ -43,13 +43,8 @@ public class HologramUtils {
                 if (element.beforePerformClick(player, action, eyeLocation)) {
                     return true;
                 }
-                Location clickPos = HologramUtils.raytraceElement(rotation, element.getAdditionalRotation(), element, eyeLocation);
-                if (clickPos != null && eyeLocation.distance(clickPos) <= interactDistance) {
-                    // 将 clickPos 投影到 element 上，获取所点击的二维坐标
-                    Point2D whereClicked = HologramUtils.getPoint(element, clickPos);
-                    ClickMeta meta = new ClickMeta(player, action, whereClicked);
-                    element.performClick(meta);
-                    return true; // 一次只允许点击一个元素
+                if (element.commonPerformClick(player, action, eyeLocation, rotation, interactDistance)) {
+                    return true;
                 }
             }
         }

@@ -13,6 +13,8 @@ import top.mrxiaom.hologram.vector.displays.ui.EnumAlign;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.event.TimerTickEvent;
 import top.mrxiaom.hologram.vector.displays.ui.widget.Panel;
+import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
+import top.mrxiaom.hologram.vector.displays.utils.Point2D;
 import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
 
 import java.util.Collection;
@@ -396,6 +398,18 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
      * @return 是否已处理该操作
      */
     public boolean beforePerformClick(Player player, Action action, Location eyeLocation) {
+        return false;
+    }
+
+    public boolean commonPerformClick(Player player, Action action, Location eyeLocation, float[] rotation, double interactDistance) {
+        Location clickPos = HologramUtils.raytraceElement(rotation, getAdditionalRotation(), this, eyeLocation);
+        if (clickPos != null && eyeLocation.distance(clickPos) <= interactDistance) {
+            // 将 clickPos 投影到 element 上，获取所点击的二维坐标
+            Point2D whereClicked = HologramUtils.getPoint(this, clickPos);
+            ClickMeta meta = new ClickMeta(player, action, whereClicked);
+            performClick(meta);
+            return true; // 一次只允许点击一个元素
+        }
         return false;
     }
 
