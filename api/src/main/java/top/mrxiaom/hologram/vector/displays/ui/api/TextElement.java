@@ -66,18 +66,10 @@ public abstract class TextElement<This extends Element<This, EntityTextDisplay>>
      * 根据悬浮字的文本，计算悬浮字在世界上的长宽尺寸
      */
     public void calculateSize() {
-        calculateSize(false);
-    }
-
-    protected void calculateSize(boolean addSpaces) {
         ITextRenderer textRenderer = HologramFont.getTextRenderer();
         Component text = getEntity().getTextAsComponent();
-        int maxWidth = 0, lines = 0;
-        for (String s : HologramUtils.toPlain(text).split("\n")) {
-            int width = textRenderer.getWidth(s) + (addSpaces ? s.length() : 0);
-            if (width > maxWidth) maxWidth = width;
-            lines++;
-        }
+        double maxWidth = textRenderer.getWidth(text);
+        int lines = textRenderer.getLines(text);
         this.textWidth = maxWidth * scaleX;
         this.textHeight = lines * HologramUtils.LINE_HEIGHT * scaleY;
         this.width = textWidth * HologramFont.getCharScale();

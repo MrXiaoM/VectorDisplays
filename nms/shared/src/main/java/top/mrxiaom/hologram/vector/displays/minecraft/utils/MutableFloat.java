@@ -16,6 +16,8 @@
  */
 package top.mrxiaom.hologram.vector.displays.minecraft.utils;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.Serial;
 
 /**
@@ -39,6 +41,8 @@ public class MutableFloat extends Number implements Comparable<MutableFloat>, Mu
 
     /** The mutable value. */
     private float value;
+
+    private @Nullable Float maxValue = null;
 
     /**
      * Constructs a new MutableFloat with the default value of zero.
@@ -396,6 +400,18 @@ public class MutableFloat extends Number implements Comparable<MutableFloat>, Mu
      */
     public Float toFloat() {
         return floatValue();
+    }
+
+    public void resetNextLine() {
+        float value = floatValue();
+        if (this.maxValue == null || value > this.maxValue) {
+            this.maxValue = value;
+        }
+        this.setValue(0f);
+    }
+
+    public float getMaxValue() {
+        return maxValue == null ? floatValue() : maxValue;
     }
 
     /**

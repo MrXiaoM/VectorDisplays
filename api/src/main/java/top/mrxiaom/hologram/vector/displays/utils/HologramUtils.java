@@ -1,7 +1,6 @@
 package top.mrxiaom.hologram.vector.displays.utils;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -18,7 +17,6 @@ import java.util.List;
 
 public class HologramUtils {
     public static double LINE_HEIGHT = 12.5;
-    private static final PlainTextComponentSerializer plainText = PlainTextComponentSerializer.plainText();
     private static final double EPSILON = 1e-10; // 用于处理浮点数精度问题
 
     public static boolean isLeftClick(Action action) {
@@ -64,19 +62,6 @@ public class HologramUtils {
             floats[i] = Float.parseFloat(String.valueOf(doubles[i]));
         }
         return floats;
-    }
-
-    public static String toPlain(Component component) {
-        return plainText.serialize(component);
-    }
-
-    /**
-     * 获取悬浮字内容的行数
-     *
-     * @param hologram 悬浮字
-     */
-    public static int getLines(EntityTextDisplay hologram) {
-        return toPlain(hologram.getTextAsComponent()).split("\n").length;
     }
 
     /**
@@ -174,11 +159,13 @@ public class HologramUtils {
      * @see HologramUtils#raytraceElement(float[], float[], Location, double, double, double, double, Location)
      */
     @Nullable
+    @Deprecated
     public static Location raytraceHologram(@NotNull Terminal<?> terminal, float @Nullable [] additionalRotation, @NotNull EntityTextDisplay hologram, @NotNull Location eyeLocation) {
         float[] rotation = terminal.getRotation();
         // 计算悬浮字宽高
-        double width = HologramFont.getWidthToLocation(hologram.getTextAsComponent()) * hologram.getScale().x;
-        double height = getLines(hologram) * LINE_HEIGHT * HologramFont.getCharScale() * hologram.getScale().y;
+        Component text = hologram.getTextAsComponent();
+        double width = HologramFont.getWidth(text) * HologramFont.getCharScale() * hologram.getScale().x;
+        double height = HologramFont.getLines(text) * LINE_HEIGHT * HologramFont.getCharScale() * hologram.getScale().y;
         // 悬浮字正下方坐标
         Location loc = hologram.getLocation();
         return raytraceElement(rotation, additionalRotation, loc, width, height, eyeLocation);
@@ -189,6 +176,7 @@ public class HologramUtils {
      * @see HologramUtils#raytraceElement(float[], float[], Location, double, double, double, double, Location)
      */
     @Nullable
+    @Deprecated
     public static Location raytraceHologram(@NotNull Terminal<?> terminal, float @Nullable [] additionalRotation, @NotNull EntityItemDisplay hologram, @NotNull Location eyeLocation) {
         float[] rotation = terminal.getRotation();
         // 计算悬浮字宽高

@@ -34,11 +34,6 @@ public class Button extends TextElement<Button> implements Hoverable {
         setText(text);
     }
 
-    @Override
-    public void calculateSize() {
-        calculateSize(true);
-    }
-
     /**
      * 获取悬浮字文本
      */

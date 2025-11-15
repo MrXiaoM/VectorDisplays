@@ -8,8 +8,8 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSp
 import me.tofaa.entitylib.meta.EntityMeta;
 import me.tofaa.entitylib.meta.display.TextDisplayMeta;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.TextDisplay;
-import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -77,7 +77,7 @@ public class EntityTextDisplay extends EntityDisplay<EntityTextDisplay> {
     }
 
     public String getTextWithoutColor() {
-        return HologramUtils.toPlain(text);
+        return plainText.serialize(text);
     }
 
     public EntityTextDisplay setText(String text) {

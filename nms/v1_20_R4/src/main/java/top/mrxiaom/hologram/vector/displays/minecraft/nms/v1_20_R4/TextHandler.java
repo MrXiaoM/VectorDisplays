@@ -37,8 +37,41 @@ public class TextHandler implements ITextHandler {
     }
 
     @Override
+    public int getLines(JsonElement json) {
+        IChatMutableComponent text = fromJson(json);
+        MutableInt mutableInt = new MutableInt(1);
+        StringDecomposer.a(text, ChatModifier.a, (unused, style, codePoint) -> {
+            if (codePoint == 0x000A) mutableInt.add(1);
+            return true;
+        });
+        return mutableInt.intValue();
+    }
+
+    @Override
+    public int getLines(@Nullable String text) {
+        if (text == null) {
+            return 1;
+        }
+        MutableInt mutableInt = new MutableInt(1);
+        StringDecomposer.a(text, ChatModifier.a, (unused, style, codePoint) -> {
+            if (codePoint == 0x000A) mutableInt.add(1);
+            return true;
+        });
+        return mutableInt.intValue();
+    }
+
+    @Override
     public float getWidth(JsonElement json) {
         return getWidth(fromJson(json));
+    }
+
+    private boolean visit(int codePoint, ChatModifier style, MutableFloat mutableFloat) {
+        if (codePoint == 0x000A) { // reset if it is '\n'
+            mutableFloat.resetNextLine();
+        } else {
+            mutableFloat.add(this.widthRetriever.getWidth(codePoint, style));
+        }
+        return true;
     }
 
     public float getWidth(@Nullable String text) {
@@ -46,11 +79,8 @@ public class TextHandler implements ITextHandler {
             return 0.0F;
         } else {
             MutableFloat mutableFloat = new MutableFloat();
-            StringDecomposer.a(text, ChatModifier.a, (unused, style, codePoint) -> {
-                mutableFloat.add(this.widthRetriever.getWidth(codePoint, style));
-                return true;
-            });
-            return mutableFloat.floatValue();
+            StringDecomposer.a(text, ChatModifier.a, (unused, style, codePoint) -> visit(codePoint, style, mutableFloat));
+            return mutableFloat.getMaxValue();
         }
     }
 
@@ -92,20 +122,14 @@ public class TextHandler implements ITextHandler {
 
     public float getWidth(IChatFormatted text) {
         MutableFloat mutableFloat = new MutableFloat();
-        StringDecomposer.a(text, ChatModifier.a, (unused, style, codePoint) -> {
-            mutableFloat.add(this.widthRetriever.getWidth(codePoint, style));
-            return true;
-        });
-        return mutableFloat.floatValue();
+        StringDecomposer.a(text, ChatModifier.a, (unused, style, codePoint) -> visit(codePoint, style, mutableFloat));
+        return mutableFloat.getMaxValue();
     }
 
     public float getWidth(FormattedString text) {
         MutableFloat mutableFloat = new MutableFloat();
-        text.accept((index, style, codePoint) -> {
-            mutableFloat.add(this.widthRetriever.getWidth(codePoint, style));
-            return true;
-        });
-        return mutableFloat.floatValue();
+        text.accept((index, style, codePoint) -> visit(codePoint, style, mutableFloat));
+        return mutableFloat.getMaxValue();
     }
 
     public int getTrimmedLength(String text, int maxWidth, ChatModifier style) {

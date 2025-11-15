@@ -22,11 +22,6 @@ public class Label extends TextElement<Label> {
         setText(text);
     }
 
-    @Override
-    public void calculateSize() {
-        calculateSize(true);
-    }
-
     /**
      * 获取悬浮字文本
      */

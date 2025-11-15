@@ -6,6 +6,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public interface ITextHandler {
+    int getLines(JsonElement json);
+    int getLines(@Nullable String text);
     float getWidth(JsonElement json);
     float getWidth(@Nullable String text);
     JsonElement trimToWidth(JsonElement json, int maxWidth);

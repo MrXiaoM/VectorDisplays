@@ -2,7 +2,6 @@ package top.mrxiaom.hologram.vector.displays.ui;
 
 import net.kyori.adventure.text.Component;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.api.ITextRenderer;
-import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 
 public class HologramFont {
     private static ITextRenderer textRenderer;
@@ -38,12 +37,7 @@ public class HologramFont {
      * @param text 文本
      */
     public static double getWidth(Component text) {
-        int max = 0;
-        for (String s : HologramUtils.toPlain(text).split("\n")) {
-            int width = textRenderer.getWidth(s);
-            if (width > max) max = width;
-        }
-        return max;
+        return textRenderer.getWidth(text);
     }
 
     /**
@@ -52,5 +46,9 @@ public class HologramFont {
      */
     public static double getWidthToLocation(Component text) {
         return getWidth(text) * charScale;
+    }
+
+    public static int getLines(Component text) {
+        return textRenderer.getLines(text);
     }
 }

@@ -20,6 +20,17 @@ public class TextRenderer implements ITextRenderer {
     }
 
     @Override
+    public int getLines(String text) {
+        return handler.getLines(text);
+    }
+
+    @Override
+    public int getLines(Component text) {
+        JsonElement json = serializer.serializeToTree(text);
+        return handler.getLines(json);
+    }
+
+    @Override
     public int getWidth(String text) {
         return ceil(this.handler.getWidth(text));
     }

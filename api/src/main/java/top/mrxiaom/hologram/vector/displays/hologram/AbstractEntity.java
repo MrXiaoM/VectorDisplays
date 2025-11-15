@@ -8,6 +8,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.*;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import me.tofaa.entitylib.meta.EntityMeta;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -18,7 +19,6 @@ import org.jetbrains.annotations.Range;
 import org.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.api.IRunTask;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
-import top.mrxiaom.hologram.vector.displays.minecraft.nms.NMS;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +26,7 @@ import java.util.List;
 @SuppressWarnings("UnusedReturnValue")
 public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     public static final LegacyComponentSerializer legacyText = LegacyComponentSerializer.legacySection();
+    public static final PlainTextComponentSerializer plainText = PlainTextComponentSerializer.plainText();
 
     protected final PluginWrapper plugin;
 

@@ -5,6 +5,8 @@ import net.kyori.adventure.text.Component;
 import java.util.List;
 
 public interface ITextRenderer {
+    int getLines(String text);
+    int getLines(Component text);
     int getWidth(String text);
     int getWidth(Component text);
     int getSpaceCount(float width);
