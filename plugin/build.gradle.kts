@@ -8,12 +8,11 @@ plugins {
 repositories {
     if (Locale.getDefault().country == "CN") {
         maven("https://mirrors.huaweicloud.com/repository/maven/")
+        maven("https://lss233.littleservice.cn/repositories/minecraft/")
     }
     mavenCentral()
     maven("https://repo.codemc.io/repository/maven-releases/")
-    //maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     maven("https://repo.papermc.io/repository/maven-public/")
-    //maven("https://repo.rosewooddev.io/repository/public/")
     maven("https://jitpack.io")
     maven("https://repo.helpch.at/releases/")
 }
