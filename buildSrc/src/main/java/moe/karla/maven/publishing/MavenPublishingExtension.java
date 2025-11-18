@@ -1,12 +1,12 @@
-package moe.karla.maven.publishing
+package moe.karla.maven.publishing;
 
-class MavenPublishingExtension {
+public class MavenPublishingExtension {
 
     ///////////////////////////
     // BASIC
     ///////////////////////////
 
-    static enum PublishingType {
+    public enum PublishingType {
         /**
          * (default) a deployment will go through validation and, if it passes, automatically proceed to publish to Maven Central
          */
@@ -17,11 +17,6 @@ class MavenPublishingExtension {
         USER_MANAGED,
     }
 
-    public PublishingType publishingType = PublishingType.AUTOMATIC
-
-    /**
-     * Generate sources jar and stub javadoc jar automatic
-     */
-    public boolean automaticSourcesAndJavadoc = true
+    public PublishingType publishingType = PublishingType.AUTOMATIC;
 
 }

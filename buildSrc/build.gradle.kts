@@ -1,6 +1,6 @@
 plugins {
     java
-    `groovy-gradle-plugin`
+    `java-gradle-plugin`
 }
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -20,9 +20,6 @@ dependencies {
 }
 
 gradlePlugin {
-    website.set("https://github.com/Karlatemp/maven-central-publish")
-    vcsUrl.set("https://github.com/Karlatemp/maven-central-publish")
-
     plugins {
         register("maven-publishing") {
             id = "moe.karla.maven-publishing"
