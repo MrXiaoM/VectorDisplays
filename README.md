@@ -20,7 +20,9 @@
 然后，你可以使用以下**任意一种**方法获取插件：
 + 到[爱发电](https://afdian.com/p/9cf5cd80a9b511f0b7d05254001e7c00)进行购买
 + 通过[QQ](https://qm.qq.com/q/umnukgs1k4)或者[QQ群](https://qm.qq.com/q/bIu01ENOIU)联系作者进行购买
-+ 克隆本仓库，自行构建
++ 克隆本仓库，自行构建  
+  > CodeMC 仓库在中国大陆境内的速度极慢，建议自备代理。
+
 
 > [!WARNING]
 > 
