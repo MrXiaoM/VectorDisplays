@@ -38,7 +38,7 @@ public class TextHandler implements ITextHandler {
 
     @Override
     public int getLines(JsonElement json) {
-        IChatMutableComponent text = fromJson(json);
+        IChatBaseComponent text = fromJson(json);
         MutableInt mutableInt = new MutableInt(1);
         StringDecomposer.a(text, ChatModifier.a, (unused, style, codePoint) -> {
             if (codePoint == 0x000A) mutableInt.add(1);
@@ -101,7 +101,7 @@ public class TextHandler implements ITextHandler {
 
     @Override
     public List<JsonElement> wrapLines(JsonElement json, int maxWidth) {
-        IChatMutableComponent formatted = fromJson(json);
+        IChatBaseComponent formatted = fromJson(json);
         List<IChatBaseComponent> lines = wrapLines(formatted, maxWidth, ChatModifier.a);
         List<JsonElement> result = new ArrayList<>();
         for (IChatBaseComponent line : lines) {
@@ -263,16 +263,12 @@ public class TextHandler implements ITextHandler {
         }
     }
 
-    @SuppressWarnings({"deprecation"})
-    public static IChatMutableComponent fromJson(JsonElement element) {
-        RegistryOps<JsonElement> ops = MinecraftServer.getDefaultRegistryAccess().a(JsonOps.INSTANCE);
-        return (IChatMutableComponent) ComponentSerialization.a.parse(ops, element).getOrThrow(JsonParseException::new);
+    public static IChatBaseComponent fromJson(JsonElement element) {
+        return ComponentSerialization.a.decode(JsonOps.INSTANCE, element).getOrThrow(JsonParseException::new).getFirst();
     }
 
-    @SuppressWarnings({"deprecation"})
     public static JsonElement toJson(IChatBaseComponent text) {
-        RegistryOps<JsonElement> ops = MinecraftServer.getDefaultRegistryAccess().a(JsonOps.INSTANCE);
-        return ComponentSerialization.a.encodeStart(ops, text).getOrThrow(JsonParseException::new);
+        return ComponentSerialization.a.encodeStart(JsonOps.INSTANCE, text).getOrThrow(JsonParseException::new);
     }
 
     @FunctionalInterface
