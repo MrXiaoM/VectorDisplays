@@ -100,6 +100,8 @@ public class ProgressBar extends TextElement<ProgressBar> implements EntityTextD
     public void init() {
         updateText();
         super.init();
+        Terminal<?> terminal = terminal();
+        if (terminal != null) hologramMark.setRenderMode(terminal.getRenderMode());
         hologramMark.setLeftRotation(getRotation());
         HologramAPI.getHologram().spawn(hologramMark, decideMarkLocation());
     }
