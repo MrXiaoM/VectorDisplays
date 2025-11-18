@@ -80,7 +80,7 @@ public class Panel extends TextElement<Panel> {
      * 预执行点击操作，将事件传递给所有子 Element
      * @param player 玩家
      * @param action 操作类型
-     * @param eyeLocation <code>player.getEyeLocation()</code>
+     * @param eyeLocation <code>HologramUtils.getEyeLocation(player)</code>
      */
     @Override
     public boolean beforePerformClick(Player player, Action action, Location eyeLocation) {

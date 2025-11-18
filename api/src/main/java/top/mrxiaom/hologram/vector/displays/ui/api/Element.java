@@ -394,7 +394,7 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
      * @see Panel#beforePerformClick(Player, Action, Location)
      * @param player 玩家
      * @param action 操作类型
-     * @param eyeLocation <code>player.getEyeLocation()</code>
+     * @param eyeLocation <code>HologramUtils.getEyeLocation(player)</code>
      * @return 是否已处理该操作
      */
     public boolean beforePerformClick(Player player, Action action, Location eyeLocation) {

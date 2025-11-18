@@ -584,7 +584,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
      * @return 是否成功执行点击操作
      */
     public boolean tryPerformClick(Player player, Action action) {
-        Location eyeLocation = player.getEyeLocation();
+        Location eyeLocation = HologramUtils.getEyeLocation(player);
         float[] rotation = getRotation();
         double interactDistance = getInteractDistance();
         return HologramUtils.commonPerformClick(player, action, eyeLocation, elements, rotation, interactDistance);

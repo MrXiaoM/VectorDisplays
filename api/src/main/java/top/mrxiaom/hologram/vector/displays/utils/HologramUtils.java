@@ -7,6 +7,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.mrxiaom.hologram.vector.displays.api.IEyeLocationAdapter;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityItemDisplay;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
@@ -16,8 +17,18 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class HologramUtils {
+    private static IEyeLocationAdapter eyeLocationAdapter = IEyeLocationAdapter.DEFAULT;
     public static double LINE_HEIGHT = 12.5;
     private static final double EPSILON = 1e-10; // 用于处理浮点数精度问题
+
+    public static void setEyeLocationAdapter(@NotNull IEyeLocationAdapter eyeLocationAdapter) {
+        HologramUtils.eyeLocationAdapter = eyeLocationAdapter;
+    }
+
+    @NotNull
+    public static Location getEyeLocation(@NotNull Player player) {
+        return eyeLocationAdapter.getEyeLocation(player);
+    }
 
     public static boolean isLeftClick(Action action) {
         return action.equals(Action.LEFT_CLICK_AIR) || action.equals(Action.LEFT_CLICK_BLOCK);
@@ -31,7 +42,7 @@ public class HologramUtils {
      * 尝试执行点击元素操作
      * @param player 玩家
      * @param action 点击操作
-     * @param eyeLocation <code>player.getEyeLocation()</code>
+     * @param eyeLocation <code>HologramUtils.getEyeLocation(player)</code>
      * @param elements 待处理点击操作的元素列表
      * @param rotation 父面板旋转变换
      * @param interactDistance 可交互距离 (单位: 方块)
@@ -117,7 +128,7 @@ public class HologramUtils {
      * @param offsetY 元素Y位置偏移值
      * @param width 悬浮字宽度
      * @param height 悬浮字高度
-     * @param eyeLocation 玩家视线位置，<code>player.getEyeLocation()</code>
+     * @param eyeLocation 玩家视线位置，<code>HologramUtils.getEyeLocation(player)</code>
      * @return 如果视线没有落在悬浮字上，返回 <code>null</code>
      */
     @Nullable
@@ -190,7 +201,7 @@ public class HologramUtils {
      * @param loc2 矩形右上角坐标
      * @param loc3 矩形左下角坐标
      * @param loc4 矩形右下角坐标
-     * @param eyeLocation 玩家视线位置，<code>player.getEyeLocation()</code>
+     * @param eyeLocation 玩家视线位置，<code>HologramUtils.getEyeLocation(player)</code>
      */
     public static Location calculateIntersection(
             Location loc, float[] r,

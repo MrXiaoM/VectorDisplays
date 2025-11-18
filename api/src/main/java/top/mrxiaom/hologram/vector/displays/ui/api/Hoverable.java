@@ -14,7 +14,7 @@ public interface Hoverable {
 
     static boolean handleHover(Terminal<?> terminal, float[] additionalRotation, Element<?, ?> element) {
         for (Player player : terminal.getViewers()) {
-            Location eyeLocation = player.getEyeLocation();
+            Location eyeLocation = HologramUtils.getEyeLocation(player);
             Location point = HologramUtils.raytraceElement(terminal, additionalRotation, element, eyeLocation);
             if (point != null && eyeLocation.distance(point) <= terminal.getInteractDistance()) {
                 return true;
@@ -25,7 +25,7 @@ public interface Hoverable {
     @Deprecated
     static boolean handleHover(Terminal<?> terminal, float[] additionalRotation, EntityTextDisplay entity) {
         for (Player player : terminal.getViewers()) {
-            Location eyeLocation = player.getEyeLocation();
+            Location eyeLocation = HologramUtils.getEyeLocation(player);
             Location point = HologramUtils.raytraceHologram(terminal, additionalRotation, entity, eyeLocation);
             if (point != null && eyeLocation.distance(point) <= terminal.getInteractDistance()) {
                 return true;
@@ -36,7 +36,7 @@ public interface Hoverable {
     @Deprecated
     static boolean handleHover(Terminal<?> terminal, float[] additionalRotation, EntityItemDisplay entity) {
         for (Player player : terminal.getViewers()) {
-            Location eyeLocation = player.getEyeLocation();
+            Location eyeLocation = HologramUtils.getEyeLocation(player);
             Location point = HologramUtils.raytraceHologram(terminal, additionalRotation, entity, eyeLocation);
             if (point != null && eyeLocation.distance(point) <= terminal.getInteractDistance()) {
                 return true;
