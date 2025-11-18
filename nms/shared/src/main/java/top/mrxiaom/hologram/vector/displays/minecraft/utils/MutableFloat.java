@@ -411,7 +411,11 @@ public class MutableFloat extends Number implements Comparable<MutableFloat>, Mu
     }
 
     public float getMaxValue() {
-        return maxValue == null ? floatValue() : maxValue;
+        float value = floatValue();
+        if (maxValue == null || value > maxValue) {
+            return value;
+        }
+        return maxValue;
     }
 
     /**
