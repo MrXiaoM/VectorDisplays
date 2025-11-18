@@ -3,7 +3,6 @@ subprojects {
     repositories {
         if (java.util.Locale.getDefault().country == "CN") {
             maven("https://mirrors.huaweicloud.com/repository/maven/")
-            maven("https://lss233.littleservice.cn/repositories/minecraft/")
         }
         mavenCentral()
         maven("https://repo.papermc.io/repository/maven-public/")
