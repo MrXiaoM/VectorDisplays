@@ -15,7 +15,8 @@ repositories {
     }
     mavenCentral()
     maven("https://repo.codemc.io/repository/maven-releases/")
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+    //maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+    maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://jitpack.io")
 }
 
@@ -67,8 +68,6 @@ tasks {
         }
         source += task.source
         (options as StandardJavadocDocletOptions).apply {
-            links("https://hub.spigotmc.org/javadocs/spigot/")
-
             locale("zh_CN")
             encoding("UTF-8")
             docEncoding("UTF-8")
