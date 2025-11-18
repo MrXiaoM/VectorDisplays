@@ -7,7 +7,8 @@ subprojects {
         mavenCentral()
         //maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
         maven("https://repo.papermc.io/repository/maven-public/")
-        maven("https://repo.rosewooddev.io/repository/public/")
+        //maven("https://repo.rosewooddev.io/repository/public/")
+        maven("https://repo.codemc.io/repository/nms/")
         maven("https://libraries.minecraft.net/")
     }
 
