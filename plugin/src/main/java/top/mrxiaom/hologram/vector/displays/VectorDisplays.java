@@ -1,11 +1,14 @@
 package top.mrxiaom.hologram.vector.displays;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import top.mrxiaom.hologram.vector.displays.api.FoliaLibScheduler;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
+import top.mrxiaom.hologram.vector.displays.api.ViveCraftEyeLocation;
 import top.mrxiaom.hologram.vector.displays.config.FontConfig;
 import top.mrxiaom.hologram.vector.displays.config.IConfig;
+import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +29,9 @@ public class VectorDisplays extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        if (Bukkit.getPluginManager().isPluginEnabled("Vivecraft-Spigot-Extension")) {
+            HologramUtils.setEyeLocationAdapter(new ViveCraftEyeLocation(this));
+        }
         manager.onEnable();
         configList.add(new FontConfig(this));
         new Commands(this);

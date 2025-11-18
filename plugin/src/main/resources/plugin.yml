@@ -7,6 +7,7 @@ depend:
 softdepend:
   - PlaceholderAPI
   - ItemsAdder
+  - Vivecraft-Spigot-Extension
 authors: [ MrXiaoM ]
 folia-supported: true
 libraries:
