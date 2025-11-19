@@ -8,6 +8,7 @@ import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
 import top.mrxiaom.hologram.vector.displays.api.ViveCraftEyeLocation;
 import top.mrxiaom.hologram.vector.displays.config.FontConfig;
 import top.mrxiaom.hologram.vector.displays.config.IConfig;
+import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ public class VectorDisplays extends JavaPlugin {
     public void onEnable() {
         if (Bukkit.getPluginManager().isPluginEnabled("Vivecraft-Spigot-Extension")) {
             HologramUtils.setEyeLocationAdapter(new ViveCraftEyeLocation(this));
+            Terminal.setDefaultInteractDistance(4.0);
             getLogger().info("已挂钩到 ViveCraft 扩展");
         }
         manager.onEnable();

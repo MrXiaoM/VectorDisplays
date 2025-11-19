@@ -24,6 +24,7 @@ import java.util.function.Consumer;
  * 悬浮字界面终端面板，负责定位与包含元素
  */
 public abstract class Terminal<This extends Terminal<This>> implements EntityTextDisplayWrapper<This> {
+    private static double defaultInteractDistance = 2.5;
     private final @NotNull String id;
     private @NotNull Location location;
     private final Map<String, List<Element<?, ?>>> pages = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
@@ -31,7 +32,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
     private final EntityTextDisplay hologram;
     private double textWidth, textHeight;
     private double width, height;
-    private double interactDistance = 2.5;
+    private double interactDistance = defaultInteractDistance;
     private float[] rotation = { 0, 0, 0, 1 };
     private Consumer<This> actionPreTimerTick, actionPostTimerTick, actionPreDispose, actionPostDispose;
     private Terminal(@NotNull RenderMode renderMode, @NotNull String id, @NotNull Location location) {
@@ -59,6 +60,14 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
     public Terminal(@NotNull RenderMode renderMode, @NotNull String id, @NotNull Location location, double width, double height) {
         this(renderMode, id, location);
         setSize(width, height);
+    }
+
+    public static double getDefaultInteractDistance() {
+        return defaultInteractDistance;
+    }
+
+    public static void setDefaultInteractDistance(double defaultInteractDistance) {
+        Terminal.defaultInteractDistance = defaultInteractDistance;
     }
 
     /**
