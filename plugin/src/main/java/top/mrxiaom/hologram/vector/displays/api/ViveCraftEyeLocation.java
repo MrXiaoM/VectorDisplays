@@ -1,6 +1,7 @@
 package top.mrxiaom.hologram.vector.displays.api;
 
-import com.google.common.collect.Iterables;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -8,9 +9,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.metadata.MetadataValue;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import org.vivecraft.api.VRAPI;
+import org.vivecraft.api.data.VRBodyPart;
+import org.vivecraft.api.data.VRBodyPartData;
+import org.vivecraft.api.data.VRPose;
 import top.mrxiaom.hologram.vector.displays.TerminalManager;
 import top.mrxiaom.hologram.vector.displays.VectorDisplays;
 
@@ -24,10 +28,16 @@ public class ViveCraftEyeLocation implements IEyeLocationAdapter, Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
         TerminalManager.inst().getPlugin().getScheduler().runTaskTimerAsync(() -> {
             for (Player p : Bukkit.getOnlinePlayers()) {
-                MetadataValue pos = Iterables.getFirst(p.getMetadata("righthand.pos"), null);
-                if (pos != null && pos.value() instanceof Location eyeLoc) {
-                    cacheMap.put(p.getUniqueId(), eyeLoc);
-                }
+                VRPose pose = VRAPI.instance().getVRPose(p);
+                if (pose == null) continue;
+                VRBodyPartData hand = pose.getBodyPartData(VRBodyPart.MAIN_HAND);
+                if (hand == null) continue;
+
+                Vector pos = hand.getPos();
+                Location loc = new Location(p.getWorld(), pos.getX(), pos.getY(), pos.getZ());
+                loc.setDirection(hand.getDir());
+
+                cacheMap.put(p.getUniqueId(), loc);
             }
         }, 1L, 1L);
     }

@@ -22,6 +22,7 @@ dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("com.github.retrooper:packetevents-spigot:2.9.5")
+    compileOnly(project(":vive-api"))
 
     implementation("com.github.technicallycoded:FoliaLib:0.4.4")
     implementation("com.github.Tofaa2.EntityLib:spigot:df6fe0f084")

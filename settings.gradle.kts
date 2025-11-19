@@ -8,9 +8,11 @@ include(":api")
 include(":nms")
 File(rootDir, "nms").listFiles()?.forEach { file ->
     if (File(file, "build.gradle.kts").exists()) {
-        if (onlyEnableNMS.isEmpty() || onlyEnableNMS.contains(file.name)) {
-            include(":nms:${file.name}")
+        val str = file.name
+        if (str == "shared" || onlyEnableNMS.isEmpty() || onlyEnableNMS.contains(str)) {
+            include(":nms:$str")
         }
     }
 }
+include(":vive-api")
 include(":plugin")

@@ -31,6 +31,7 @@ public class VectorDisplays extends JavaPlugin {
     public void onEnable() {
         if (Bukkit.getPluginManager().isPluginEnabled("Vivecraft-Spigot-Extension")) {
             HologramUtils.setEyeLocationAdapter(new ViveCraftEyeLocation(this));
+            getLogger().info("已挂钩到 ViveCraft 扩展");
         }
         manager.onEnable();
         configList.add(new FontConfig(this));
