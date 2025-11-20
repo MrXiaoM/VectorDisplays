@@ -627,18 +627,43 @@ public class HologramUtils {
      */
     public static Point2D getPoint(Element<?, ?> element, Location loc) {
         Calculator calc = element.calc();
-        double x = element.getX();
-        double y = element.getY();
-        double[] p1 = calc.decideLocation(x, y, true);
-        double[] p2 = calc.decideLocation(x - 100, y + 100, true);
-        double[] p3 = calc.decideLocation(x + 100, y + 100, true);
-        double[] p4 = calc.decideLocation(x, y - 100, true, true);
-        double[] p5 = calc.decideLocation(x + 100, y, true, true);
-        // 计算投影
-        double[] result = projectToPlane(p1, p2, p3, toVector(p1, p5), toVector(p1, p4), toArray(loc));
-        // 将结果转换为文本坐标系
-        double charScale = HologramFont.getCharScale();
-        return new Point2D(result[0] / charScale, result[1] / charScale);
+        if (element instanceof Triangle triangle) {
+            // 三角形使用重心作为原点坐标
+            float[] pos1 = triangle.getPos1();
+            float[] pos2 = triangle.getPos2();
+            float[] pos3 = triangle.getPos3();
+            // 正常运行到这里时，这三个坐标必不可能是 null
+            assert pos1 != null && pos2 != null && pos3 != null;
+            // 获取三角形在平面上的二维重心
+            double centerX = (pos1[0] + pos2[0] + pos3[0]) / 3.0;
+            double centerY = (pos1[1] + pos2[1] + pos3[1]) / 3.0;
+            // 三个用于确定平面的三维坐标，确保不共线
+            double[] center = calc.decideLocation(centerX, centerY, true); // 原点坐标
+            double[] p1 = calc.decideLocation(pos1[0], pos1[1], true);
+            double[] p3 = calc.decideLocation(pos3[0], pos3[1], true);
+            double[] pY = calc.decideLocation(centerX, centerY - 100, true, true); // y轴向量末端坐标
+            double[] pX = calc.decideLocation(centerX + 100, centerY, true, true); // x轴向量末端坐标
+            // 计算投影
+            double[] result = projectToPlane(center, p1, p3, toVector(center, pX), toVector(center, pY), toArray(loc));
+            // 将结果转换为文本坐标系
+            double charScale = HologramFont.getCharScale();
+            return new Point2D(result[0] / charScale, result[1] / charScale);
+        } else {
+            // 其它元素使用元素坐标作为原点坐标
+            double x = element.getX();
+            double y = element.getY();
+            // 三个用于确定平面的三维坐标，确保不共线
+            double[] p1 = calc.decideLocation(x, y, true); // 原点坐标
+            double[] p2 = calc.decideLocation(x - 100, y + 100, true);
+            double[] p3 = calc.decideLocation(x + 100, y + 100, true);
+            double[] pY = calc.decideLocation(x, y - 100, true, true); // y轴向量末端坐标
+            double[] pX = calc.decideLocation(x + 100, y, true, true); // x轴向量末端坐标
+            // 计算投影
+            double[] result = projectToPlane(p1, p2, p3, toVector(p1, pX), toVector(p1, pY), toArray(loc));
+            // 将结果转换为文本坐标系
+            double charScale = HologramFont.getCharScale();
+            return new Point2D(result[0] / charScale, result[1] / charScale);
+        }
     }
 
     private static double[] toArray(Location loc) {

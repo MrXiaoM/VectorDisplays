@@ -7,10 +7,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.hologram.*;
+import top.mrxiaom.hologram.vector.displays.ui.api.ClickMeta;
 import top.mrxiaom.hologram.vector.displays.ui.api.Element;
 import top.mrxiaom.hologram.vector.displays.ui.api.Hoverable;
 import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
 import top.mrxiaom.hologram.vector.displays.hologram.style.TextDisplayStyle;
+import top.mrxiaom.hologram.vector.displays.ui.event.ElementClickEvent;
 import top.mrxiaom.hologram.vector.displays.ui.event.HoverStateChange;
 import top.mrxiaom.hologram.vector.displays.utils.TriangleUtils;
 
@@ -18,12 +20,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class Triangle extends Element<Triangle, EntityNone> implements Hoverable {
     private final Map<Integer, EntityTextDisplay> entities = new HashMap<>();
     private final TextDisplayStyle style = new TextDisplayStyle();
     private float[] pos1, pos2, pos3;
     private boolean hoverState = false;
+    private ElementClickEvent<Triangle> clickEvent;
     private HoverStateChange<Triangle> hoverStateChange;
     public Triangle(@NotNull String id) {
         this(id, IEntityIdProvider.DEFAULT);
@@ -185,6 +189,33 @@ public class Triangle extends Element<Triangle, EntityNone> implements Hoverable
     }
 
     /**
+     * 设置当玩家点击这个元素时执行操作
+     * @param clickEvent 点击事件
+     */
+    public Triangle setOnClick(@Nullable ElementClickEvent<Triangle> clickEvent) {
+        this.clickEvent = clickEvent;
+        return this;
+    }
+
+    /**
+     * 设置当玩家点击这个元素时执行操作
+     * @param supplier 点击事件
+     */
+    public Triangle setOnClick(@Nullable Supplier<ElementClickEvent<Triangle>> supplier) {
+        if (supplier == null) {
+            this.clickEvent = null;
+        } else {
+            this.clickEvent = (meta, element) -> {
+                ElementClickEvent<Triangle> clickEvent = supplier.get();
+                if (clickEvent != null) {
+                    clickEvent.perform(meta, element);
+                }
+            };
+        }
+        return this;
+    }
+
+    /**
      * 设置当有任意玩家的准心指向这个元素的状态更新时执行操作
      * @param hoverStateChange 悬停状态变化事件
      */
@@ -199,6 +230,13 @@ public class Triangle extends Element<Triangle, EntityNone> implements Hoverable
         super.onTimerTick();
 
         tryUpdateHoverState(Hoverable.handleHover(getTerminal(), null, this));
+    }
+
+    @Override
+    public void performClick(ClickMeta meta) {
+        if (clickEvent != null) {
+            clickEvent.perform(meta, this);
+        }
     }
 
     @Override
