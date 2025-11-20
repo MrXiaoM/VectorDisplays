@@ -41,14 +41,14 @@ public class EntityItemDisplay extends EntityDisplay<EntityItemDisplay> {
     }
 
     @Override
-    public PacketWrapper<?> buildSpawnPacket() {
+    public @Nullable PacketWrapper<?> buildSpawnPacket() {
         return new WrapperPlayServerSpawnEntity(
                 entityID, Optional.of(UUID.randomUUID()), getEntityType(),
                 new Vector3d(location.getX(), location.getY(), location.getZ()), 0f, 0f, 0f, 0, Optional.empty()
         );
     }
 
-    protected ItemDisplayMeta createMeta() {
+    protected @Nullable ItemDisplayMeta createMeta() {
         applyCommonMeta(meta);
         applyDisplayMeta(meta);
         meta.setItem(itemAsPacket);

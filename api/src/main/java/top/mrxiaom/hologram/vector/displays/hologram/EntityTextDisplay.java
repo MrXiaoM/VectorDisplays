@@ -8,8 +8,8 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSp
 import me.tofaa.entitylib.meta.EntityMeta;
 import me.tofaa.entitylib.meta.display.TextDisplayMeta;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.TextDisplay;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -45,14 +45,14 @@ public class EntityTextDisplay extends EntityDisplay<EntityTextDisplay> {
     }
 
     @Override
-    public PacketWrapper<?> buildSpawnPacket() {
+    public @Nullable PacketWrapper<?> buildSpawnPacket() {
         return new WrapperPlayServerSpawnEntity(
                 entityID, Optional.of(UUID.randomUUID()), getEntityType(),
                 new Vector3d(location.getX(), location.getY(), location.getZ()), 0f, 0f, 0f, 0, Optional.empty()
         );
     }
 
-    protected TextDisplayMeta createMeta() {
+    protected @Nullable TextDisplayMeta createMeta() {
         applyCommonMeta(meta);
         applyDisplayMeta(meta);
         meta.setText(getTextAsComponent());

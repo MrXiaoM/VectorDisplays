@@ -104,6 +104,7 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         update();
     }
 
+    @Nullable
     protected abstract PacketWrapper<?> buildSpawnPacket();
 
     protected void applyCommonMeta(EntityMeta meta) {
@@ -115,9 +116,10 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     public void update() {
         updateAffectedPlayers();
         EntityMeta meta = createMeta();
-        sendPacket(meta.createPacket());
+        sendPacket(meta == null ? null : meta.createPacket());
     }
 
+    @Nullable
     protected abstract EntityMeta createMeta();
 
     /**
@@ -127,14 +129,18 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     public void kill() {
         this.dead = true;
         this.location = null;
-        PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
-        sendPacket(packet);
+        if (getEntityType() != null) {
+            PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
+            sendPacket(packet);
+        }
     }
 
     public This teleport(@NotNull Location location) {
-        PacketWrapper<?> packet = new WrapperPlayServerEntityTeleport(this.entityID, SpigotConversionUtil.fromBukkitLocation(location), false);
         this.location = location;
-        sendPacket(packet);
+        if (getEntityType() != null) {
+            PacketWrapper<?> packet = new WrapperPlayServerEntityTeleport(this.entityID, SpigotConversionUtil.fromBukkitLocation(location), false);
+            sendPacket(packet);
+        }
         return $this();
     }
 
@@ -177,16 +183,16 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
             @Nullable Integer duration,
             byte flags
     ) {
-        PacketWrapper<?> packet;
-        if (duration == null) {
-            packet = new WrapperPlayServerRemoveEntityEffect(this.entityID, type);
-            System.out.printf("为实体 %d 移除药水效果 %s\n", this.entityID, type.getName());
-        } else {
-            int d = Math.max(-1, duration);
-            packet = new WrapperPlayServerEntityEffect(this.entityID, type, amplifier, d, flags);
-            System.out.printf("为实体 %d 添加药水效果 %s %d %d\n", this.entityID, type.getName(), amplifier, d);
+        if (getEntityType() != null) {
+            PacketWrapper<?> packet;
+            if (duration == null) {
+                packet = new WrapperPlayServerRemoveEntityEffect(this.entityID, type);
+            } else {
+                int d = Math.max(-1, duration);
+                packet = new WrapperPlayServerEntityEffect(this.entityID, type, amplifier, d, flags);
+            }
+            sendPacket(packet);
         }
-        sendPacket(packet);
         return $this();
     }
 
@@ -217,13 +223,13 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         sendPacket(player, packet);
         updateAffectedPlayers();
         EntityMeta meta = createMeta();
-        sendPacket(player, meta.createPacket());
+        sendPacket(player, meta == null ? null : meta.createPacket());
     }
 
     public This removeViewer(@NotNull Player player) {
         this.viewers.remove(player);
         this.leftViewers.remove(player);
-        if (!dead) {
+        if (!dead && getEntityType() != null) {
             PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
             sendPacket(player, packet);
         }
@@ -231,8 +237,10 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     }
 
     public This removeAllViewers() {
-        PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
-        sendPacket(packet);
+        if (getEntityType() != null) {
+            PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
+            sendPacket(packet);
+        }
         this.viewers.clear();
         this.leftViewers.clear();
         return $this();
@@ -266,8 +274,10 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
                 if (this.renderMode == RenderMode.NEARBY) {
                     removeViewer(player);
                 } else {
-                    PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
-                    sendPacket(player, packet);
+                    if (getEntityType() != null) {
+                        PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
+                        sendPacket(player, packet);
+                    }
                     if (this.renderMode == RenderMode.VIEWER_LIST && !leftViewers.contains(player)) {
                         leftViewers.add(player);
                     }
@@ -297,13 +307,15 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         }
     }
 
-    private void sendPacket(@NotNull PacketWrapper<?> packet) {
-        if (this.renderMode == RenderMode.NONE) return;
+    private void sendPacket(@Nullable PacketWrapper<?> packet) {
+        if (this.renderMode == RenderMode.NONE || packet == null) return;
         viewers.forEach(player -> sendPacket(player, packet));
     }
 
-    private void sendPacket(@NotNull Player player, @NotNull PacketWrapper<?> packet) {
-        HologramAPI.getPlayerManager().sendPacket(player, packet);
+    private void sendPacket(@NotNull Player player, @Nullable PacketWrapper<?> packet) {
+        if (packet != null) {
+            HologramAPI.getPlayerManager().sendPacket(player, packet);
+        }
     }
 
     /**
