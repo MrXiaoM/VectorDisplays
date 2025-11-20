@@ -1,4 +1,4 @@
-package top.mrxiaom.hologram.vector.displays.minecraft.nms.v1_20_R4;
+package top.mrxiaom.hologram.vector.displays.minecraft.nms.v1_21_R2;
 
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +29,7 @@ public class Factory implements NMSFactory {
 
     @Override
     public @NotNull String getName() {
-        return "v1_20_R4 (1.20.5 -- 1.21.3)";
+        return "v1_21_R3 (1.21.2 -- 1.21.3)";
     }
 
     @Override
@@ -37,7 +37,7 @@ public class Factory implements NMSFactory {
         return new TextHandler((codePoint, style) ->
                 fontStorageGetter.apply(style.k().toString())
                         .getGlyph(codePoint, validateAdvance)
-                        .getAdvance(style.b()));
+                        .getAdvance(style.c()));
     }
 
     @Override
@@ -49,6 +49,6 @@ public class Factory implements NMSFactory {
     public @NotNull Matrix4f textDisplayUnitSquare() {
         return new Matrix4f()
                 .translate(-0.1f + .5f, -0.5f + .5f, 0f)
-                .scale(8.0f, 3.65f, 1f);
+                .scale(8.0f, 4.0f, 1f);
     }
 }

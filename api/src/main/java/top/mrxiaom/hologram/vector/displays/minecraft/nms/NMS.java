@@ -23,8 +23,12 @@ public class NMS {
             craft = "v1_19_R3";
         } else if (minor == 20 && (patch == 3 || patch == 4)) { // 1.20.3-1.20.4
             craft = "v1_20_R3";
-        } else if (minor == 20 || (minor == 21 && patch <= 3)) { // 1.20.5-1.21.3
+        } else if (minor == 20 && (patch == 5 || patch == 6)) { // 1.20.5-1.20.6
             craft = "v1_20_R4";
+        } else if (minor == 21 && (patch == 0 || patch == 1)) { // 1.21-1.21.1
+            craft = "v1_21_R1";
+        } else if (minor == 21 && (patch == 2 || patch == 3)) { // 1.21.2-1.21.3
+            craft = "v1_21_R2";
         } else if (minor == 21 && patch == 4) { // 1.21.4
             craft = "v1_21_R3";
         } else if (minor == 21 && patch == 5) { // 1.21.5
