@@ -7,6 +7,7 @@ import org.bukkit.entity.Display;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.hologram.utils.Vector3F;
 import top.mrxiaom.hologram.vector.displays.utils.matrix.Decomposed;
@@ -109,6 +110,12 @@ public abstract class EntityDisplay<This extends AbstractEntity<This>> extends A
         return $this();
     }
 
+    public This setScale(Vector3f scale) {
+        this.scale = new Vector3f(scale.x, scale.y, scale.z);
+        this.composeMatrix();
+        return $this();
+    }
+
     public This setScale(Vector3F scale) {
         this.scale = new Vector3f(scale.x, scale.y, scale.z);
         this.composeMatrix();
@@ -119,10 +126,18 @@ public abstract class EntityDisplay<This extends AbstractEntity<This>> extends A
         return new Vector3F(this.translation.x, this.translation.y, this.translation.z);
     }
 
+    public This setLeftRotation(Quaternionf r) {
+        return setLeftRotation(r.x, r.y, r.z, r.w);
+    }
+
     public This setLeftRotation(float x, float y, float z, float w) {
         this.leftRotation = new Quaternion4f(x, y, z, w);
         this.composeMatrix();
         return $this();
+    }
+
+    public This setRightRotation(Quaternionf r) {
+        return setRightRotation(r.x, r.y, r.z, r.w);
     }
 
     public This setRightRotation(float x, float y, float z, float w) {
@@ -148,9 +163,19 @@ public abstract class EntityDisplay<This extends AbstractEntity<This>> extends A
         return new float[] { r.getX(), r.getY(), r.getZ(), r.getW() };
     }
 
+    public Quaternionf getLeftRotationQuaternion() {
+        Quaternion4f r = leftRotation;
+        return new Quaternionf(r.getX(), r.getY(), r.getZ(), r.getW());
+    }
+
     public float[] getRightRotation() {
         Quaternion4f r = rightRotation;
         return new float[] { r.getX(), r.getY(), r.getZ(), r.getW() };
+    }
+
+    public Quaternionf getRightRotationQuaternion() {
+        Quaternion4f r = rightRotation;
+        return new Quaternionf(r.getX(), r.getY(), r.getZ(), r.getW());
     }
 
     public This setTranslation(float x, float y, float z) {

@@ -9,11 +9,7 @@ import org.jetbrains.annotations.Nullable;
  * 不向玩家发包的占位用虚拟实体
  */
 public class EntityNone extends AbstractEntity<EntityNone> {
-    protected EntityNone(RenderMode renderMode) {
-        super(renderMode, type -> -1);
-    }
-
-    protected EntityNone(RenderMode renderMode, IEntityIdProvider provider) {
+    public EntityNone(RenderMode renderMode) {
         super(renderMode, type -> -1);
     }
 

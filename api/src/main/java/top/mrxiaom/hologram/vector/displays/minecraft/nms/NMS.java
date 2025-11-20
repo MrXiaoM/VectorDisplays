@@ -3,6 +3,7 @@ package top.mrxiaom.hologram.vector.displays.minecraft.nms;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import me.tofaa.entitylib.wrapper.WrapperEntity;
 import org.bukkit.Bukkit;
+import org.joml.Matrix4f;
 
 import java.util.logging.Logger;
 
@@ -64,6 +65,15 @@ public class NMS {
             return new WrapperEntity(type).getEntityId();
         }
         return id;
+    }
+
+    public static Matrix4f textDisplayUnitSquare() {
+        if (nmsFactory == null) {
+            return new Matrix4f()
+                    .translate(-0.1f + .5f, -0.5f + .5f, 0f)
+                    .scale(8.0f, 4.0f, 1f);
+        }
+        return nmsFactory.textDisplayUnitSquare();
     }
 
     private static int parse(String[] split, int index, int def) {

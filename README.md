@@ -56,4 +56,5 @@
 + [HologramAPI 1.2.x](https://github.com/HologramLib/HologramLib) 悬浮字控制逻辑
 + [Tofaa2/EntityLib](https://github.com/Tofaa2/EntityLib) 虚拟实体控制逻辑
 + [retrooper/packetevents](https://github.com/retrooper/packetevents) 用于发包控制虚拟悬浮字
++ [TheCymaera](https://github.com/TheCymaera/minecraft-hologram) 提供三角形渲染方案
 + [豆包AI](https://doubao.com/) 复杂数学运算的原型代码参考

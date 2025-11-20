@@ -3,6 +3,7 @@ package top.mrxiaom.hologram.vector.displays.minecraft.nms.v1_21_R4;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.FontStorage;
 import top.mrxiaom.hologram.vector.displays.minecraft.nms.ITextHandler;
 import top.mrxiaom.hologram.vector.displays.minecraft.nms.NMSFactory;
@@ -42,5 +43,12 @@ public class Factory implements NMSFactory {
     @Override
     public @Nullable Integer nextEntityId() {
         return ENTITY_COUNTER == null ? null : ENTITY_COUNTER.incrementAndGet();
+    }
+
+    @Override
+    public @NotNull Matrix4f textDisplayUnitSquare() {
+        return new Matrix4f()
+                .translate(-0.1f + .5f, -0.5f + .5f, 0f)
+                .scale(8.0f, 4.0f, 1f);
     }
 }
