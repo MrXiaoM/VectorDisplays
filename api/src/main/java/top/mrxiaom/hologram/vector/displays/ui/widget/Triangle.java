@@ -8,8 +8,10 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.hologram.*;
 import top.mrxiaom.hologram.vector.displays.ui.api.Element;
+import top.mrxiaom.hologram.vector.displays.ui.api.Hoverable;
 import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
 import top.mrxiaom.hologram.vector.displays.hologram.style.TextDisplayStyle;
+import top.mrxiaom.hologram.vector.displays.ui.event.HoverStateChange;
 import top.mrxiaom.hologram.vector.displays.utils.TriangleUtils;
 
 import java.util.Collection;
@@ -17,16 +19,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class Triangle extends Element<Triangle, EntityNone> {
+public class Triangle extends Element<Triangle, EntityNone> implements Hoverable {
     private final Map<Integer, EntityTextDisplay> entities = new HashMap<>();
     private final TextDisplayStyle style = new TextDisplayStyle();
     private float[] pos1, pos2, pos3;
+    private boolean hoverState = false;
+    private HoverStateChange<Triangle> hoverStateChange;
     public Triangle(@NotNull String id) {
         this(id, IEntityIdProvider.DEFAULT);
     }
     public Triangle(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider) {
         super(id, entityIdProvider);
         style.setBackgroundColor(0xFFFFFFFF);
+        style.setInterpolationDurationTransformation(3);
+        style.setInterpolationDurationRotation(0);
         style.setBillboard(Display.Billboard.FIXED);
     }
 
@@ -78,24 +84,21 @@ public class Triangle extends Element<Triangle, EntityNone> {
         entities.clear();
     }
 
+    private static Vector3f toVector3f(float[] pos) {
+        return new Vector3f(pos[0], pos[1], pos[2]);
+    }
+
     protected void calculateTriangle(@NotNull Terminal<?> terminal) {
-        if (pos1 == null || pos2 == null || pos3 == null) return;
-        double[] rawP1 = decideLocationRaw(pos1[0], pos1[1]);
-        double[] rawP2 = decideLocationRaw(pos2[0], pos2[1]);
-        double[] rawP3 = decideLocationRaw(pos3[0], pos3[1]);
-        float[] p1 = terminal.getRotated(rawP1);
-        float[] p2 = terminal.getRotated(rawP2);
-        float[] p3 = terminal.getRotated(rawP3);
+        float[][] pos = decidePos(terminal);
+        if (pos == null) return;
+        float[] p1 = pos[0], p2 = pos[1], p3 = pos[2];
         Location origin = new Location(terminal.getWorld(), p2[0], p2[1], p2[2]);
         TriangleUtils.textDisplayTriangle(
-                new Vector3f(p1[0], p1[1], p1[2]),
-                new Vector3f(p2[0], p2[1], p2[2]),
-                new Vector3f(p3[0], p3[1], p3[2])
+                toVector3f(p1), toVector3f(p2), toVector3f(p3)
         ).create(index -> {
             EntityTextDisplay entity = entities.get(index);
-            if (entity != null) {
-                return entity;
-            }
+            if (entity != null) return entity;
+
             EntityTextDisplay newEntity = new EntityTextDisplay(getEntity().getRenderMode(), entityIdProvider);
             newEntity.setParent(getEntity());
             entities.put(index, newEntity);
@@ -126,6 +129,17 @@ public class Triangle extends Element<Triangle, EntityNone> {
     public void calculateSize() {
         this.width = 0;
         this.height = 0;
+    }
+
+    public float @Nullable [][] decidePos(Terminal<?> terminal) {
+        if (pos1 == null || pos2 == null || pos3 == null || terminal == null) return null;
+        double[] rawP1 = decideLocationRaw(pos1[0], pos1[1]);
+        double[] rawP2 = decideLocationRaw(pos2[0], pos2[1]);
+        double[] rawP3 = decideLocationRaw(pos3[0], pos3[1]);
+        float[] p1 = terminal.getRotated(rawP1);
+        float[] p2 = terminal.getRotated(rawP2);
+        float[] p3 = terminal.getRotated(rawP3);
+        return new float[][] { p1, p2, p3 };
     }
 
     public float @Nullable [] getPos1() {
@@ -168,6 +182,32 @@ public class Triangle extends Element<Triangle, EntityNone> {
     public Triangle setPos3(float x, float y) {
         this.pos3 = new float[] { x, y };
         return this;
+    }
+
+    /**
+     * 设置当有任意玩家的准心指向这个元素的状态更新时执行操作
+     * @param hoverStateChange 悬停状态变化事件
+     */
+    public Triangle setOnHoverStateChange(HoverStateChange<Triangle> hoverStateChange) {
+        this.hoverStateChange = hoverStateChange;
+        hoverStateChange.perform(hoverState, this);
+        return this;
+    }
+
+    @Override
+    public void onTimerTick() {
+        super.onTimerTick();
+
+        tryUpdateHoverState(Hoverable.handleHover(getTerminal(), null, this));
+    }
+
+    @Override
+    public void tryUpdateHoverState(boolean hover) {
+        if (hover == hoverState) return;
+        hoverState = hover;
+        if (hoverStateChange != null) {
+            hoverStateChange.perform(hover, this);
+        }
     }
 
     @Override

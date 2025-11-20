@@ -12,6 +12,7 @@ import top.mrxiaom.hologram.vector.displays.hologram.EntityItemDisplay;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.api.*;
+import top.mrxiaom.hologram.vector.displays.ui.widget.Triangle;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -95,6 +96,13 @@ public class HologramUtils {
      */
     @Nullable
     public static Location raytraceElement(float @NotNull [] rotation, float @Nullable [] additionalRotation, @NotNull Element<?, ?> element, @NotNull Location eyeLocation) {
+        // 三角形使用特殊算法
+        if (element instanceof Triangle triangle) {
+            float[][] pos = triangle.decidePos(triangle.getTerminal());
+            if (pos == null) return null;
+            float[] p1 = pos[0], p2 = pos[1], p3 = pos[2];
+            return calculateIntersection(rotation, p1, p2, p3, eyeLocation);
+        }
         // 获取悬浮字宽高
         double width = element.getWidth();
         double height = element.getHeight();
@@ -216,6 +224,29 @@ public class HologramUtils {
                 QuaternionUtils.rotateChildren(loc, r, loc2),
                 QuaternionUtils.rotateChildren(loc, r, loc3),
                 QuaternionUtils.rotateChildren(loc, r, loc4));
+        if (point == null) return null;
+        // 最后进行校验，要求 射线方向 和 终端面板方向 的夹角大于 90 度，才能算作成功
+        // 即玩家必须要面向终端面板的正面，才能进行悬停和点击操作
+        double[] vectorA = toDirectionVector(r);
+        double[] vectorB = toVector(eyeLocation, point);
+        double angle = Math.abs(calculateAngle(vectorA, vectorB));
+        return angle >= 90 ? point : null;
+    }
+
+    /**
+     * 计算射线与平面上矩形的交点，要求射线与平面特定方向相同
+     * @param r 终端面板旋转量四元数
+     * @param p1 三角形端点1
+     * @param p2 三角形端点2
+     * @param p3 三角形端点3
+     * @param eyeLocation 玩家视线位置，<code>HologramUtils.getEyeLocation(player)</code>
+     */
+    public static Location calculateIntersection(
+            float[] r, float[] p1, float[] p2, float[] p3,
+            Location eyeLocation
+    ) {
+        // 计算交点
+        Location point = calculateRayTriangleIntersection(eyeLocation, p1, p2, p3);
         if (point == null) return null;
         // 最后进行校验，要求 射线方向 和 终端面板方向 的夹角大于 90 度，才能算作成功
         // 即玩家必须要面向终端面板的正面，才能进行悬停和点击操作
@@ -414,6 +445,126 @@ public class HologramUtils {
 
         return new double[]{x, y, z};
     }
+
+
+    /**
+     * 静态方法：计算射线与三角形的交点 (豆包AI 生成)
+     * @param eyeLocation 玩家视角位置
+     * @param p1 三角形顶点1
+     * @param p2 三角形顶点2
+     * @param p3 三角形顶点3
+     * @return 交点坐标，无交点返回 null
+     */
+    public static Location calculateRayTriangleIntersection(
+            Location eyeLocation,
+            float[] p1, float[] p2, float[] p3
+    ) {
+        Vector direction = eyeLocation.getDirection();
+        float aX = (float) eyeLocation.getX();
+        float aY = (float) eyeLocation.getY();
+        float aZ = (float) eyeLocation.getZ();
+        float vX = (float) direction.getX();
+        float vY = (float) direction.getY();
+        float vZ = (float) direction.getZ();
+
+        // 1. 计算三角形边向量和射线起点到p1的向量
+        float[] e1 = subtract(p2, p1);    // e1 = p2 - p1
+        float[] e2 = subtract(p3, p1);    // e2 = p3 - p1
+        float[] s = subtract(new float[] { aX, aY, aZ }, p1); // s = origin - p1
+
+        // 2. 计算叉乘和分母（判断射线与平面是否平行）
+        float[] s1 = crossProduct(new float[] { vX, vY, vZ }, e2); // s1 = direction × e2
+        float denom = dotProduct(s1, e1);         // 分母 = s1 · e1
+
+        // 分母接近0 → 射线与平面平行或共面，无交点
+        if (Math.abs(denom) < EPSILON) {
+            return null;
+        }
+
+        float invDenom = 1.0f / denom; // 分母倒数（优化除法效率）
+
+        // 3. 计算重心坐标 u，判断是否在三角形左侧
+        float u = dotProduct(s, s1) * invDenom;
+        if (u < -EPSILON) { // 允许微小负误差（浮点精度）
+            return null;
+        }
+
+        // 4. 计算重心坐标 v，判断是否在三角形右侧和上方
+        float[] s2 = crossProduct(s, e1); // s2 = s × e1
+        float v = dotProduct(new float[] { vX, vY, vZ }, s2) * invDenom;
+        if (v < -EPSILON || u + v > 1.0f + EPSILON) { // 允许微小超界误差
+            return null;
+        }
+
+        // 5. 计算射线参数 t，判断交点是否在射线前进方向上
+        float t = dotProduct(e2, s2) * invDenom;
+        if (t > EPSILON) { // t>0 表示在射线起点前方（避免起点本身重合）
+            // 计算交点：origin + t * direction
+            float[] tDir = multiplyScalar(new float[] { vX, vY, vZ }, t);
+            float[] point = add(new float[]{aX, aY, aZ}, tDir);
+            return new Location(eyeLocation.getWorld(), point[0], point[1], point[2]);
+        }
+
+        // t≤0 或其他无效情况 → 无交点
+        return null;
+    }
+
+    /**
+     * 向量叉乘：a × b（3维向量）
+     * @return 叉乘结果向量，输入无效返回 null
+     */
+    private static float[] crossProduct(float[] a, float[] b) {
+        float[] result = new float[3];
+        result[0] = a[1] * b[2] - a[2] * b[1];
+        result[1] = a[2] * b[0] - a[0] * b[2];
+        result[2] = a[0] * b[1] - a[1] * b[0];
+        return result;
+    }
+
+    /**
+     * 向量点乘：a · b（3维向量）
+     * @return 点乘结果，输入无效返回 0
+     */
+    private static float dotProduct(float[] a, float[] b) {
+        return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    }
+
+    /**
+     * 向量减法：a - b（3维向量）
+     * @return 减法结果向量，输入无效返回 null
+     */
+    private static float[] subtract(float[] a, float[] b) {
+        float[] result = new float[3];
+        result[0] = a[0] - b[0];
+        result[1] = a[1] - b[1];
+        result[2] = a[2] - b[2];
+        return result;
+    }
+
+    /**
+     * 向量加法：a + b（3维向量）
+     * @return 加法结果向量，输入无效返回 null
+     */
+    private static float[] add(float[] a, float[] b) {
+        float[] result = new float[3];
+        result[0] = a[0] + b[0];
+        result[1] = a[1] + b[1];
+        result[2] = a[2] + b[2];
+        return result;
+    }
+
+    /**
+     * 向量数乘：vec * scalar（3维向量）
+     * @return 数乘结果向量，输入无效返回 null
+     */
+    private static float[] multiplyScalar(float[] vec, float scalar) {
+        float[] result = new float[3];
+        result[0] = vec[0] * scalar;
+        result[1] = vec[1] * scalar;
+        result[2] = vec[2] * scalar;
+        return result;
+    }
+
     /**
      * 向量相减：a - b
      */

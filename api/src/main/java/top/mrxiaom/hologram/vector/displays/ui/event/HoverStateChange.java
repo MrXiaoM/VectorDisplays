@@ -9,6 +9,7 @@ import top.mrxiaom.hologram.vector.displays.hologram.EntityItemDisplay;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
 import top.mrxiaom.hologram.vector.displays.ui.api.Element;
 import top.mrxiaom.hologram.vector.displays.ui.api.ItemElement;
+import top.mrxiaom.hologram.vector.displays.ui.widget.Triangle;
 
 /**
  * 元素悬停状态变更事件
@@ -24,6 +25,9 @@ public interface HoverStateChange<E extends Element<E, ?>> {
         return (newState, element) -> {
             if (element.getEntity() instanceof EntityTextDisplay txt) {
                 txt.setBackgroundColor(newState ? hover : normal);
+            }
+            if (element instanceof Triangle triangle) {
+                triangle.getStyle().setBackgroundColor(newState ? hover : normal);
             }
             if (action != null) action.perform(newState, element);
         };
