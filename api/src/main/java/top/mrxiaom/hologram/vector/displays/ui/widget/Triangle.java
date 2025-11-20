@@ -9,7 +9,7 @@ import org.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.hologram.*;
 import top.mrxiaom.hologram.vector.displays.ui.api.Element;
 import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
-import top.mrxiaom.hologram.vector.displays.ui.api.style.TextDisplayStyle;
+import top.mrxiaom.hologram.vector.displays.hologram.style.TextDisplayStyle;
 import top.mrxiaom.hologram.vector.displays.utils.TriangleUtils;
 
 import java.util.Collection;

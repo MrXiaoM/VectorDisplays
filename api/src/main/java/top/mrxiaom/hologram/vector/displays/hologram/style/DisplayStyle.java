@@ -1,4 +1,4 @@
-package top.mrxiaom.hologram.vector.displays.ui.api.style;
+package top.mrxiaom.hologram.vector.displays.hologram.style;
 
 import org.bukkit.entity.Display;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityDisplay;

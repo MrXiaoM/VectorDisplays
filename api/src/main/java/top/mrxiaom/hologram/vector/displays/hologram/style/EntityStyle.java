@@ -1,4 +1,4 @@
-package top.mrxiaom.hologram.vector.displays.ui.api.style;
+package top.mrxiaom.hologram.vector.displays.hologram.style;
 
 import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose;
 import top.mrxiaom.hologram.vector.displays.hologram.AbstractEntity;
