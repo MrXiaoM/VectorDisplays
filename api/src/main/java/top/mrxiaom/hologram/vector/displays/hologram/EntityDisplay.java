@@ -5,10 +5,16 @@ import me.tofaa.entitylib.meta.display.AbstractDisplayMeta;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.hologram.utils.Vector3F;
+import top.mrxiaom.hologram.vector.displays.utils.matrix.Decomposed;
+import top.mrxiaom.hologram.vector.displays.utils.matrix.MatrixUtil;
 
 public abstract class EntityDisplay<This extends AbstractEntity<This>> extends AbstractEntity<This> {
+    private Matrix4f matrix;
+
     protected Vector3f scale = new Vector3f(1, 1, 1);
     protected Vector3f translation = new Vector3f(0, 0F, 0);
 
@@ -25,6 +31,7 @@ public abstract class EntityDisplay<This extends AbstractEntity<This>> extends A
     }
     protected EntityDisplay(RenderMode renderMode, IEntityIdProvider provider) {
         super(renderMode, provider);
+        this.composeMatrix();
     }
 
     protected void applyDisplayMeta(AbstractDisplayMeta meta) {
@@ -52,6 +59,42 @@ public abstract class EntityDisplay<This extends AbstractEntity<This>> extends A
         return super.teleport(new Location(location.getWorld(), location.getX(), location.getY(), location.getZ()));
     }
 
+    public This setTransformationMatrix(@NotNull Matrix4f matrix) {
+        // com.mojang.math.Transformation#ensureDecomposed()
+        float f = 1.0F / matrix.m33();
+
+        Decomposed decomposed = MatrixUtil.svdDecompose(new Matrix3f(matrix).scale(f));
+        this.translation = matrix.getTranslation(new Vector3f()).mul(f);
+        this.leftRotation = decomposed.getLeftRotation();
+        this.scale = decomposed.getScale();
+        this.rightRotation = decomposed.getRightRotation();
+        this.composeMatrix();
+        return $this();
+    }
+
+    @NotNull
+    public Matrix4f getTransformationMatrix() {
+        return this.matrix;
+    }
+
+    protected void composeMatrix() {
+        // com.mojang.math.Transformation#compose(Vector3f, Quaternionf, Vector3f, Quaternionf)
+        Matrix4f matrix4f = new Matrix4f();
+        if (translation != null) {
+            matrix4f.translation(translation);
+        }
+        if (leftRotation != null) {
+            matrix4f.rotate(leftRotation.getX(), leftRotation.getY(), leftRotation.getZ(), leftRotation.getW());
+        }
+        if (scale != null) {
+            matrix4f.scale(scale);
+        }
+        if (rightRotation != null) {
+            matrix4f.rotate(rightRotation.getX(), rightRotation.getY(), rightRotation.getZ(), rightRotation.getW());
+        }
+        this.matrix = matrix4f;
+    }
+
     public Vector3F getScale() {
         return new Vector3F(this.scale.x, this.scale.y, this.scale.z);
     }
@@ -62,11 +105,13 @@ public abstract class EntityDisplay<This extends AbstractEntity<This>> extends A
 
     public This setScale(float x, float y, float z) {
         this.scale = new Vector3f(x, y, z);
+        this.composeMatrix();
         return $this();
     }
 
     public This setScale(Vector3F scale) {
         this.scale = new Vector3f(scale.x, scale.y, scale.z);
+        this.composeMatrix();
         return $this();
     }
 
@@ -76,21 +121,25 @@ public abstract class EntityDisplay<This extends AbstractEntity<This>> extends A
 
     public This setLeftRotation(float x, float y, float z, float w) {
         this.leftRotation = new Quaternion4f(x, y, z, w);
+        this.composeMatrix();
         return $this();
     }
 
     public This setRightRotation(float x, float y, float z, float w) {
         this.rightRotation = new Quaternion4f(x, y, z, w);
+        this.composeMatrix();
         return $this();
     }
 
     public This setLeftRotation(float[] rotation) {
         this.leftRotation = new Quaternion4f(rotation[0], rotation[1], rotation[2], rotation[3]);
+        this.composeMatrix();
         return $this();
     }
 
     public This setRightRotation(float[] rotation) {
         this.rightRotation = new Quaternion4f(rotation[0], rotation[1], rotation[2], rotation[3]);
+        this.composeMatrix();
         return $this();
     }
 
@@ -106,11 +155,13 @@ public abstract class EntityDisplay<This extends AbstractEntity<This>> extends A
 
     public This setTranslation(float x, float y, float z) {
         this.translation = new Vector3f(x, y, z);
+        this.composeMatrix();
         return $this();
     }
 
     public This setTranslation(Vector3F translation) {
         this.translation = new Vector3f(translation.x, translation.y, translation.z);
+        this.composeMatrix();
         return $this();
     }
 
