@@ -96,8 +96,7 @@ public class Triangle extends Element<Triangle, EntityNone> {
             if (entity != null) {
                 return entity;
             }
-            EntityTextDisplay newEntity = new EntityTextDisplay(getEntity().getRenderMode(), entityIdProvider)
-                    .setBillboard(Display.Billboard.CENTER);
+            EntityTextDisplay newEntity = new EntityTextDisplay(getEntity().getRenderMode(), entityIdProvider);
             newEntity.setParent(getEntity());
             entities.put(index, newEntity);
             style.addEntity(newEntity);
@@ -108,6 +107,7 @@ public class Triangle extends Element<Triangle, EntityNone> {
                 HologramAPI.getHologram().spawn(entity, origin);
             } else {
                 entity.teleport(origin);
+                entity.update();
             }
         }
     }
