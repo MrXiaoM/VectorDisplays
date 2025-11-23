@@ -18,6 +18,12 @@ import top.mrxiaom.hologram.vector.displays.ui.widget.Triangle;
 public interface HoverStateChange<E extends Element<E, ?>> {
     void perform(boolean newState, E element);
 
+    static <E extends Element<E, ?>> HoverStateChange<E> hoverBg(@Nullable Number hover, @Nullable Number normal) {
+        return hoverBg(hover == null ? 0 : hover.intValue(), normal == null ? 0 : normal.intValue());
+    }
+    static <E extends Element<E, ?>> HoverStateChange<E> hoverBg(@Nullable Number hover, @Nullable Number normal, @Nullable HoverStateChange<E> action) {
+        return hoverBg(hover == null ? 0 : hover.intValue(), normal == null ? 0 : normal.intValue(), action);
+    }
     static <E extends Element<E, ?>> HoverStateChange<E> hoverBg(int hover, int normal) {
         return hoverBg(hover, normal, HoverStateChange.<E>updateEntity());
     }
@@ -50,6 +56,18 @@ public interface HoverStateChange<E extends Element<E, ?>> {
         };
     }
 
+    static <E extends Element<E, ?>> HoverStateChange<E> hoverScale(@Nullable Number hover) {
+        return hoverScale(hover == null ? 1.0f : hover.floatValue());
+    }
+    static <E extends Element<E, ?>> HoverStateChange<E> hoverScale(@Nullable Number hover, @Nullable Number normal) {
+        return hoverScale(hover == null ? 1.0f : hover.floatValue(), normal == null ? 1.0f : normal.floatValue());
+    }
+    static <E extends Element<E, ?>> HoverStateChange<E> hoverScale(@Nullable Number hover, @Nullable HoverStateChange<E> action) {
+        return hoverScale(hover == null ? 1.0f : hover.floatValue(), action);
+    }
+    static <E extends Element<E, ?>> HoverStateChange<E> hoverScale(@Nullable Number hover, @Nullable Number normal, @Nullable HoverStateChange<E> action) {
+        return hoverScale(hover == null ? 1.0f : hover.floatValue(), normal == null ? 1.0f : normal.floatValue(), action);
+    }
     static <E extends Element<E, ?>> HoverStateChange<E> hoverScale(float hover) {
         return hoverScale(hover, HoverStateChange.<E>updateEntity());
     }
