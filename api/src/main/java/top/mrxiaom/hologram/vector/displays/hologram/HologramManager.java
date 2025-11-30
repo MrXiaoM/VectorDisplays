@@ -32,6 +32,7 @@ public class HologramManager {
         }
         this.updateTask = plugin.getScheduler().runTaskTimerAsync(() -> {
             for (AbstractEntity<?> entity : virtualEntities) {
+                if (entity.location == null || !entity.location.isWorldLoaded()) continue;
                 entity.updateAffectedPlayers();
             }
         }, delay, this.updatePeriod = period);
