@@ -1,10 +1,17 @@
 package top.mrxiaom.hologram.vector.displays.minecraft.nms;
 
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import me.tofaa.entitylib.wrapper.WrapperEntity;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.joml.Matrix4f;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.logging.Logger;
 
 public class NMS {
@@ -78,6 +85,10 @@ public class NMS {
                     .scale(8.0f, 4.0f, 1f);
         }
         return nmsFactory.textDisplayUnitSquare();
+    }
+
+    public static <T> void reloadFontsViaNBTFile(InputStream stream, BiFunction<Integer, Float, T> glyph, BiConsumer<NamespacedKey, Int2ObjectMap<T>> loaded) throws Exception {
+        nmsFactory.reloadFontsViaNBTFile(stream, glyph, loaded);
     }
 
     private static int parse(String[] split, int index, int def) {

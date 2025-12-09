@@ -9,6 +9,7 @@ import top.mrxiaom.hologram.vector.displays.minecraft.font.api.Font;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.api.IFontManager;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.server.ServerFont;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.server.ServerGlyph;
+import top.mrxiaom.hologram.vector.displays.minecraft.nms.NMS;
 import top.mrxiaom.hologram.vector.displays.minecraft.nms.NMSFactory;
 
 import java.io.*;
@@ -66,8 +67,15 @@ public class FontManager implements IFontManager {
         this.fontStorages.clear();
         this.fonts.forEach(Font::close);
         this.fonts.clear();
-        try (FileReader reader = new FileReader(fontsFile, StandardCharsets.UTF_8)) {
-            reload(gson.fromJson(reader, JsonArray.class));
+        String name = fontsFile.getName();
+        if (name.endsWith(".json")) {
+            try (FileReader reader = new FileReader(fontsFile, StandardCharsets.UTF_8)) {
+                reload(gson.fromJson(reader, JsonArray.class));
+            }
+        } else {
+            try (InputStream stream = new FileInputStream(fontsFile)) {
+                reloadNbt(stream);
+            }
         }
     }
 
@@ -77,8 +85,23 @@ public class FontManager implements IFontManager {
         this.fontStorages.clear();
         this.fonts.forEach(Font::close);
         this.fonts.clear();
-        try (InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-            reload(gson.fromJson(reader, JsonArray.class));
+        reloadNbt(stream);
+    }
+
+    private void reloadNbt(InputStream stream) throws Exception {
+        List<Font> allProviders = new ArrayList<>();
+        NMS.reloadFontsViaNBTFile(stream,
+                (codePoint, advance) -> new ServerGlyph(advance),
+                (key, glyphs) -> {
+                    FontStorage fontStorage = new FontStorage(key);
+                    ServerFont font = new ServerFont(key, glyphs);
+                    allProviders.add(font);
+                    fontStorage.setFonts(Lists.newArrayList(font));
+                    this.fontStorages.put(key.toString(), fontStorage);
+                });
+        this.fonts.addAll(allProviders);
+        if (!this.fontStorages.containsKey(DEFAULT_FONT_ID.toString())) {
+            throw new IllegalStateException("Default font failed to load");
         }
     }
 

@@ -34,13 +34,13 @@ public class FontConfig implements IConfig {
 
         HologramUtils.LINE_HEIGHT = config.getDouble("line-height", 13);
 
-        String path = config.getString("fonts-file", "font.json");
+        String path = config.getString("fonts-file", "fonts.nbt");
         File file = new File(plugin.getDataFolder(), path);
         try {
             if (!file.exists()) {
-                InputStream resource = plugin.getResource("font.json");
+                InputStream resource = plugin.getResource("fonts.nbt");
                 if (resource == null) {
-                    throw new IllegalStateException("找不到资源文件 font.json");
+                    throw new IllegalStateException("找不到资源文件 fonts.nbt");
                 }
                 this.manager.reload(resource);
             } else {

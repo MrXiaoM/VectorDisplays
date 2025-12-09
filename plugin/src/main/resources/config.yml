@@ -1,5 +1,5 @@
 # 字体宽度数据文件，如果不存在，将读取内置的字体宽度数据
-fonts-file: 'font.json'
+fonts-file: 'fonts.nbt'
 # 客户端是否开启强制 Unicode 字体，这将影响字体宽度计算逻辑
 forces-unicode-font: false
 # 悬浮字字体宽度与世界单位尺寸（一个方块的边长）的比例缩放关系
