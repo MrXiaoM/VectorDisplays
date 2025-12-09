@@ -11,10 +11,7 @@ import top.mrxiaom.hologram.vector.displays.minecraft.font.server.ServerFont;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.server.ServerGlyph;
 import top.mrxiaom.hologram.vector.displays.minecraft.nms.NMSFactory;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -25,6 +22,7 @@ public class FontManager implements IFontManager {
     private final Map<String, FontStorage> fontStorages = new HashMap<>();
     private final FontStorage missingStorage;
     private final List<Font> fonts = new ArrayList<>();
+    private final Map<String, String> idOverrides = new HashMap<>();
     private NMSFactory factory;
     public FontManager(NMSFactory factory) {
         this.factory = factory;
@@ -43,8 +41,18 @@ public class FontManager implements IFontManager {
     }
 
     @Override
+    public void setForcesUnicodeFont(boolean forcesUnicodeFont) {
+        if (forcesUnicodeFont) {
+            idOverrides.put("minecraft:default", "minecraft:uniform");
+        } else {
+            idOverrides.clear();
+        }
+    }
+
+    @Override
     public FontStorage getFontStorage(String id) {
-        return this.fontStorages.getOrDefault(id, missingStorage);
+        String fontId = idOverrides.getOrDefault(id, id);
+        return this.fontStorages.getOrDefault(fontId, missingStorage);
     }
 
     @Override

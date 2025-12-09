@@ -18,6 +18,7 @@ import java.util.logging.Level;
 public class FontConfig implements IConfig {
     private final VectorDisplays plugin;
     private final IFontManager manager;
+    private boolean forcesUnicodeFont;
     public FontConfig(VectorDisplays plugin) {
         NMSFactory factory = NMS.getFactory();
         this.plugin = plugin;
@@ -47,6 +48,8 @@ public class FontConfig implements IConfig {
             }
             String scaleSample = config.getString("font-char-scale.sample-char", " ");
             double sampleCount = config.getDouble("font-char-scale.location-scale", 9.7407407407407407);
+            this.forcesUnicodeFont = config.getBoolean("forces-unicode-font", false);
+            this.manager.setForcesUnicodeFont(forcesUnicodeFont);
             HologramFont.setCharScale(scaleSample, sampleCount);
         } catch (Throwable t) {
             plugin.getLogger().log(Level.WARNING, "重载字体时出现异常", t);

@@ -11,6 +11,7 @@ import java.util.List;
 public interface IFontManager extends AutoCloseable {
     NMSFactory getFactory();
     void setFactory(NMSFactory factory);
+    void setForcesUnicodeFont(boolean forcesUnicodeFont);
     FontStorage getFontStorage(String id);
     List<Font> getFonts();
     void reload(File fontsFile) throws Exception;
