@@ -1,4 +1,4 @@
-package top.mrxiaom.hologram.vector.displays.minecraft.nms.v1_21_R6;
+package top.mrxiaom.hologram.vector.displays.minecraft.nms.v1_21_R7;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -37,7 +37,7 @@ public class Factory implements NMSFactory {
 
     @Override
     public @NotNull String getName() {
-        return "v1_21_R6 (1.21.9 - 1.21.10)";
+        return "v1_21_R7 (1.21.11 - 1.21.x)";
     }
 
     @Override

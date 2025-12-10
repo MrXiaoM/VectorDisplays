@@ -7,8 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.joml.Matrix4f;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -22,6 +20,9 @@ public class NMS {
         int major = parse(version, 0, 1);
         int minor = parse(version, 1, 0);
         int patch = parse(version, 2, 0);
+        if (major >= 26) {
+            throw new IllegalStateException("当前版本不受支持 (你正在使用 26.x 或以上的新版本 Minecraft，目前 VectorDisplays 暂不支持)");
+        }
         if (major != 1 || minor < 19 || (minor == 19 && patch < 4)) { // 1.19.4 以下
             throw new IllegalStateException("当前版本不受支持 (小于 1.19.4 或大于 v1)");
         }
@@ -42,8 +43,10 @@ public class NMS {
             craft = "v1_21_R4";
         } else if (minor == 21 && patch <= 8) { // 1.21.6-1.21.8
             craft = "v1_21_R5";
-        } else { // 1.21.9 及以上通用
+        } else if (minor == 21 && patch <= 10) { // 1.21.9-1.21.10
             craft = "v1_21_R6";
+        } else { // 1.21.11 及以上通用
+            craft = "v1_21_R7";
 
             /*
              在这里标注一下 1.21.x NMS 的问题
