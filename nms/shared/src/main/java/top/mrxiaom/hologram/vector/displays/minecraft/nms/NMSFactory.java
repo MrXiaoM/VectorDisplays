@@ -14,6 +14,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public interface NMSFactory {
+    String CAN_NOT_GET_ENTITY_COUNTER = "无法取得 ENTITY_COUNTER，将使用 EntityLib 默认的虚拟实体 ID 生成器。";
+
     @NotNull String getName();
     @NotNull ITextHandler create(Function<String, FontStorage> fontStorageGetter, boolean validateAdvance);
     @Nullable Integer nextEntityId();

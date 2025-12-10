@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 public class Factory implements NMSFactory {
     AtomicInteger ENTITY_COUNTER;
@@ -33,6 +34,9 @@ public class Factory implements NMSFactory {
                 }
             }
         } catch (ReflectiveOperationException ignored) {}
+        if (ENTITY_COUNTER == null) {
+            Logger.getLogger("VectorDisplays").warning(CAN_NOT_GET_ENTITY_COUNTER);
+        }
     }
 
     @Override
