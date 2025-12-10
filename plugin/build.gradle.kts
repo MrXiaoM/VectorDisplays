@@ -25,7 +25,7 @@ dependencies {
     compileOnly(project(":vive-api"))
 
     implementation("com.github.technicallycoded:FoliaLib:0.4.4")
-    implementation("com.github.Tofaa2.EntityLib:spigot:df6fe0f084")
+    implementation("com.github.Tofaa2.EntityLib:spigot:b8ec880978")
     implementation(project(":api"))
     for (item in project.project(":nms").subprojects) {
         if (item.name == "shared") {
