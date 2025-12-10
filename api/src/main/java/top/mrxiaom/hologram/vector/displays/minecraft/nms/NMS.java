@@ -47,6 +47,12 @@ public class NMS {
             craft = "v1_21_R6";
         } else { // 1.21.11 及以上通用
             craft = "v1_21_R7";
+            try {
+                Class.forName("net.minecraft.network.chat.IChatFormatted");
+            } catch (Throwable ignored) {
+                // 如果找不到 Spigot 混淆表的类，说明没有被 Paper 执行 remap 操作，使用 mojang mapping 的实现
+                craft = "mojmap.v1_21_R7";
+            }
 
             /*
              在这里标注一下 1.21.x NMS 的问题

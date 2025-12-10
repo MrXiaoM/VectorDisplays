@@ -12,7 +12,7 @@ subprojects {
 
     dependencies {
         add("compileOnly", "org.jetbrains:annotations:24.0.0")
-        if (project.name.startsWith("v")) {
+        if (project.name.startsWith("v") || project.name.startsWith("mojmap")) {
             add("compileOnly", project(":nms:shared"))
         }
     }

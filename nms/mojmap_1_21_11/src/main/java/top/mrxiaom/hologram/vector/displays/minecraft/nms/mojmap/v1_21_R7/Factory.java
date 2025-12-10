@@ -1,4 +1,4 @@
-package top.mrxiaom.hologram.vector.displays.minecraft.nms.v1_21_R7;
+package top.mrxiaom.hologram.vector.displays.minecraft.nms.mojmap.v1_21_R7;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -37,15 +37,15 @@ public class Factory implements NMSFactory {
 
     @Override
     public @NotNull String getName() {
-        return "v1_21_R7 (1.21.11 - 1.21.x)";
+        return "Mojmap 1.21.11 (1.21.11 - 1.21.x)";
     }
 
     @Override
     public @NotNull ITextHandler create(Function<String, FontStorage> fontStorageGetter, boolean validateAdvance) {
         return new TextHandler((codePoint, style) ->
-                fontStorageGetter.apply(style.l().toString())
+                fontStorageGetter.apply(style.getFont().toString())
                         .getGlyph(codePoint, validateAdvance)
-                        .getAdvance(style.c()));
+                        .getAdvance(style.isBold()));
     }
 
     @Override
@@ -62,16 +62,16 @@ public class Factory implements NMSFactory {
 
     @Override
     public <T> void reloadFontsViaNBTFile(InputStream stream, BiFunction<Integer, Float, T> glyph, BiConsumer<NamespacedKey, Int2ObjectMap<T>> loaded) throws IOException {
-        NBTTagCompound nbt = NBTCompressedStreamTools.a(stream, NBTReadLimiter.c()); // readCompressed
-        NBTTagList nbtFonts = nbt.o("fonts").orElseThrow(); // getTagList
-        for (NBTBase b : nbtFonts) {
-            if (!(b instanceof NBTTagCompound fontCompound)) continue;
-            String id = fontCompound.i("id").orElseThrow(); // getString
-            NBTTagCompound advances = fontCompound.m("advances").orElseThrow(); // getCompound
+        CompoundTag nbt = NbtIo.readCompressed(stream, NbtAccounter.unlimitedHeap());
+        ListTag nbtFonts = nbt.getList("fonts").orElseThrow();
+        for (Tag b : nbtFonts) {
+            if (!(b instanceof CompoundTag fontCompound)) continue;
+            String id = fontCompound.getString("id").orElseThrow();
+            CompoundTag advances = fontCompound.getCompound("advances").orElseThrow();
             Int2ObjectMap<T> glyphs = new Int2ObjectOpenHashMap<>();
-            for (String str : advances.e()) { // getKeys()
+            for (String str : advances.keySet()) {
                 int codePoint = Integer.parseInt(str);
-                float advance = advances.g(str).orElseThrow(); // getFloat
+                float advance = advances.getFloat(str).orElseThrow();
                 glyphs.put(codePoint, glyph.apply(codePoint, advance));
             }
             NamespacedKey key;
