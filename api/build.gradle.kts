@@ -30,7 +30,7 @@ dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("it.unimi.dsi:fastutil:8.5.12")
     compileOnly("com.github.LoneDev6:API-ItemsAdder:3.6.1")
-    compileOnly("com.github.Tofaa2.EntityLib:spigot:df6fe0f084")
+    compileOnly("com.github.Tofaa2.EntityLib:spigot:b8ec880978")
     compileOnly("com.github.retrooper:packetevents-spigot:2.9.5")
 
     compileOnly("net.kyori:adventure-platform-bukkit:4.4.1")
