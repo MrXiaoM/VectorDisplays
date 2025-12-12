@@ -9,6 +9,7 @@ import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import me.tofaa.entitylib.meta.EntityMeta;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -21,7 +22,9 @@ import top.mrxiaom.hologram.vector.displays.api.IRunTask;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 @SuppressWarnings("UnusedReturnValue")
 public abstract class AbstractEntity<This extends AbstractEntity<This>> {
@@ -247,6 +250,9 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     }
 
     protected void updateAffectedPlayers() {
+        updateAffectedPlayers(HologramAPI::shouldShowToNearby);
+    }
+    protected void updateAffectedPlayers(Predicate<Player> nearbyPlayerFilter) {
         if (this.dead || this.location == null) return;
         // 如果这个实体有父实体
         if (parent != null) {
@@ -300,7 +306,7 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
             // 将附近的玩家添加进来
             for (Player player : world.getPlayers()) {
                 if (player.getLocation().distance(this.location) > viewDistance) continue;
-                if (!this.viewers.contains(player)) {
+                if (!this.viewers.contains(player) && nearbyPlayerFilter.test(player)) {
                     addViewer(player);
                 }
             }

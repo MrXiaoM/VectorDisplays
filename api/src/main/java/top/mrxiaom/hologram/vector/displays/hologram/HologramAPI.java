@@ -6,11 +6,24 @@ import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
 import me.tofaa.entitylib.APIConfig;
 import me.tofaa.entitylib.EntityLib;
 import me.tofaa.entitylib.spigot.SpigotEntityLibPlatform;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.jetbrains.annotations.ApiStatus;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
 import top.mrxiaom.hologram.vector.displays.hologram.utils.ItemsAdderHolder;
 import top.mrxiaom.hologram.vector.displays.hologram.utils.ReplaceText;
 
-public class HologramAPI {
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+public class HologramAPI implements Listener {
     // com.github.retrooper.packetevents
     private static final String apiPackage = String.valueOf(new char[] {
             'c','o','m',
@@ -24,6 +37,7 @@ public class HologramAPI {
     private static HologramManager hologram;
     private static ReplaceText replaceText;
     private static PlayerManager playerManager;
+    private static final Set<UUID> loadedPlayersMap = new HashSet<>();
 
     public static HologramManager getHologram() {
         return hologram;
@@ -40,6 +54,11 @@ public class HologramAPI {
     private final PluginWrapper plugin;
     public HologramAPI(PluginWrapper plugin) {
         this.plugin = plugin;
+    }
+
+    @ApiStatus.Internal
+    protected static boolean shouldShowToNearby(Player player) {
+        return loadedPlayersMap.contains(player.getUniqueId());
     }
 
     @SuppressWarnings({"UnstableApiUsage", "deprecation"})
@@ -69,6 +88,11 @@ public class HologramAPI {
         playerManager = PacketEvents.getAPI().getPlayerManager();
         hologram = new HologramManager(plugin);
 
+        Bukkit.getPluginManager().registerEvents(this, plugin.getPlugin());
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            loadedPlayersMap.add(player.getUniqueId());
+        }
+
         try {
             replaceText = new ItemsAdderHolder();
         } catch (ClassNotFoundException exception) {
@@ -76,10 +100,24 @@ public class HologramAPI {
         }
     }
 
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerJoin(PlayerJoinEvent e) {
+        UUID uuid = e.getPlayer().getUniqueId();
+        loadedPlayersMap.remove(uuid);
+        plugin.getScheduler().runTaskLater(() -> loadedPlayersMap.add(uuid), 2L);
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent e) {
+        loadedPlayersMap.remove(e.getPlayer().getUniqueId());
+    }
+
     public void onDisable() {
         hologram.onDisable();
         if (!PacketEvents.class.getName().startsWith(apiPackage)) {
             PacketEvents.getAPI().terminate();
         }
+        HandlerList.unregisterAll(this);
+        loadedPlayersMap.clear();
     }
 }
