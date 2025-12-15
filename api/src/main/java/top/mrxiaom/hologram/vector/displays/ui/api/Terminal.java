@@ -576,9 +576,11 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         if (actionPreTimerTick != null) {
             actionPreTimerTick.accept($this());
         }
-        for (Element<?, ?> element : getElements()) {
-            if (element.isEnabled()) {
-                element.onTimerTick();
+        for (Object obj : elements.toArray()) {
+            if (obj instanceof Element<?, ?> element) {
+                if (element.isEnabled()) {
+                    element.onTimerTick();
+                }
             }
         }
         if (actionPostTimerTick != null) {
