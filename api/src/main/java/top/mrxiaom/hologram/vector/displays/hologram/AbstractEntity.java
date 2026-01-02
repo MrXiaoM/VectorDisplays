@@ -315,7 +315,11 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
 
     private void sendPacket(@Nullable PacketWrapper<?> packet) {
         if (this.renderMode == RenderMode.NONE || packet == null) return;
-        viewers.forEach(player -> sendPacket(player, packet));
+        for (Object obj : viewers.toArray()) {
+            if (obj instanceof Player player) {
+                sendPacket(player, packet);
+            }
+        }
     }
 
     private void sendPacket(@NotNull Player player, @Nullable PacketWrapper<?> packet) {
