@@ -2,7 +2,7 @@ import java.util.*
 
 plugins {
     id("java")
-    id("com.gradleup.shadow") version "8.3.0"
+    id("com.gradleup.shadow")
 }
 
 repositories {
@@ -43,7 +43,7 @@ tasks {
         relocate("com.tcoded.folialib", "${target}.libs.folialib")
         relocate("me.tofaa.entitylib", "${target}.libs.entitylib")
     }
-    val copyTask = create<Copy>("copyBuildArtifact") {
+    val copyTask = register<Copy>("copyBuildArtifact") {
         dependsOn(shadowJar)
         from(shadowJar.get().outputs)
         rename { "${rootProject.name}-plugin-${rootProject.version}.jar" }
