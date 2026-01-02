@@ -5,6 +5,7 @@ plugins {
     id("maven-publish")
     id("signing")
     id("com.gradleup.shadow")
+    id("com.github.gmazzo.buildconfig")
 }
 
 version = rootProject.version
@@ -23,6 +24,15 @@ repositories {
 java {
     withSourcesJar()
     withJavadocJar()
+}
+
+buildConfig {
+    className("BuildConstants")
+    packageName("top.mrxiaom.hologram.vector.displays")
+
+    useJavaOutput()
+    buildConfigField("String", "version", "\"${project.version}\"")
+    buildConfigField("java.time.Instant", "BUILD_TIME", "java.time.Instant.ofEpochSecond(${System.currentTimeMillis() / 1000L}L)")
 }
 
 val shadowLink = configurations.create("shadowLink")
