@@ -313,7 +313,7 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         }
     }
 
-    private void sendPacket(@Nullable PacketWrapper<?> packet) {
+    protected void sendPacket(@Nullable PacketWrapper<?> packet) {
         if (this.renderMode == RenderMode.NONE || packet == null) return;
         for (Object obj : viewers.toArray()) {
             if (obj instanceof Player player) {
@@ -322,7 +322,7 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         }
     }
 
-    private void sendPacket(@NotNull Player player, @Nullable PacketWrapper<?> packet) {
+    protected void sendPacket(@NotNull Player player, @Nullable PacketWrapper<?> packet) {
         if (packet != null) {
             HologramAPI.getPlayerManager().sendPacket(player, packet);
         }
