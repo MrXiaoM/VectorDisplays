@@ -35,9 +35,8 @@ dependencies {
     for (item in project.project(":nms").subprojects) {
         if (item.name == "shared") {
             implementation(item)
-        } else {
-            add("shadowLink", item)
         }
+        add("shadowLink", item)
     }
 }
 
