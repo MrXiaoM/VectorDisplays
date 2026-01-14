@@ -17,16 +17,21 @@ repositories {
     maven("https://repo.helpch.at/releases/")
 }
 
-val shadowLink = configurations.create("shadowLink")
+val shadowLink: Configuration = configurations.create("shadowLink")
+fun DependencyHandler.shadowLib(notation: String, config: ExternalModuleDependency.() -> Unit = {}) {
+    add("implementation", notation, config)
+    add("shadowLink", notation, config)
+}
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("com.github.retrooper:packetevents-spigot:2.9.5")
     compileOnly(project(":vive-api"))
 
-    implementation("com.github.technicallycoded:FoliaLib:0.4.4")
-    implementation("com.github.Tofaa2.EntityLib:spigot:b8ec880978")
     implementation(project(":api"))
+    shadowLib("com.github.technicallycoded:FoliaLib:0.4.4")
+    shadowLib("com.github.Tofaa2.EntityLib:spigot:b8ec880978")
+    shadowLink(project(":api"))
     for (item in project.project(":nms").subprojects) {
         if (item.name == "shared") {
             implementation(item)
