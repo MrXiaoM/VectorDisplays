@@ -9,7 +9,6 @@ import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import me.tofaa.entitylib.meta.EntityMeta;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -22,7 +21,6 @@ import top.mrxiaom.hologram.vector.displays.api.IRunTask;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -102,9 +100,17 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         this.location = location;
         PacketWrapper<?> packet = buildSpawnPacket();
         updateAffectedPlayers();
-        sendPacket(packet);
+        sendSpawnPacket(packet);
         this.dead = false;
         update();
+    }
+
+    protected void sendSpawnPacket(PacketWrapper<?> packet) {
+        sendPacket(packet);
+    }
+
+    protected void sendSpawnPacket(Player player, PacketWrapper<?> packet) {
+        sendPacket(player, packet);
     }
 
     @Nullable
@@ -221,9 +227,9 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         return $this();
     }
 
-    private void respawnFor(@NotNull Player player) {
+    protected void respawnFor(@NotNull Player player) {
         PacketWrapper<?> packet = buildSpawnPacket();
-        sendPacket(player, packet);
+        sendSpawnPacket(player, packet);
         updateAffectedPlayers();
         EntityMeta meta = createMeta();
         sendPacket(player, meta == null ? null : meta.createPacket());
@@ -365,16 +371,18 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         return glowing;
     }
 
-    public void setGlowing(boolean glowing) {
+    public This setGlowing(boolean glowing) {
         this.glowing = glowing;
+        return $this();
     }
 
     public boolean isSilent() {
         return silent;
     }
 
-    public void setSilent(boolean silent) {
+    public This setSilent(boolean silent) {
         this.silent = silent;
+        return $this();
     }
 
     @NotNull
@@ -382,8 +390,9 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         return pose;
     }
 
-    public void setPose(@Nullable EntityPose pose) {
+    public This setPose(@Nullable EntityPose pose) {
         this.pose = pose == null ? EntityPose.STANDING : pose;
+        return $this();
     }
 
     @NotNull
