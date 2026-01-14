@@ -8,7 +8,7 @@ plugins {
 
 val sdkVersion = 17
 group = "top.mrxiaom.hologram"
-version = "1.0.2"
+version = "1.0.3"
 
 allprojects {
     group = rootProject.group
