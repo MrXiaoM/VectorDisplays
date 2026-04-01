@@ -18,6 +18,7 @@ allprojects {
 
         fun setJavaVersion(targetJavaVersion: Int) {
             extensions.configure<JavaPluginExtension> {
+                disableAutoTargetJvm()
                 val javaVersion = JavaVersion.toVersion(targetJavaVersion)
                 if (JavaVersion.current() < javaVersion) {
                     toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
@@ -32,6 +33,7 @@ allprojects {
         }
         setJavaVersion(sdkVersion)
         ext["setJavaVersion"] = ::setJavaVersion
+        ext["shadowTarget"] = "top.mrxiaom.hologram.vector.displays.libs"
     }
 }
 

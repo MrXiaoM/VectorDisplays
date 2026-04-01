@@ -18,6 +18,7 @@ repositories {
     mavenCentral()
     maven("https://repo.codemc.io/repository/maven-releases/")
     maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://maven.pvphub.me/tofaa/")
     maven("https://jitpack.io")
 }
 
@@ -36,12 +37,16 @@ buildConfig {
 }
 
 val shadowLink = configurations.create("shadowLink")
+val shadowLinkWithLib = configurations.create("shadowLinkWithLib")
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("it.unimi.dsi:fastutil:8.5.12")
     compileOnly("com.github.LoneDev6:API-ItemsAdder:3.6.1")
-    compileOnly("com.github.Tofaa2.EntityLib:spigot:b8ec880978")
-    compileOnly("com.github.retrooper:packetevents-spigot:2.9.5")
+    compileOnly("io.github.tofaa2:spigot:3.1.0-SNAPSHOT")
+    add("shadowLinkWithLib", "io.github.tofaa2:spigot:3.1.0-SNAPSHOT") {
+        exclude("org.jetbrains", "annotations")
+    }
+    compileOnly("com.github.retrooper:packetevents-spigot:2.11.2")
 
     compileOnly("net.kyori:adventure-platform-bukkit:4.4.1")
     compileOnly("net.kyori:adventure-text-serializer-plain:4.23.0")
@@ -58,15 +63,20 @@ dependencies {
     }
 }
 tasks {
-    jar {
-        archiveClassifier.set("api")
-    }
     getByName<Jar>(sourceSets.main.get().sourcesJarTaskName) {
         from(project(":nms:shared").sourceSets.main.get().allSource)
     }
     shadowJar {
         configurations.add(shadowLink)
-        archiveClassifier.set("")
+        configurations.add(project.configurations.runtimeClasspath.get())
+    }
+    this.register("shadowJarWithLib", com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
+        from(sourceSets.main.map { it.output })
+        configurations.add(shadowLink)
+        configurations.add(shadowLinkWithLib)
+        configurations.add(project.configurations.runtimeClasspath.get())
+        archiveClassifier.set("with-lib")
+        relocate("me.tofaa.entitylib", "${ext["shadowTarget"]}.entitylib")
     }
     build {
         dependsOn(shadowJar)
@@ -90,10 +100,14 @@ tasks {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            from(components.getByName("java"))
             groupId = project.group.toString()
             artifactId = "VectorDisplays-API"
             version = project.version.toString()
+
+            artifact(tasks["shadowJar"]).classifier = null
+            artifact(tasks["shadowJarWithLib"]).classifier = "for-plugin"
+            artifact(tasks["sourcesJar"])
+            artifact(tasks["javadocJar"])
 
             pom {
                 name.set(artifactId)

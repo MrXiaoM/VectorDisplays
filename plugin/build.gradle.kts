@@ -15,23 +15,24 @@ repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://jitpack.io")
     maven("https://repo.helpch.at/releases/")
+    maven("https://maven.pvphub.me/tofaa/")
 }
 
 val shadowLink: Configuration = configurations.create("shadowLink")
-fun DependencyHandler.shadowLib(notation: String, config: ExternalModuleDependency.() -> Unit = {}) {
-    add("implementation", notation, config)
-    add("shadowLink", notation, config)
-}
+
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.6")
-    compileOnly("com.github.retrooper:packetevents-spigot:2.9.5")
+    compileOnly("com.github.retrooper:packetevents-spigot:2.11.2")
     compileOnly(project(":vive-api"))
 
     implementation(project(":api"))
-    shadowLib("com.github.technicallycoded:FoliaLib:0.4.4")
-    shadowLib("com.github.Tofaa2.EntityLib:spigot:b8ec880978")
-    shadowLink(project(":api"))
+    implementation("com.github.technicallycoded:FoliaLib:0.4.4") {
+        exclude("org.jetbrains", "annotations")
+    }
+    implementation("io.github.tofaa2:spigot:3.1.0-SNAPSHOT") {
+        exclude("org.jetbrains", "annotations")
+    }
     for (item in project.project(":nms").subprojects) {
         if (item.name == "shared") {
             implementation(item)
@@ -43,9 +44,13 @@ dependencies {
 tasks {
     shadowJar {
         configurations.add(shadowLink)
-        val target = "top.mrxiaom.hologram.vector.displays"
-        relocate("com.tcoded.folialib", "${target}.libs.folialib")
-        relocate("me.tofaa.entitylib", "${target}.libs.entitylib")
+        configurations.add(project.configurations.runtimeClasspath.get())
+        mapOf(
+            "com.tcoded.folialib" to "folialib",
+            "me.tofaa.entitylib" to "entitylib",
+        ).forEach { (original, target) ->
+            relocate(original, "${ext["shadowTarget"]}.$target")
+        }
     }
     val copyTask = register<Copy>("copyBuildArtifact") {
         dependsOn(shadowJar)
