@@ -6,9 +6,8 @@ plugins {
     id("moe.karla.maven-publishing")
 }
 
-val sdkVersion = 17
-group = "top.mrxiaom.hologram"
-version = "1.0.3"
+group = ext["project.group"].toString()
+version = ext["project.version"].toString()
 
 allprojects {
     group = rootProject.group
@@ -31,7 +30,7 @@ allprojects {
                 }
             }
         }
-        setJavaVersion(sdkVersion)
+        setJavaVersion(rootProject.ext["sdkVersion"].toString().toInt())
         ext["setJavaVersion"] = ::setJavaVersion
         ext["shadowTarget"] = "top.mrxiaom.hologram.vector.displays.libs"
     }
