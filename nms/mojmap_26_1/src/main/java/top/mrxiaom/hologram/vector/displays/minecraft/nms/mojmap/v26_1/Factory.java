@@ -2,6 +2,7 @@ package top.mrxiaom.hologram.vector.displays.minecraft.nms.mojmap.v26_1;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import net.minecraft.nbt.*;
 import net.minecraft.world.entity.Entity;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
