@@ -20,49 +20,57 @@ public class NMS {
         int major = parse(version, 0, 1);
         int minor = parse(version, 1, 0);
         int patch = parse(version, 2, 0);
-        if (major >= 26) {
-            throw new IllegalStateException("当前版本不受支持 (你正在使用 26.x 或以上的新版本 Minecraft，目前 VectorDisplays 暂不支持)");
-        }
-        if (major != 1 || minor < 19 || (minor == 19 && patch < 4)) { // 1.19.4 以下
-            throw new IllegalStateException("当前版本不受支持 (小于 1.19.4 或大于 v1)");
-        }
-        String craft;
-        if (minor < 20 || (minor == 20 && patch < 3)) { // 1.20.3 以下
-            craft = "v1_19_R3";
-        } else if (minor == 20 && (patch == 3 || patch == 4)) { // 1.20.3-1.20.4
-            craft = "v1_20_R3";
-        } else if (minor == 20 && (patch == 5 || patch == 6)) { // 1.20.5-1.20.6
-            craft = "v1_20_R4";
-        } else if (minor == 21 && (patch == 0 || patch == 1)) { // 1.21-1.21.1
-            craft = "v1_21_R1";
-        } else if (minor == 21 && (patch == 2 || patch == 3)) { // 1.21.2-1.21.3
-            craft = "v1_21_R2";
-        } else if (minor == 21 && patch == 4) { // 1.21.4
-            craft = "v1_21_R3";
-        } else if (minor == 21 && patch == 5) { // 1.21.5
-            craft = "v1_21_R4";
-        } else if (minor == 21 && patch <= 8) { // 1.21.6-1.21.8
-            craft = "v1_21_R5";
-        } else if (minor == 21 && patch <= 10) { // 1.21.9-1.21.10
-            craft = "v1_21_R6";
-        } else { // 1.21.11 及以上通用
-            craft = "v1_21_R7";
-            try {
-                Class.forName("net.minecraft.network.chat.IChatFormatted");
-            } catch (Throwable ignored) {
-                // 如果找不到 Spigot 混淆表的类，说明没有被 Paper 执行 remap 操作，使用 mojang mapping 的实现
-                craft = "mojmap.v1_21_R7";
+        String craft = null;
+        if (major == 1) {
+            if (minor < 19 || (minor == 19 && patch < 4)) { // 1.19.4 以下
+                throw new IllegalStateException("当前版本不受支持 (小于 1.19.4)");
             }
+            if (minor < 20 || (minor == 20 && patch < 3)) { // 1.20.3 以下
+                craft = "v1_19_R3";
+            } else if (minor == 20 && (patch == 3 || patch == 4)) { // 1.20.3-1.20.4
+                craft = "v1_20_R3";
+            } else if (minor == 20 && (patch == 5 || patch == 6)) { // 1.20.5-1.20.6
+                craft = "v1_20_R4";
+            } else if (minor == 21 && (patch == 0 || patch == 1)) { // 1.21-1.21.1
+                craft = "v1_21_R1";
+            } else if (minor == 21 && (patch == 2 || patch == 3)) { // 1.21.2-1.21.3
+                craft = "v1_21_R2";
+            } else if (minor == 21 && patch == 4) { // 1.21.4
+                craft = "v1_21_R3";
+            } else if (minor == 21 && patch == 5) { // 1.21.5
+                craft = "v1_21_R4";
+            } else if (minor == 21 && patch <= 8) { // 1.21.6-1.21.8
+                craft = "v1_21_R5";
+            } else if (minor == 21 && patch <= 10) { // 1.21.9-1.21.10
+                craft = "v1_21_R6";
+            } else { // 1.21.11 及以上通用
+                craft = "v1_21_R7";
+                try {
+                    Class.forName("net.minecraft.network.chat.IChatFormatted");
+                } catch (Throwable ignored) {
+                    // 如果找不到 Spigot 混淆表的类，说明没有被 Paper 执行 remap 操作，使用 mojang mapping 的实现
+                    craft = "mojmap.v1_21_R7";
+                }
 
-            /*
-             在这里标注一下 1.21.x NMS 的问题
-             拿 1.21.5+ 做依赖，编译的代码没法在 1.21.4 上面跑
-             怀疑是新版本发生了破坏性变更，导致方法签名改变，但是代码用法没变
-            */
+                /*
+                 在这里标注一下 1.21.x NMS 的问题
+                 拿 1.21.5+ 做依赖，编译的代码没法在 1.21.4 上面跑
+                 怀疑是新版本发生了破坏性变更，导致方法签名改变，但是代码用法没变
+                */
 
-            if (minor > 21) {
+                if (minor > 21) {
+                    Logger.getLogger("VectorDisplays").warning("看起来你正在使用一个不受支持的未来版本，已尝试使用本插件所支持的最新版本，插件可能无法正常工作");
+                }
+            }
+        }
+        if (major == 26) { // 26.1
+            craft = "v26_1";
+            if (minor > 1) {
                 Logger.getLogger("VectorDisplays").warning("看起来你正在使用一个不受支持的未来版本，已尝试使用本插件所支持的最新版本，插件可能无法正常工作");
             }
+        }
+        if (craft == null) {
+            throw new IllegalStateException("当前版本不受支持 (" + String.format("%d.%d.%d", major, minor, patch)+ ")");
         }
         String className = NMS.class.getPackageName() + "." + craft + ".Factory";
         try {
