@@ -1,9 +1,8 @@
 package top.mrxiaom.hologram.vector.displays.minecraft.font;
 
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.google.gson.JsonElement;
-import net.kyori.adventure.platform.bukkit.BukkitComponentSerializer;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.api.ITextRenderer;
 import top.mrxiaom.hologram.vector.displays.minecraft.nms.ITextHandler;
 
@@ -13,7 +12,7 @@ import java.util.List;
 @SuppressWarnings({"unused"})
 public class TextRenderer implements ITextRenderer {
     private final ITextHandler handler;
-    private final GsonComponentSerializer serializer = BukkitComponentSerializer.gson();
+    private final AdventureSerializer serializer = AdventureSerializer.serializer();
 
     public TextRenderer(FontManager fontManager, ITextHandler handler) {
         this.handler = handler;
@@ -26,7 +25,7 @@ public class TextRenderer implements ITextRenderer {
 
     @Override
     public int getLines(Component text) {
-        JsonElement json = serializer.serializeToTree(text);
+        JsonElement json = serializer.asJsonTree(text);
         return handler.getLines(json);
     }
 
@@ -37,7 +36,7 @@ public class TextRenderer implements ITextRenderer {
 
     @Override
     public int getWidth(Component text) {
-        JsonElement json = serializer.serializeToTree(text);
+        JsonElement json = serializer.asJsonTree(text);
         return ceil(handler.getWidth(json));
     }
 
@@ -59,8 +58,8 @@ public class TextRenderer implements ITextRenderer {
 
     @Override
     public Component trimToWidth(Component text, int width) {
-        JsonElement trimmed = this.handler.trimToWidth(serializer.serializeToTree(text), width);
-        return serializer.deserializeFromTree(trimmed);
+        JsonElement trimmed = this.handler.trimToWidth(serializer.asJsonTree(text), width);
+        return serializer.fromJsonTree(trimmed);
     }
 
     @Override
@@ -70,15 +69,15 @@ public class TextRenderer implements ITextRenderer {
 
     @Override
     public int getWrappedLinesHeight(Component text, int maxWidth) {
-        return 9 * this.handler.wrapLinesSize(serializer.serializeToTree(text), maxWidth);
+        return 9 * this.handler.wrapLinesSize(serializer.asJsonTree(text), maxWidth);
     }
 
     @Override
     public List<Component> wrapLines(Component text, int width) {
-        List<JsonElement> lines = this.handler.wrapLines(serializer.serializeToTree(text), width);
+        List<JsonElement> lines = this.handler.wrapLines(serializer.asJsonTree(text), width);
         List<Component> components = new ArrayList<>();
         for (JsonElement line : lines) {
-            components.add(serializer.deserializeFromTree(line));
+            components.add(serializer.fromJsonTree(line));
         }
         return components;
     }

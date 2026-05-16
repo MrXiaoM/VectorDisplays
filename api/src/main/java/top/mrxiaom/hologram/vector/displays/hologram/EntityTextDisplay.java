@@ -8,6 +8,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSp
 import me.tofaa.entitylib.meta.EntityMeta;
 import me.tofaa.entitylib.meta.display.TextDisplayMeta;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.flattener.ComponentFlattener;
 import org.bukkit.entity.TextDisplay;
 import org.jetbrains.annotations.Nullable;
 
@@ -77,7 +78,9 @@ public class EntityTextDisplay extends EntityDisplay<EntityTextDisplay> {
     }
 
     public String getTextWithoutColor() {
-        return plainText.serialize(text);
+        StringBuilder sb = new StringBuilder();
+        ComponentFlattener.basic().flatten(text, sb::append);
+        return sb.toString();
     }
 
     public EntityTextDisplay setText(String text) {

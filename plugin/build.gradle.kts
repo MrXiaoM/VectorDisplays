@@ -8,7 +8,7 @@ plugins {
 repositories {
     if (Locale.getDefault().country == "CN") {
         maven("https://mirrors.huaweicloud.com/repository/maven/")
-        maven("https://lss233.littleservice.cn/repositories/minecraft/")
+        maven("https://crystal.app.lss233.com/repositories/minecraft/")
     }
     mavenCentral()
     maven("https://repo.codemc.io/repository/maven-releases/")
@@ -23,16 +23,17 @@ val shadowLink: Configuration = configurations.create("shadowLink")
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.6")
-    compileOnly("com.github.retrooper:packetevents-spigot:2.11.2")
+    compileOnly("com.github.retrooper:packetevents-spigot:2.12.1")
     compileOnly(project(":vive-api"))
 
     implementation(project(":api"))
     implementation("com.github.technicallycoded:FoliaLib:0.4.4") {
         exclude("org.jetbrains", "annotations")
     }
-    implementation("io.github.tofaa2:spigot:3.1.0-SNAPSHOT") {
+    implementation("io.github.tofaa2:spigot:3.2.3-SNAPSHOT") {
         exclude("org.jetbrains", "annotations")
     }
+    implementation("net.kyori:adventure-text-minimessage:4.26.1") { isTransitive = false }
     for (item in project.project(":nms").subprojects) {
         if (item.name == "shared") {
             implementation(item)
@@ -48,6 +49,7 @@ tasks {
         mapOf(
             "com.tcoded.folialib" to "folialib",
             "me.tofaa.entitylib" to "entitylib",
+            "net.kyori.adventure.text.minimessage" to "text.minimessage",
         ).forEach { (original, target) ->
             relocate(original, "${ext["shadowTarget"]}.$target")
         }

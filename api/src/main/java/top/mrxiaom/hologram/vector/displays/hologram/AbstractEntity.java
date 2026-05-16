@@ -5,10 +5,9 @@ import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
+import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import me.tofaa.entitylib.meta.EntityMeta;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -27,7 +26,6 @@ import java.util.function.Predicate;
 @SuppressWarnings("UnusedReturnValue")
 public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     public static final LegacyComponentSerializer legacyText = LegacyComponentSerializer.legacySection();
-    public static final PlainTextComponentSerializer plainText = PlainTextComponentSerializer.plainText();
 
     protected final PluginWrapper plugin;
 

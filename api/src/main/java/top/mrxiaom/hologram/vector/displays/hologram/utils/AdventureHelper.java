@@ -1,6 +1,9 @@
 package top.mrxiaom.hologram.vector.displays.hologram.utils;
 
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.ShadowColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -8,32 +11,55 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class AdventureHelper {
-    private static final MiniMessage miniMessage = create();
+    private static Field resolversField;
+    private static final Map<String, Consumer<Component>> tagImplMap = new HashMap<>() {{
+        put("shadow", c -> c.style().shadowColor(ShadowColor.none()));
+        put("font", c -> c.style().font(Key.key("default")));
+        put("gradient", c -> c.style().color(TextColor.color(255, 255, 255)));
+    }};
+    private static final List<String> disabledTags = new ArrayList<>();
+    private static final MiniMessage miniMessage;
 
-    @SuppressWarnings({"unchecked", "CallToPrintStackTrace"})
-    private static void remove(TagResolver.Builder builder, String... tags) {
-        Class<?> type = builder.getClass();
+    static {
+        disabledTags.add("pride");
+        tagImplMap.forEach((tag, type) -> {
+            try {
+                type.accept(Component.empty());
+            } catch (LinkageError e) {
+                disabledTags.add(tag);
+            }
+        });
+        miniMessage = create();
+    }
+
+    @SuppressWarnings({"unchecked", "SameParameterValue"})
+    public static void remove(TagResolver.Builder builder, Iterable<String> tags) {
         try {
-            Field field = type.getDeclaredField("resolvers");
-            field.setAccessible(true);
-            List<TagResolver> list = (List<TagResolver>) field.get(builder);
+            if (resolversField == null) {
+                resolversField = builder.getClass().getDeclaredField("resolvers");
+                resolversField.setAccessible(true);
+            }
+            List<TagResolver> list = (List<TagResolver>) resolversField.get(builder);
             list.removeIf(it -> {
                 for (String tag : tags) {
                     if (it.has(tag)) return true;
                 }
                 return false;
             });
-        } catch (Throwable t) {
-            t.printStackTrace();
+        } catch (Throwable ignored) {
         }
     }
 
     private static MiniMessage create() {
         return MiniMessage.builder()
-                .editTags(it -> remove(it, "pride"))
+                .editTags(it -> remove(it, disabledTags))
+                .preProcessor(AdventureHelper::legacyToMiniMessage)
                 .postProcessor(it -> it.decoration(TextDecoration.ITALIC, false))
                 .build();
     }
@@ -46,7 +72,7 @@ public class AdventureHelper {
     public static Component miniMessage(String s) {
         return s == null
                 ? Component.empty()
-                : miniMessage.deserialize(legacyToMiniMessage(s));
+                : miniMessage.deserialize(s);
     }
 
     @NotNull
@@ -63,7 +89,7 @@ public class AdventureHelper {
         for (String s : list) {
             components.add(s == null
                     ? Component.empty()
-                    : miniMessage.deserialize(legacyToMiniMessage(s)));
+                    : miniMessage.deserialize(s));
         }
         return components;
     }
@@ -79,41 +105,42 @@ public class AdventureHelper {
         }
         return list;
     }
-    public static String legacyToMiniMessage(String legacy) {
-        StringBuilder stringBuilder = new StringBuilder();
+
+    public static @NotNull String legacyToMiniMessage(@NotNull String legacy) {
+        StringBuilder builder = new StringBuilder();
         char[] chars = legacy.toCharArray();
         for (int i = 0; i < chars.length; i++) {
             if (!isColorCode(chars[i])) {
-                stringBuilder.append(chars[i]);
+                builder.append(chars[i]);
                 continue;
             }
             if (i + 1 >= chars.length) {
-                stringBuilder.append(chars[i]);
+                builder.append(chars[i]);
                 continue;
             }
-            switch (chars[i+1]) {
-                case '0': stringBuilder.append("<black>"); break;
-                case '1': stringBuilder.append("<dark_blue>"); break;
-                case '2': stringBuilder.append("<dark_green>"); break;
-                case '3': stringBuilder.append("<dark_aqua>"); break;
-                case '4': stringBuilder.append("<dark_red>"); break;
-                case '5': stringBuilder.append("<dark_purple>"); break;
-                case '6': stringBuilder.append("<gold>"); break;
-                case '7': stringBuilder.append("<gray>"); break;
-                case '8': stringBuilder.append("<dark_gray>"); break;
-                case '9': stringBuilder.append("<blue>"); break;
-                case 'a': stringBuilder.append("<green>"); break;
-                case 'b': stringBuilder.append("<aqua>"); break;
-                case 'c': stringBuilder.append("<red>"); break;
-                case 'd': stringBuilder.append("<light_purple>"); break;
-                case 'e': stringBuilder.append("<yellow>"); break;
-                case 'f': stringBuilder.append("<white>"); break;
-                case 'r': stringBuilder.append("<reset><!i>"); break;
-                case 'l': stringBuilder.append("<b>"); break;
-                case 'm': stringBuilder.append("<st>"); break;
-                case 'o': stringBuilder.append("<i>"); break;
-                case 'n': stringBuilder.append("<u>"); break;
-                case 'k': stringBuilder.append("<obf>"); break;
+            switch (Character.toLowerCase(chars[i+1])) {
+                case '0': builder.append("<black>"); break;
+                case '1': builder.append("<dark_blue>"); break;
+                case '2': builder.append("<dark_green>"); break;
+                case '3': builder.append("<dark_aqua>"); break;
+                case '4': builder.append("<dark_red>"); break;
+                case '5': builder.append("<dark_purple>"); break;
+                case '6': builder.append("<gold>"); break;
+                case '7': builder.append("<gray>"); break;
+                case '8': builder.append("<dark_gray>"); break;
+                case '9': builder.append("<blue>"); break;
+                case 'a': builder.append("<green>"); break;
+                case 'b': builder.append("<aqua>"); break;
+                case 'c': builder.append("<red>"); break;
+                case 'd': builder.append("<light_purple>"); break;
+                case 'e': builder.append("<yellow>"); break;
+                case 'f': builder.append("<white>"); break;
+                case 'r': builder.append("<reset><!i>"); break;
+                case 'l': builder.append("<b>"); break;
+                case 'm': builder.append("<st>"); break;
+                case 'o': builder.append("<i>"); break;
+                case 'n': builder.append("<u>"); break;
+                case 'k': builder.append("<obf>"); break;
                 case 'x': {
                     if (i + 13 >= chars.length
                             || !isColorCode(chars[i+2])
@@ -122,10 +149,10 @@ public class AdventureHelper {
                             || !isColorCode(chars[i+8])
                             || !isColorCode(chars[i+10])
                             || !isColorCode(chars[i+12])) {
-                        stringBuilder.append(chars[i]);
+                        builder.append(chars[i]);
                         continue;
                     }
-                    stringBuilder
+                    builder
                             .append("<#")
                             .append(chars[i+3])
                             .append(chars[i+5])
@@ -137,14 +164,29 @@ public class AdventureHelper {
                     i += 12;
                     break;
                 }
+                case '#': {
+                    if (i + 6 >= chars.length) {
+                        builder.append(chars[i]);
+                        continue;
+                    }
+                    builder
+                            .append("<#")
+                            .append(chars,i+1, 6)
+                            .append(">");
+                    i += 5;
+                    break;
+                }
                 default: {
-                    stringBuilder.append(chars[i]);
+                    builder.append(chars[i]);
+                    if (chars[i+1] == chars[i]) { // && 转义为 &
+                        i++;
+                    }
                     continue;
                 }
             }
             i++;
         }
-        return stringBuilder.toString();
+        return builder.toString();
     }
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isColorCode(char c) {

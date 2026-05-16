@@ -13,12 +13,13 @@ version = rootProject.version
 repositories {
     if (Locale.getDefault().country == "CN") {
         maven("https://mirrors.huaweicloud.com/repository/maven/")
-        maven("https://lss233.littleservice.cn/repositories/minecraft/")
+        maven("https://crystal.app.lss233.com/repositories/minecraft/")
     }
     mavenCentral()
     maven("https://repo.codemc.io/repository/maven-releases/")
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://maven.pvphub.me/tofaa/")
+    maven("https://maven.devs.beer/")
     maven("https://jitpack.io")
 }
 
@@ -41,16 +42,15 @@ val shadowLinkWithLib = configurations.create("shadowLinkWithLib")
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("it.unimi.dsi:fastutil:8.5.12")
-    compileOnly("com.github.LoneDev6:API-ItemsAdder:3.6.1")
-    compileOnly("io.github.tofaa2:spigot:3.1.0-SNAPSHOT")
-    add("shadowLinkWithLib", "io.github.tofaa2:spigot:3.1.0-SNAPSHOT") {
+    compileOnly("dev.lone:api-itemsadder:4.0.10") { isTransitive = false }
+    compileOnly("io.github.tofaa2:spigot:3.2.3-SNAPSHOT")
+    add("shadowLinkWithLib", "io.github.tofaa2:spigot:3.2.3-SNAPSHOT") {
         exclude("org.jetbrains", "annotations")
     }
-    compileOnly("com.github.retrooper:packetevents-spigot:2.11.2")
+    compileOnly("com.github.retrooper:packetevents-spigot:2.12.1")
 
-    compileOnly("net.kyori:adventure-platform-bukkit:4.4.1")
-    compileOnly("net.kyori:adventure-text-serializer-plain:4.23.0")
-    compileOnly("net.kyori:adventure-text-minimessage:4.23.0")
+    compileOnly("net.kyori:adventure-text-minimessage:4.26.1")
+    add("shadowLink", "net.kyori:adventure-text-minimessage:4.26.1") { isTransitive = false }
     compileOnly("org.jetbrains:annotations:24.0.0")
 
     for (item in project.project(":nms").subprojects) {
@@ -66,9 +66,15 @@ tasks {
     getByName<Jar>(sourceSets.main.get().sourcesJarTaskName) {
         from(project(":nms:shared").sourceSets.main.get().allSource)
     }
+    val shadowGroup = ext["shadowTarget"]
     shadowJar {
         configurations.add(shadowLink)
         configurations.add(project.configurations.runtimeClasspath.get())
+        mapOf(
+            "net.kyori.adventure.text.minimessage" to "text.minimessage",
+        ).forEach { (original, target) ->
+            relocate(original, "$shadowGroup.$target")
+        }
     }
     this.register("shadowJarWithLib", com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
         from(sourceSets.main.map { it.output })
@@ -76,7 +82,12 @@ tasks {
         configurations.add(shadowLinkWithLib)
         configurations.add(project.configurations.runtimeClasspath.get())
         archiveClassifier.set("with-lib")
-        relocate("me.tofaa.entitylib", "${ext["shadowTarget"]}.entitylib")
+        mapOf(
+            "me.tofaa.entitylib" to "entitylib",
+            "net.kyori.adventure.text.minimessage" to "text.minimessage",
+        ).forEach { (original, target) ->
+            relocate(original, "$shadowGroup.$target")
+        }
     }
     build {
         dependsOn(shadowJar)
