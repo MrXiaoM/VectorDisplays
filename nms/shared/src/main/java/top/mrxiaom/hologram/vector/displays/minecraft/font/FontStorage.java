@@ -78,27 +78,27 @@ public class FontStorage implements AutoCloseable {
                 }
 
                 if (!isAdvanceInvalid(glyph2)) {
-                    return new GlyphPair(glyph, glyph2);
+                    return new GlyphPair(glyph);
                 }
             }
         }
 
         if (glyph != null) {
-            return new GlyphPair(glyph, EmptyGlyph.MISSING);
+            return new GlyphPair(glyph);
         } else {
             return GlyphPair.MISSING;
         }
     }
 
-    public Glyph getGlyph(int codePoint, boolean validateAdvance) {
-        return this.glyphCache.computeIfAbsent(codePoint, this::findGlyph).getGlyph(validateAdvance);
+    public Glyph getGlyph(int codePoint) {
+        return this.glyphCache.computeIfAbsent(codePoint, this::findGlyph).getGlyph();
     }
 
-    private record GlyphPair(Glyph glyph, Glyph advanceValidatedGlyph) {
-        static final GlyphPair MISSING = new GlyphPair(EmptyGlyph.MISSING, EmptyGlyph.MISSING);
+    private record GlyphPair(Glyph glyph) {
+        static final GlyphPair MISSING = new GlyphPair(EmptyGlyph.MISSING);
 
-        Glyph getGlyph(boolean validateAdvance) {
-            return validateAdvance ? this.advanceValidatedGlyph : this.glyph;
+        Glyph getGlyph() {
+            return this.glyph;
         }
     }
 }

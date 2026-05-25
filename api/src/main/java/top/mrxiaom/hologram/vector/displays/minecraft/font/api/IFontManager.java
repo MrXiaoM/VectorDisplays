@@ -17,5 +17,4 @@ public interface IFontManager extends AutoCloseable {
     void reload(File fontsFile) throws Exception;
     void reload(InputStream stream) throws Exception;
     TextRenderer createTextRenderer();
-    TextRenderer createAdvanceValidatingTextRenderer();
 }

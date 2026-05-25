@@ -153,12 +153,7 @@ public class FontManager implements IFontManager {
 
     @Override
     public TextRenderer createTextRenderer() {
-        return new TextRenderer(this, factory.create(this::getFontStorage, false));
-    }
-
-    @Override
-    public TextRenderer createAdvanceValidatingTextRenderer() {
-        return new TextRenderer(this, factory.create(this::getFontStorage, true));
+        return new TextRenderer(this, factory.create(this::getFontStorage));
     }
 
     @Override

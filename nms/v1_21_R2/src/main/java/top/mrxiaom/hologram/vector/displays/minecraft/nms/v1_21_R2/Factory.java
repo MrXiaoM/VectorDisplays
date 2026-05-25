@@ -45,10 +45,10 @@ public class Factory implements NMSFactory {
     }
 
     @Override
-    public @NotNull ITextHandler create(Function<String, FontStorage> fontStorageGetter, boolean validateAdvance) {
+    public @NotNull ITextHandler create(Function<String, FontStorage> fontStorageGetter) {
         return new TextHandler((codePoint, style) ->
                 fontStorageGetter.apply(style.k().toString())
-                        .getGlyph(codePoint, validateAdvance)
+                        .getGlyph(codePoint)
                         .getAdvance(style.c()));
     }
 
