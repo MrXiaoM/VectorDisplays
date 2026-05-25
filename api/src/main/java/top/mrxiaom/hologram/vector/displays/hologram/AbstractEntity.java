@@ -219,7 +219,7 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         if (this.leftViewers.remove(player)) {
             respawn = true;
         }
-        if (respawn && !dead) {
+        if (respawn && !dead && location != null) {
             respawnFor(player);
         }
         return $this();
@@ -292,6 +292,9 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
                         leftViewers.add(player);
                     }
                 }
+            }
+            if (!player.isOnline()) {
+                removeViewer(player);
             }
         }
 
