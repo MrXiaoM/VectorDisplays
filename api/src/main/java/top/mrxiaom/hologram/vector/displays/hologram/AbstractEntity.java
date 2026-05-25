@@ -226,6 +226,7 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     }
 
     protected void respawnFor(@NotNull Player player) {
+        if (location == null) return;
         PacketWrapper<?> packet = buildSpawnPacket();
         sendSpawnPacket(player, packet);
         updateAffectedPlayers();
