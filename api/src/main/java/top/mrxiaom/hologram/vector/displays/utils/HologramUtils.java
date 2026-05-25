@@ -178,8 +178,8 @@ public class HologramUtils {
         float[] rotation = terminal.getRotation();
         // 计算悬浮字宽高
         Component text = hologram.getTextAsComponent();
-        double width = HologramFont.getWidth(text) * HologramFont.getCharScale() * hologram.getScale().x;
-        double height = HologramFont.getLines(text) * LINE_HEIGHT * HologramFont.getCharScale() * hologram.getScale().y;
+        double width = HologramFont.getWidthToLocation(text) * hologram.getScale().x;
+        double height = HologramFont.getLinesToLocation(text) * hologram.getScale().y;
         // 悬浮字正下方坐标
         Location loc = hologram.getLocation();
         return raytraceElement(rotation, additionalRotation, loc, width, height, eyeLocation);
@@ -194,8 +194,8 @@ public class HologramUtils {
     public static Location raytraceHologram(@NotNull Terminal<?> terminal, float @Nullable [] additionalRotation, @NotNull EntityItemDisplay hologram, @NotNull Location eyeLocation) {
         float[] rotation = terminal.getRotation();
         // 计算悬浮字宽高
-        double width = ItemElement.scaleWidth * HologramFont.getCharScale() * hologram.getScale().x;
-        double height = ItemElement.scaleHeight * HologramFont.getCharScale() * hologram.getScale().y;
+        double width = HologramFont.textToWorld(ItemElement.scaleWidth) * hologram.getScale().x;
+        double height = HologramFont.textToWorld(ItemElement.scaleHeight) * hologram.getScale().y;
         // 悬浮字正下方坐标
         Location loc = hologram.getLocation();
         return raytraceElement(rotation, additionalRotation, loc, width, height, eyeLocation);
@@ -646,8 +646,7 @@ public class HologramUtils {
             // 计算投影
             double[] result = projectToPlane(center, p1, p3, toVector(center, pX), toVector(center, pY), toArray(loc));
             // 将结果转换为文本坐标系
-            double charScale = HologramFont.getCharScale();
-            return new Point2D(result[0] / charScale, result[1] / charScale);
+            return new Point2D(HologramFont.worldToText(result[0]), HologramFont.worldToText(result[1]));
         } else {
             // 其它元素使用元素坐标作为原点坐标
             double x = element.getX();
@@ -661,8 +660,7 @@ public class HologramUtils {
             // 计算投影
             double[] result = projectToPlane(p1, p2, p3, toVector(p1, pX), toVector(p1, pY), toArray(loc));
             // 将结果转换为文本坐标系
-            double charScale = HologramFont.getCharScale();
-            return new Point2D(result[0] / charScale, result[1] / charScale);
+            return new Point2D(HologramFont.worldToText(result[0]), HologramFont.worldToText(result[1]));
         }
     }
 

@@ -1,11 +1,14 @@
 package top.mrxiaom.hologram.vector.displays.ui;
 
 import net.kyori.adventure.text.Component;
+import org.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.api.ITextRenderer;
+import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
+import top.mrxiaom.hologram.vector.displays.utils.TriangleUtils;
 
 public class HologramFont {
     private static ITextRenderer textRenderer;
-    private static double charScale = 0.01140684410646387837470543162399;
+    private static double ratioX;
     public static void setTextRenderer(ITextRenderer textRenderer) {
         HologramFont.textRenderer = textRenderer;
     }
@@ -13,23 +16,27 @@ public class HologramFont {
     public static ITextRenderer getTextRenderer() {
         return textRenderer;
     }
+
+    public static void recalcRatio() {
+        Vector3f scale = TriangleUtils.textDisplayUnitSquare().getScale(new Vector3f());
+        ratioX = (1.0 / scale.x()) / textRenderer.getWidth(Component.space());
+        System.out.println(ratioX);
+    }
+
     /**
-     * 设置悬浮字的文本与世界方块尺寸之间的缩放关系
-     * @param scaleSample 样例文本，例如空格
-     * @param sampleCount 多少个样例文本的宽度，才有 1 个方块的大小
+     * 获取悬浮字的文本与世界方块尺寸之间的缩放关系
+     * @see HologramFont#getRatioX()
      */
-    public static void setCharScale(String scaleSample, double sampleCount) {
-        // 获取样例字符宽度
-        int sampleWidth = textRenderer.getWidth(scaleSample);
-        // 坐标缩放比例 = 方块数量(1) / (一个方块边长所用的字符数量 * 单个字符宽度)
-        charScale = 1.0 / (sampleCount * sampleWidth);
+    @Deprecated
+    public static double getCharScale() {
+        return ratioX;
     }
 
     /**
      * 获取悬浮字的文本与世界方块尺寸之间的缩放关系
      */
-    public static double getCharScale() {
-        return charScale;
+    public static double getRatioX() {
+        return ratioX;
     }
 
     /**
@@ -45,10 +52,31 @@ public class HologramFont {
      * @param text 文本
      */
     public static double getWidthToLocation(Component text) {
-        return getWidth(text) * charScale;
+        return textToWorld(getWidth(text));
+    }
+
+    /**
+     * 获取悬浮字文本在世界坐标上的宽度
+     * @param size 文本宽度
+     */
+    public static Double textToWorld(double size) {
+        return size * getRatioX();
+    }
+
+    /**
+     * 获取世界坐标转换为悬浮字文本的宽度
+     * @param size 世界宽度
+     */
+    public static Double worldToText(double size) {
+        return size / getRatioX();
     }
 
     public static int getLines(Component text) {
         return textRenderer.getLines(text);
+    }
+
+    public static double getLinesToLocation(Component text) {
+        int lines = getLines(text);
+        return textToWorld(lines * HologramUtils.LINE_HEIGHT);
     }
 }

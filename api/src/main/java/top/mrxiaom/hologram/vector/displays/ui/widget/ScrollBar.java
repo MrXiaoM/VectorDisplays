@@ -122,9 +122,8 @@ public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDispl
     protected double[] decideMarkLocationRaw(double pX, double pY) {
         Terminal<?> terminal = getTerminal();
         // 计算世界相对坐标
-        double charScale = HologramFont.getCharScale();
-        double x = pX * charScale;
-        double y = pY * charScale;
+        double x = HologramFont.textToWorld(pX);
+        double y = HologramFont.textToWorld(pY);
         // 获取终端背景的参数
         double rootWidth = terminal.getWidth();
         double rootHeight = terminal.getHeight();
@@ -248,8 +247,8 @@ public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDispl
 
         this.markTextWidth = this.barWidth / this.division;
         float spaceScaleX = HologramUtils.calculateScale(spaceWidth, this.markTextWidth);
-        markWidth = HologramUtils.LINE_HEIGHT * HologramFont.getCharScale() * scaleY;
-        markHeight = HologramUtils.LINE_HEIGHT * HologramFont.getCharScale() * scaleY;
+        markWidth = HologramFont.textToWorld(HologramUtils.LINE_HEIGHT) * scaleY;
+        markHeight = HologramFont.textToWorld(HologramUtils.LINE_HEIGHT) * scaleY;
         hologramMark.setScale(spaceScaleX, scaleY, 1.0f);
     }
 

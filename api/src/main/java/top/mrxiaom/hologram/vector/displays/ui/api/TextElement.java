@@ -72,8 +72,8 @@ public abstract class TextElement<This extends Element<This, EntityTextDisplay>>
         int lines = textRenderer.getLines(text);
         this.textWidth = maxWidth * scaleX;
         this.textHeight = lines * HologramUtils.LINE_HEIGHT * scaleY;
-        this.width = textWidth * HologramFont.getCharScale();
-        this.height = textHeight * HologramFont.getCharScale();
+        this.width = HologramFont.textToWorld(textWidth);
+        this.height = HologramFont.textToWorld(textHeight);
     }
 
     @Override

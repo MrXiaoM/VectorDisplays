@@ -69,8 +69,8 @@ public abstract class ItemElement<This extends Element<This, EntityItemDisplay>>
     @Override
     public void calculateSize() {
         // TODO: 确定大小
-        this.width = scaleWidth * HologramFont.getCharScale() * scaleX;
-        this.height = scaleHeight * HologramFont.getCharScale() * scaleY;
+        this.width = HologramFont.textToWorld(scaleWidth) * scaleX;
+        this.height = HologramFont.textToWorld(scaleHeight) * scaleY;
     }
 
     @Override

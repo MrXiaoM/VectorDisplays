@@ -1,7 +1,6 @@
 package top.mrxiaom.hologram.vector.displays.ui.api;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Display;
@@ -10,12 +9,14 @@ import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.block.Action;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.hologram.*;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.api.wrapper.EntityTextDisplayWrapper;
 import top.mrxiaom.hologram.vector.displays.ui.widget.Panel;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
+import top.mrxiaom.hologram.vector.displays.utils.TriangleUtils;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -46,13 +47,6 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
                 .setText(Component.text(""))
                 .setShadow(false)
                 .setBackgroundColor(0x30000000);
-    }
-    public Terminal(@NotNull String id, @NotNull Location location, int widthSpace, int heightLines) {
-        this(RenderMode.VIEWER_LIST, id, location, widthSpace, heightLines);
-    }
-    public Terminal(@NotNull RenderMode renderMode, @NotNull String id, @NotNull Location location, int widthSpace, int heightLines) {
-        this(renderMode, id, location);
-        setSize(widthSpace, heightLines);
     }
     public Terminal(@NotNull String id, @NotNull Location location, double width, double height) {
         this(RenderMode.VIEWER_LIST, id, location, width, height);
@@ -458,50 +452,24 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
 
     /**
      * 设置终端面板尺寸
-     * @param widthSpace 宽度，单位为空格数量。大约一个空格是 27 单位
-     * @param heightLines 高度，单位为行数。大约一行是 12 单位
-     */
-    public void setSize(int widthSpace, int heightLines) {
-        TextComponent line = Component.text(" ".repeat(widthSpace));
-        TextComponent.Builder builder = Component.text();
-        for (int i = 0; i < heightLines; i++) {
-            if (i > 0) builder.appendNewline();
-            builder.append(line);
-        }
-        hologram.setText(builder.build());
-
-        textWidth = HologramFont.getTextRenderer().getWidth(line) * hologram.getScale().x;
-        textHeight = HologramUtils.LINE_HEIGHT * heightLines * hologram.getScale().y;
-        width = textWidth * HologramFont.getCharScale();
-        height = textHeight * HologramFont.getCharScale();
-        if (!hologram.isDead()) {
-            hologram.update();
-            for (Element<?, ?> element : elements) {
-                element.updateLocation();
-                element.update();
-            }
-        }
-    }
-
-    /**
-     * 设置终端面板尺寸
      * <p>
      * 注意，由于计算误差，最终设定的宽度和高度不一定与你传入的数值一致
-     * @param width 宽度，单位为像素
-     * @param height 高度，单位为像素
+     * @param textWidth 宽度，单位为像素
+     * @param textHeight 高度，单位为像素
      */
-    public void setSize(double width, double height) {
-        TextComponent component = Component.text("                ");
-        hologram.setText(component);
-        double oldWidth = HologramFont.getTextRenderer().getWidth(component);
-        double oldHeight = HologramUtils.LINE_HEIGHT;
-        float scaleX = HologramUtils.calculateScale(oldWidth, width);
-        float scaleY = HologramUtils.calculateScale(oldHeight, height);
+    public void setSize(double textWidth, double textHeight) {
+        hologram.setText(Component.space());
+        Double width = HologramFont.textToWorld(textWidth);
+        Double height = HologramFont.textToWorld(textHeight);
+        // 获取“将空格转换为1x1方块大小”的缩放配置，然后乘以其世界宽度，获得最终缩放配置
+        Vector3f square = TriangleUtils.textDisplayUnitSquare().getScale(new Vector3f());
+        float scaleX = square.x() * width.floatValue();
+        float scaleY = square.y() * height.floatValue();
         hologram.setScale(scaleX, scaleY, 1.0f);
-        this.textWidth = oldWidth * scaleX;
-        this.textHeight = oldHeight * scaleY;
-        this.width = textWidth * HologramFont.getCharScale();
-        this.height = textHeight * HologramFont.getCharScale();
+        this.textWidth = textWidth;
+        this.textHeight = textHeight;
+        this.width = width;
+        this.height = height;
         if (!hologram.isDead()) {
             hologram.update();
             for (Element<?, ?> element : elements) {

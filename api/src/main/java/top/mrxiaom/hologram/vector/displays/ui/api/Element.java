@@ -310,9 +310,8 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
 
     protected double[] decideLocationRaw(double pX, double pY) {
         // 计算世界相对坐标
-        double charScale = HologramFont.getCharScale();
-        double x = pX * charScale;
-        double y = pY * charScale;
+        double x = HologramFont.textToWorld(pX);
+        double y = HologramFont.textToWorld(pY);
         // 获取 父元素 或 终端背景 的参数
         double[] parentLoc;
         double parentWidth, parentHeight;

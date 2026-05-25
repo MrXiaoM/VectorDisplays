@@ -51,7 +51,7 @@ public class Commands implements CommandExecutor, TabCompleter {
                 Location eyeLocation = player.getEyeLocation().clone(); eyeLocation.setPitch(0);
                 Location loc = player.getLocation().clone().add(0, 0.75, 0).add(eyeLocation.getDirection().multiply(1.5));
                 terminal = new SimpleTerminal(RenderMode.NEARBY, "vectordisplays_test", loc, 100.0, 50.0);
-                terminal.setRotation(180.0f - eyeLocation.getYaw(), -15.0f);
+                terminal.setRotation(180.0f - eyeLocation.getYaw(), 0);
                 double height = HologramUtils.LINE_HEIGHT;
 
                 TextComponent space = Component.text("  ");
