@@ -22,7 +22,8 @@ val shadowLink: Configuration = configurations.create("shadowLink")
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
-    compileOnly("me.clip:placeholderapi:2.11.6")
+    compileOnly("it.unimi.dsi:fastutil:8.5.12")
+    compileOnly("me.clip:placeholderapi:2.12.2")
     compileOnly("com.github.retrooper:packetevents-spigot:2.12.1")
     compileOnly(project(":vive-api"))
 
