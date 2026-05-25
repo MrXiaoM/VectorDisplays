@@ -18,7 +18,7 @@ import java.util.UUID;
 public class EntityTextDisplay extends EntityDisplay<EntityTextDisplay> {
 
     private final TextDisplayMeta meta;
-    protected Component text = Component.text("");
+    protected Component text = Component.empty();
 
     private boolean shadow = true;
     private int maxLineWidth = 10000;
