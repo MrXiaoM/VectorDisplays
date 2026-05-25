@@ -13,10 +13,9 @@ repositories {
     mavenCentral()
     maven("https://repo.codemc.io/repository/maven-releases/")
     maven("https://repo.papermc.io/repository/maven-public/")
-    maven("https://jitpack.io")
-    maven("https://repo.helpch.at/releases/")
     maven("https://maven.pvphub.me/tofaa/")
-}
+    maven("https://repo.helpch.at/releases/")
+    maven("https://jitpack.io")
 
 val shadowLink: Configuration = configurations.create("shadowLink")
 
@@ -30,7 +29,7 @@ dependencies {
     implementation("com.github.technicallycoded:FoliaLib:0.4.4") {
         exclude("org.jetbrains", "annotations")
     }
-    implementation("io.github.tofaa2:spigot:3.2.3-SNAPSHOT") {
+    implementation("io.github.tofaa2:spigot:3.3.2-SNAPSHOT") {
         exclude("org.jetbrains", "annotations")
     }
     implementation("net.kyori:adventure-text-minimessage:4.26.1") { isTransitive = false }
