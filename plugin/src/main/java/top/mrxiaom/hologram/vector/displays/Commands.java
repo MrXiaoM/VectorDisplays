@@ -279,7 +279,7 @@ public class Commands implements CommandExecutor, TabCompleter {
                 label.setAlign(EnumAlign.CENTER);
                 label.setBackgroundColor(0xFFFF00FF);
                 label.setTextAlignment(TextDisplay.TextAlignment.CENTER);
-                label.setText(Component.text((int)terminal.getWidth() + "x" + (int)terminal.getHeight()));
+                label.setText(Component.text((int)terminal.getTextWidth() + "x" + (int)terminal.getTextHeight()));
                 label.setScale(0.25f);
                 label.setPos(0, 0);
             });
