@@ -3,6 +3,7 @@ package top.mrxiaom.hologram.vector.displays.minecraft.nms.v1_21_R6;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.nbt.*;
+import net.minecraft.network.chat.FontDescription;
 import net.minecraft.world.entity.Entity;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
@@ -44,10 +45,17 @@ public class Factory implements NMSFactory {
         return "v1_21_R6 (1.21.9 - 1.21.10)";
     }
 
+    public String getFontId(FontDescription font) {
+        if (font instanceof FontDescription.c) {
+            return ((FontDescription.c) font).a().toString();
+        }
+        return font.toString();
+    }
+
     @Override
     public @NotNull ITextHandler create(Function<String, FontStorage> fontStorageGetter) {
         return new TextHandler((codePoint, style) ->
-                fontStorageGetter.apply(style.l().toString())
+                fontStorageGetter.apply(getFontId(style.l()))
                         .getGlyph(codePoint)
                         .getAdvance(style.c()));
     }

@@ -3,12 +3,14 @@ package top.mrxiaom.hologram.vector.displays.minecraft.nms.mojmap.v26_1;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.nbt.*;
+import net.minecraft.network.chat.FontDescription;
 import net.minecraft.world.entity.Entity;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.FontStorage;
+import top.mrxiaom.hologram.vector.displays.minecraft.font.api.Glyph;
 import top.mrxiaom.hologram.vector.displays.minecraft.nms.ITextHandler;
 import top.mrxiaom.hologram.vector.displays.minecraft.nms.NMSFactory;
 
@@ -44,12 +46,22 @@ public class Factory implements NMSFactory {
         return "Mojmap 26.1 (26.1 - 26.x)";
     }
 
+    public String getFontId(FontDescription font) {
+        if (font instanceof FontDescription.Resource) {
+            return ((FontDescription.Resource) font).id().toString();
+        }
+        return font.toString();
+    }
+
     @Override
     public @NotNull ITextHandler create(Function<String, FontStorage> fontStorageGetter) {
-        return new TextHandler((codePoint, style) ->
-                fontStorageGetter.apply(style.getFont().toString())
-                        .getGlyph(codePoint)
-                        .getAdvance(style.isBold()));
+        return new TextHandler((codePoint, style) -> {
+            Glyph glyph = fontStorageGetter.apply(getFontId(style.getFont()))
+                    .getGlyph(codePoint);
+            float advance = glyph.getAdvance(style.isBold());
+            System.out.println(glyph.getClass().getSimpleName() + " " + codePoint + " " + Character.toString(codePoint) + ": " + advance);
+            return advance;
+        });
     }
 
     @Override
