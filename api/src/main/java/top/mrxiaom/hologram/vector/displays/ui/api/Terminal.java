@@ -5,10 +5,10 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.block.Action;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Math;
 import org.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.hologram.*;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
@@ -42,9 +42,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         this.hologram = new EntityTextDisplay(renderMode)
                 .setInterpolationDurationTransformation(3)
                 .setInterpolationDurationRotation(0)
-                .setAlignment(TextDisplay.TextAlignment.LEFT)
                 .setBillboard(Display.Billboard.FIXED)
-                .setText(Component.text(""))
                 .setShadow(false)
                 .setBackgroundColor(0x30000000);
     }
@@ -389,6 +387,15 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
      */
     public void setRotation(float[] rotation) {
         hologram.setLeftRotation(this.rotation = rotation);
+
+        // 根据悬浮字宽度来修正自身渲染位置
+        float vX = -Double.valueOf(width).floatValue() * 0.1f, vY = 0.0f, vZ = 0.0f;
+        float xx = rotation[0] * rotation[0], yy = rotation[1] * rotation[1], zz = rotation[2] * rotation[2], ww = rotation[3] * rotation[3];
+        float xy = rotation[0] * rotation[1], xz = rotation[0] * rotation[2], yz = rotation[1] * rotation[2], xw = rotation[0] * rotation[3];
+        float zw = rotation[2] * rotation[3], yw = rotation[1] * rotation[3], k = 1 / (xx + yy + zz + ww);
+        hologram.setTranslation(Math.fma((xx - yy - zz + ww) * k, vX, Math.fma(2 * (xy - zw) * k, vY, (2 * (xz + yw) * k) * vZ)),
+                Math.fma(2 * (xy + zw) * k, vX, Math.fma((yy - xx - zz + ww) * k, vY, (2 * (yz - xw) * k) * vZ)),
+                Math.fma(2 * (xz - yw) * k, vX, Math.fma(2 * (yz + xw) * k, vY, ((zz - xx - yy + ww) * k) * vZ)));
     }
 
     /**
@@ -461,15 +468,19 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         hologram.setText(Component.space());
         Double width = HologramFont.textToWorld(textWidth);
         Double height = HologramFont.textToWorld(textHeight);
+
         // 获取“将空格转换为1x1方块大小”的缩放配置，然后乘以其世界宽度，获得最终缩放配置
         Vector3f square = TriangleUtils.textDisplayUnitSquare().getScale(new Vector3f());
         float scaleX = square.x() * width.floatValue();
         float scaleY = square.y() * height.floatValue();
         hologram.setScale(scaleX, scaleY, 1.0f);
+
         this.textWidth = textWidth;
         this.textHeight = textHeight;
         this.width = width;
         this.height = height;
+
+        this.setRotation(rotation);
         if (!hologram.isDead()) {
             hologram.update();
             for (Element<?, ?> element : elements) {
