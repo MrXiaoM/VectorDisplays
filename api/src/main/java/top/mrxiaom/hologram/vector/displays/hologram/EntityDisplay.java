@@ -178,6 +178,10 @@ public abstract class EntityDisplay<This extends AbstractEntity<This>> extends A
         return new Quaternionf(r.getX(), r.getY(), r.getZ(), r.getW());
     }
 
+    public This setTranslation(float[] translation) {
+        return setTranslation(translation[0], translation[1], translation[2]);
+    }
+
     public This setTranslation(float x, float y, float z) {
         this.translation = new Vector3f(x, y, z);
         this.composeMatrix();
