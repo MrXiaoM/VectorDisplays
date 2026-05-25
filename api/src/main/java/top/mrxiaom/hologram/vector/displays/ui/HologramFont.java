@@ -20,7 +20,6 @@ public class HologramFont {
     public static void recalcRatio() {
         Vector3f scale = TriangleUtils.textDisplayUnitSquare().getScale(new Vector3f());
         ratioX = (1.0 / scale.x()) / textRenderer.getWidth(Component.space());
-        System.out.println(ratioX);
     }
 
     /**
