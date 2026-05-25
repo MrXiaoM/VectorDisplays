@@ -2,7 +2,7 @@
 fonts-file: 'fonts.nbt'
 # 覆盖某些宽度的数值
 font-advance-overrides:
-  9: 8.5
+  9: 7.5
 # 客户端是否开启强制 Unicode 字体，这将影响字体宽度计算逻辑
 forces-unicode-font: false
 # 指定文本悬浮字每一行的高度，用于界面高度运算
