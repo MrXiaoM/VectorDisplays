@@ -16,6 +16,7 @@ repositories {
     maven("https://maven.pvphub.me/tofaa/")
     maven("https://repo.helpch.at/releases/")
     maven("https://jitpack.io")
+}
 
 val shadowLink: Configuration = configurations.create("shadowLink")
 
