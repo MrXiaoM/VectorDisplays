@@ -8,6 +8,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSp
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import me.tofaa.entitylib.meta.EntityMeta;
 import me.tofaa.entitylib.meta.display.ItemDisplayMeta;
+import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.hologram.vector.displays.ui.api.wrapper.DisplayType;
@@ -42,9 +43,12 @@ public class EntityItemDisplay extends EntityDisplay<EntityItemDisplay> {
 
     @Override
     public @Nullable PacketWrapper<?> buildSpawnPacket() {
+        Location loc = this.location;
+        if (loc == null) return null;
+        Vector3d pos = new Vector3d(loc.getX(), loc.getY(), loc.getZ());
         return new WrapperPlayServerSpawnEntity(
                 entityID, Optional.of(UUID.randomUUID()), getEntityType(),
-                new Vector3d(location.getX(), location.getY(), location.getZ()), 0f, 0f, 0f, 0, Optional.empty()
+                pos, 0f, 0f, 0f, 0, Optional.empty()
         );
     }
 
