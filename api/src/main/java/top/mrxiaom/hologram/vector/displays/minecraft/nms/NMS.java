@@ -64,7 +64,7 @@ public class NMS {
             }
         }
         if (major == 26) { // 26.1
-            craft = "v26_1";
+            craft = "mojmap.v26_1";
             if (minor > 1) {
                 Logger.getLogger("VectorDisplays").warning("看起来你正在使用一个不受支持的未来版本，已尝试使用本插件所支持的最新版本，插件可能无法正常工作");
             }
