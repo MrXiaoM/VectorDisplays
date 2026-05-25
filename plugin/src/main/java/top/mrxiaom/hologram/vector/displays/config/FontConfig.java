@@ -1,11 +1,11 @@
 package top.mrxiaom.hologram.vector.displays.config;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import top.mrxiaom.hologram.vector.displays.TerminalManager;
 import top.mrxiaom.hologram.vector.displays.VectorDisplays;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.FontManager;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.api.Font;
-import top.mrxiaom.hologram.vector.displays.minecraft.font.api.IFontManager;
 import top.mrxiaom.hologram.vector.displays.minecraft.nms.NMS;
 import top.mrxiaom.hologram.vector.displays.minecraft.nms.NMSFactory;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
@@ -13,11 +13,12 @@ import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.logging.Level;
 
 public class FontConfig implements IConfig {
     private final VectorDisplays plugin;
-    private final IFontManager manager;
+    private final FontManager manager;
     private boolean forcesUnicodeFont;
     public FontConfig(VectorDisplays plugin) {
         NMSFactory factory = NMS.getFactory();
@@ -34,6 +35,19 @@ public class FontConfig implements IConfig {
 
         HologramUtils.LINE_HEIGHT = config.getDouble("line-height", 13);
 
+        Map<Integer, Float> advanceOverrides = manager.getAdvanceOverrides();
+        advanceOverrides.clear();
+        ConfigurationSection section = config.getConfigurationSection("font-advance-overrides");
+        if (section != null) for (String key : section.getKeys(false)) {
+            try {
+                String value = section.getString(key);
+                if (value == null) continue;
+                int input = Integer.parseInt(key);
+                float override = Float.parseFloat(value);
+                advanceOverrides.put(input, override);
+            } catch (Exception ignored) {
+            }
+        }
         String path = config.getString("fonts-file", "fonts.nbt");
         File file = new File(plugin.getDataFolder(), path);
         try {

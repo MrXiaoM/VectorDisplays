@@ -24,6 +24,7 @@ public class FontManager implements IFontManager {
     private final FontStorage missingStorage;
     private final List<Font> fonts = new ArrayList<>();
     private final Map<String, String> idOverrides = new HashMap<>();
+    private final Map<Integer, Float> advanceOverrides = new HashMap<>();
     private NMSFactory factory;
     public FontManager(NMSFactory factory) {
         this.factory = factory;
@@ -88,10 +89,20 @@ public class FontManager implements IFontManager {
         reloadNbt(stream);
     }
 
+    public Map<Integer, Float> getAdvanceOverrides() {
+        return advanceOverrides;
+    }
+
+    private ServerGlyph glyph(float advance) {
+        int intValue = (int) advance;
+        float value = advanceOverrides.getOrDefault(intValue, advance);
+        return new ServerGlyph(value);
+    }
+
     private void reloadNbt(InputStream stream) throws Exception {
         List<Font> allProviders = new ArrayList<>();
         NMS.reloadFontsViaNBTFile(stream,
-                (codePoint, advance) -> new ServerGlyph(advance),
+                (codePoint, advance) -> glyph(advance),
                 (key, glyphs) -> {
                     FontStorage fontStorage = new FontStorage(key);
                     ServerFont font = new ServerFont(key, glyphs);
@@ -129,7 +140,7 @@ public class FontManager implements IFontManager {
                 float advance = Float.parseFloat(key);
                 JsonArray a = advances.get(key).getAsJsonArray();
                 for (JsonElement codePoint : a) {
-                    glyphs.put(codePoint.getAsInt(), new ServerGlyph(advance));
+                    glyphs.put(codePoint.getAsInt(), glyph(advance));
                 }
             }
             NamespacedKey key;
