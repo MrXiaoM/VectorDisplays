@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import top.mrxiaom.hologram.vector.displays.api.FoliaLibScheduler;
+import top.mrxiaom.hologram.vector.displays.api.IScheduler;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
 import top.mrxiaom.hologram.vector.displays.api.ViveCraftEyeLocation;
 import top.mrxiaom.hologram.vector.displays.config.FontConfig;
@@ -21,6 +22,10 @@ public class VectorDisplays extends JavaPlugin {
         this.manager = new PluginWrapper(this)
                 .setScheduler(new FoliaLibScheduler(this))
                 .createTerminalManager();
+    }
+
+    public IScheduler getScheduler() {
+        return manager.getPlugin().getScheduler();
     }
 
     @Override
