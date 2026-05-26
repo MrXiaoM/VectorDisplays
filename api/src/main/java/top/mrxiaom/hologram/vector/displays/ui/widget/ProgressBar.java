@@ -47,10 +47,27 @@ public class ProgressBar extends TextElement<ProgressBar> implements EntityTextD
     /**
      * 进度条控件
      * @param id 元素ID
+     */
+    public ProgressBar(@NotNull String id, boolean fixedLocation) {
+        this(id, fixedLocation, 10.0f, 1f);
+    }
+
+    /**
+     * 进度条控件
+     * @param id 元素ID
      * @param entityIdProvider 虚拟实体ID提供器，用于复用实体ID
      */
     public ProgressBar(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider) {
         this(id, entityIdProvider, 10.0f, 1f);
+    }
+
+    /**
+     * 进度条控件
+     * @param id 元素ID
+     * @param entityIdProvider 虚拟实体ID提供器，用于复用实体ID
+     */
+    public ProgressBar(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, boolean fixedLocation) {
+        this(id, entityIdProvider, fixedLocation, 10.0f, 1f);
     }
 
     /**
@@ -66,12 +83,33 @@ public class ProgressBar extends TextElement<ProgressBar> implements EntityTextD
     /**
      * 进度条控件
      * @param id 元素ID
+     * @param barWidth 进度条宽度
+     * @param barHeight 进度条高度
+     */
+    public ProgressBar(@NotNull String id, boolean fixedLocation, float barWidth, float barHeight) {
+        this(id, IEntityIdProvider.DEFAULT, fixedLocation, barWidth, barHeight);
+    }
+
+    /**
+     * 进度条控件
+     * @param id 元素ID
      * @param entityIdProvider 虚拟实体ID提供器，用于复用实体ID
      * @param barWidth 进度条宽度
      * @param barHeight 进度条高度
      */
     public ProgressBar(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, float barWidth, float barHeight) {
-        super(id, entityIdProvider);
+        this(id, entityIdProvider, true, barWidth, barHeight);
+    }
+
+    /**
+     * 进度条控件
+     * @param id 元素ID
+     * @param entityIdProvider 虚拟实体ID提供器，用于复用实体ID
+     * @param barWidth 进度条宽度
+     * @param barHeight 进度条高度
+     */
+    public ProgressBar(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, boolean fixedLocation, float barWidth, float barHeight) {
+        super(id, entityIdProvider, fixedLocation);
         this.hologramMark = createHologram()
                 .setInterpolationDurationTransformation(2)
                 .setText(Component.text("                "))

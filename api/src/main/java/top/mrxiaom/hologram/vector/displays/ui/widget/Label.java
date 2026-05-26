@@ -9,16 +9,22 @@ import top.mrxiaom.hologram.vector.displays.ui.api.TextElement;
 public class Label extends TextElement<Label> {
     private @NotNull String text = "";
     public Label(@NotNull String id) {
-        super(id);
+        this(id, IEntityIdProvider.DEFAULT);
     }
     public Label(@NotNull String id, @NotNull String text) {
         this(id, IEntityIdProvider.DEFAULT, text);
     }
     public Label(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider) {
-        super(id, entityIdProvider);
+        this(id, entityIdProvider, true);
+    }
+    public Label(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, boolean fixedLocation) {
+        this(id, entityIdProvider, fixedLocation, "");
     }
     public Label(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, @NotNull String text) {
-        this(id, entityIdProvider);
+        this(id, entityIdProvider, true, text);
+    }
+    public Label(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, boolean fixedLocation, @NotNull String text) {
+        super(id, entityIdProvider, fixedLocation);
         setText(text);
     }
 

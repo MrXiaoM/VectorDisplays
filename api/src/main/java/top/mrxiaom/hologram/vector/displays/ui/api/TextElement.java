@@ -21,7 +21,11 @@ public abstract class TextElement<This extends Element<This, EntityTextDisplay>>
     }
 
     public TextElement(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider) {
-        super(id, entityIdProvider, true);
+        this(id, entityIdProvider, true);
+    }
+
+    public TextElement(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, boolean fixedLocation) {
+        super(id, entityIdProvider, fixedLocation);
     }
 
     @Override

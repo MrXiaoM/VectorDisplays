@@ -33,10 +33,16 @@ public class Panel extends TextElement<Panel> {
     private Double interactDistance = null;
     private final List<Element<?, ?>> elements = new ArrayList<>();
     public Panel(@NotNull String id, double width, double height) {
-        this(id, IEntityIdProvider.DEFAULT, width, height);
+        this(id, true, width, height);
+    }
+    public Panel(@NotNull String id, boolean fixedLocation, double width, double height) {
+        this(id, IEntityIdProvider.DEFAULT, fixedLocation, width, height);
     }
     public Panel(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, double width, double height) {
-        super(id, entityIdProvider);
+        this(id, entityIdProvider, true, width, height);
+    }
+    public Panel(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, boolean fixedLocation, double width, double height) {
+        super(id, entityIdProvider, fixedLocation);
         this.getEntity().setText(Component.text("                "));
         this.spaceWidth = HologramFont.getTextRenderer().getWidth(getEntity().getTextAsComponent());
         this.setPanelSize(width, height);

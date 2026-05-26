@@ -21,16 +21,22 @@ public class Button extends TextElement<Button> implements Hoverable {
     private ElementClickEvent<Button> clickEvent;
     private HoverStateChange<Button> hoverStateChange;
     public Button(@NotNull String id) {
-        super(id);
+        this(id, IEntityIdProvider.DEFAULT);
     }
     public Button(@NotNull String id, @NotNull String text) {
         this(id, IEntityIdProvider.DEFAULT, text);
     }
     public Button(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider) {
-        super(id, entityIdProvider);
+        this(id, entityIdProvider, true);
+    }
+    public Button(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, boolean fixedLocation) {
+        this(id, entityIdProvider, fixedLocation, "");
     }
     public Button(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, @NotNull String text) {
-        this(id, entityIdProvider);
+        this(id, entityIdProvider, true, text);
+    }
+    public Button(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, boolean fixedLocation, @NotNull String text) {
+        super(id, entityIdProvider, fixedLocation);
         setText(text);
     }
 

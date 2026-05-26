@@ -52,10 +52,27 @@ public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDispl
     /**
      * 滚动条控件
      * @param id 元素ID
+     */
+    public ScrollBar(@NotNull String id, boolean fixedLocation) {
+        this(id, fixedLocation, 10, 10.0f, 2f);
+    }
+
+    /**
+     * 滚动条控件
+     * @param id 元素ID
      * @param entityIdProvider 虚拟实体ID提供器，用于复用实体ID
      */
     public ScrollBar(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider) {
         this(id, entityIdProvider, 10, 10.0f, 1f);
+    }
+
+    /**
+     * 滚动条控件
+     * @param id 元素ID
+     * @param entityIdProvider 虚拟实体ID提供器，用于复用实体ID
+     */
+    public ScrollBar(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, boolean fixedLocation) {
+        this(id, entityIdProvider, fixedLocation, 10, 10.0f, 1f);
     }
 
     /**
@@ -68,6 +85,18 @@ public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDispl
     public ScrollBar(@NotNull String id, int division, float barWidth, float barHeight) {
         this(id, IEntityIdProvider.DEFAULT, division, barWidth, barHeight);
     }
+
+    /**
+     * 滚动条控件
+     * @param id 元素ID
+     * @param division 分为多少块（确定滑动按钮大小）
+     * @param barWidth 滚动条宽度
+     * @param barHeight 滚动条高度
+     */
+    public ScrollBar(@NotNull String id, boolean fixedLocation, int division, float barWidth, float barHeight) {
+        this(id, IEntityIdProvider.DEFAULT, fixedLocation, division, barWidth, barHeight);
+    }
+
     /**
      * 滚动条控件
      * @param id 元素ID
@@ -77,7 +106,19 @@ public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDispl
      * @param barHeight 滚动条高度
      */
     public ScrollBar(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, int division, float barWidth, float barHeight) {
-        super(id, entityIdProvider);
+        this(id, entityIdProvider, true, division, barWidth, barHeight);
+    }
+
+    /**
+     * 滚动条控件
+     * @param id 元素ID
+     * @param entityIdProvider 虚拟实体ID提供器，用于复用实体ID
+     * @param division 分为多少块（确定滑动按钮大小）
+     * @param barWidth 滚动条宽度
+     * @param barHeight 滚动条高度
+     */
+    public ScrollBar(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, boolean fixedLocation, int division, float barWidth, float barHeight) {
+        super(id, entityIdProvider, fixedLocation);
         this.hologramMark = createHologram()
                 .setText(Component.text("                "))
                 .setShadow(false);

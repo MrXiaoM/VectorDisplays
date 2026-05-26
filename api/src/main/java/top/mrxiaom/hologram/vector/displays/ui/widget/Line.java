@@ -22,8 +22,14 @@ public class Line extends TextElement<Line> {
     public Line(@NotNull String id) {
         this(id, IEntityIdProvider.DEFAULT);
     }
+    public Line(@NotNull String id, boolean fixedLocation) {
+        this(id, IEntityIdProvider.DEFAULT, fixedLocation);
+    }
     public Line(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider) {
-        super(id, entityIdProvider);
+        this(id, entityIdProvider, true);
+    }
+    public Line(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, boolean fixedLocation) {
+        super(id, entityIdProvider, fixedLocation);
         setEnabled(false);
         setShadow(false);
         setBackgroundColor(0x80FFFFFF);

@@ -18,7 +18,11 @@ public abstract class ItemElement<This extends Element<This, EntityItemDisplay>>
     }
 
     public ItemElement(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider) {
-        super(id, entityIdProvider, true);
+        this(id, entityIdProvider, true);
+    }
+
+    public ItemElement(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, boolean fixedLocation) {
+        super(id, entityIdProvider, fixedLocation);
     }
 
     @Override

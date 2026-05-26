@@ -28,8 +28,14 @@ public class Item extends ItemElement<Item> implements Hoverable {
     public Item(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider) {
         this(id, entityIdProvider, null);
     }
+    public Item(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, boolean fixedLocation) {
+        this(id, entityIdProvider, fixedLocation, null);
+    }
     public Item(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, @Nullable ItemStack itemStack) {
-        super(id, entityIdProvider);
+        this(id, entityIdProvider, true, itemStack);
+    }
+    public Item(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, boolean fixedLocation, @Nullable ItemStack itemStack) {
+        super(id, entityIdProvider, fixedLocation);
         this.getEntity().setRightRotation(QuaternionUtils.fromEulerYXZtoQuaternion(180.0f, 0.0f, 0.0f));
         this.setItemStack(itemStack);
     }
