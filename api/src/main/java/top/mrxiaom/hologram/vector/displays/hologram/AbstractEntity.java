@@ -137,16 +137,17 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         this.dead = true;
         this.location = null;
         if (getEntityType() != null) {
-            PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
-            sendPacket(packet);
+            sendPacket(new WrapperPlayServerDestroyEntities(this.entityID));
         }
     }
 
     public This teleport(@NotNull Location location) {
-        this.location = location;
-        if (getEntityType() != null) {
-            PacketWrapper<?> packet = new WrapperPlayServerEntityTeleport(this.entityID, SpigotConversionUtil.fromBukkitLocation(location), false);
-            sendPacket(packet);
+        // 在位置没有变化时，不进行传送
+        if (!location.equals(this.location)) {
+            this.location = location;
+            if (getEntityType() != null) {
+                sendPacket(new WrapperPlayServerEntityTeleport(this.entityID, SpigotConversionUtil.fromBukkitLocation(location), false));
+            }
         }
         return $this();
     }
@@ -191,14 +192,12 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
             byte flags
     ) {
         if (getEntityType() != null) {
-            PacketWrapper<?> packet;
             if (duration == null) {
-                packet = new WrapperPlayServerRemoveEntityEffect(this.entityID, type);
+                sendPacket(new WrapperPlayServerRemoveEntityEffect(this.entityID, type));
             } else {
                 int d = Math.max(-1, duration);
-                packet = new WrapperPlayServerEntityEffect(this.entityID, type, amplifier, d, flags);
+                sendPacket(new WrapperPlayServerEntityEffect(this.entityID, type, amplifier, d, flags));
             }
-            sendPacket(packet);
         }
         return $this();
     }
@@ -237,16 +236,14 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         this.viewers.remove(player);
         this.leftViewers.remove(player);
         if (!dead && getEntityType() != null) {
-            PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
-            sendPacket(player, packet);
+            sendPacket(player, new WrapperPlayServerDestroyEntities(this.entityID));
         }
         return $this();
     }
 
     public This removeAllViewers() {
         if (getEntityType() != null) {
-            PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
-            sendPacket(packet);
+            sendPacket(new WrapperPlayServerDestroyEntities(this.entityID));
         }
         this.viewers.clear();
         this.leftViewers.clear();
@@ -265,12 +262,14 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
             for (Player viewer : playerList) {
                 // 将未添加的玩家添加进去
                 if (viewers.contains(viewer)) continue;
-                addViewer(viewer);
+                if (viewer.isOnline()) {
+                    addViewer(viewer);
+                }
             }
             // 将不在父实体的可视玩家列表中的玩家移出去
             for (Object o : viewers.toArray()) {
                 Player player = (Player) o;
-                if (!playerList.contains(player)) {
+                if (!playerList.contains(player) || !player.isOnline()) {
                     removeViewer(player);
                 }
             }
@@ -285,8 +284,7 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
                     removeViewer(player);
                 } else {
                     if (getEntityType() != null) {
-                        PacketWrapper<?> packet = new WrapperPlayServerDestroyEntities(this.entityID);
-                        sendPacket(player, packet);
+                        sendPacket(player, new WrapperPlayServerDestroyEntities(this.entityID));
                     }
                     if (this.renderMode == RenderMode.VIEWER_LIST && !leftViewers.contains(player)) {
                         leftViewers.add(player);
@@ -330,7 +328,7 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     }
 
     protected void sendPacket(@NotNull Player player, @Nullable PacketWrapper<?> packet) {
-        if (packet != null) {
+        if (packet != null && player.isOnline()) {
             HologramAPI.getPlayerManager().sendPacket(player, packet);
         }
     }
