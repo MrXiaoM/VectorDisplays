@@ -35,6 +35,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
     private double width, height;
     private double interactDistance = defaultInteractDistance;
     private float[] rotation = { 0, 0, 0, 1 };
+    private double[] translation = { 0, 0, 0 };
     private Consumer<This> actionPreTimerTick, actionPostTimerTick, actionPreDispose, actionPostDispose;
     private Terminal(@NotNull RenderMode renderMode, @NotNull String id, @NotNull Location location) {
         this.id = id;
@@ -340,6 +341,11 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         return location;
     }
 
+    public double[] getLocationDouble() {
+        Location loc = location;
+        return new double[] { loc.getX(), loc.getY(), loc.getZ() };
+    }
+
     /**
      * 设置悬浮字位置
      */
@@ -352,6 +358,35 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
                 element.update();
             }
         }
+    }
+
+    /**
+     * 设置悬浮字的偏移向量
+     * @param x x偏移值
+     * @param y y偏移值
+     * @param z z偏移值
+     */
+    public void setTranslation(double x, double y, double z) {
+        setTranslation(new double[] { x, y, z });
+    }
+
+    /**
+     * 设置悬浮字的偏移向量
+     * @param translation 偏移向量
+     */
+    public void setTranslation(double[] translation) {
+        this.translation = translation;
+        float[] transform = HologramUtils.toFloat(translation);
+        // 根据悬浮字宽度来修正自身渲染位置
+        HologramUtils.addF(transform, getRotatedVector(-Double.valueOf(width).floatValue() * 0.1f, 0.0f, 0.0f));
+        this.hologram.setTranslation(transform);
+    }
+
+    /**
+     * 获取悬浮字的偏移向量
+     */
+    public double[] getTranslation() {
+        return translation;
     }
 
     /**
@@ -388,9 +423,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
      */
     public void setRotation(float[] rotation) {
         hologram.setLeftRotation(this.rotation = rotation);
-
-        // 根据悬浮字宽度来修正自身渲染位置
-        hologram.setTranslation(getRotatedVector(-Double.valueOf(width).floatValue() * 0.1f, 0.0f, 0.0f));
+        setTranslation(translation);
     }
 
     public float[] getRotatedVector(float vX, float vY, float vZ) {
@@ -462,7 +495,9 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
     }
 
     public Location getRotatedLoc(double[] loc) {
-        double[] result = QuaternionUtils.rotateChildrenToDouble(getLocation(), getRotation(), loc);
+        double[] origin = getLocationDouble();
+        HologramUtils.add(origin, translation);
+        double[] result = QuaternionUtils.rotateChildrenToDouble(origin, getRotation(), loc);
         return new Location(getWorld(), result[0], result[1], result[2]);
     }
 

@@ -168,10 +168,11 @@ public class ScrollBar extends TextElement<ScrollBar> implements EntityTextDispl
         // 获取终端背景的参数
         double rootWidth = terminal.getWidth();
         double rootHeight = terminal.getHeight();
-        Location rootLocation = terminal.getLocation();
-        double rootX = rootLocation.getX();
-        double rootY = rootLocation.getY();
-        double z = rootLocation.getZ() + (0.001 * (getZIndex() + 1));
+        double[] rootLocation = terminal.getLocationDouble();
+        HologramUtils.add(rootLocation, terminal.getTranslation());
+        double rootX = rootLocation[0];
+        double rootY = rootLocation[1];
+        double z = rootLocation[2] + (0.001 * (getZIndex() + 1));
 
         // 根据排列方式的不同，计算在世界上的初始坐标
         return getAlign().get(rootX, rootY, z, rootWidth, rootHeight, x, y, markWidth, markHeight);

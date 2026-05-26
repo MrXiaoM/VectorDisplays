@@ -400,8 +400,8 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
         } else {
             parentWidth = terminal.getWidth();
             parentHeight = terminal.getHeight();
-            Location loc = terminal.getLocation();
-            parentLoc = new double[] { loc.getX(), loc.getY(), loc.getZ() };
+            parentLoc = terminal.getLocationDouble();
+            HologramUtils.add(parentLoc, terminal.getTranslation());
             ar = null;
         }
         double parentX = parentLoc[0];
@@ -421,7 +421,9 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
     public double[] decideTranslation() {
         double[] t = decideTranslationRaw(x, y);
         HologramUtils.add(t, additionalTranslation);
-        return terminal.getRotatedVector(t[0], t[1], t[2]);
+        double[] transform = terminal.getRotatedVector(t[0], t[1], t[2]);
+        HologramUtils.add(transform, terminal.getTranslation());
+        return transform;
     }
 
     /**

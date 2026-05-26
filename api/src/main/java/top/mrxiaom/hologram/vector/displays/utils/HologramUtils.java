@@ -97,6 +97,15 @@ public class HologramUtils {
         }
     }
 
+    public static void addF(float[] original, float[] toAdd) {
+        if (toAdd == null || original.length != toAdd.length) {
+            return;
+        }
+        for (int i = 0; i < original.length; i++) {
+            original[i] += toAdd[i];
+        }
+    }
+
     /**
      * @see HologramUtils#raytraceElement(float[], float[], Location, double, double, double, double, Location)
      */

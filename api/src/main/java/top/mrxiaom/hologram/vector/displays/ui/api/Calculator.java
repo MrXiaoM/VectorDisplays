@@ -88,7 +88,8 @@ public class Calculator {
                 }
             }
             // TODO: 考虑 parent
-            Location origin = terminal.getLocation();
+            double[] origin = terminal.getLocationDouble();
+            HologramUtils.add(origin, terminal.getTranslation());
             float[] rotation = terminal.getRotation();
             raw = QuaternionUtils.rotateChildrenToDouble(origin, rotation, raw);
         }
