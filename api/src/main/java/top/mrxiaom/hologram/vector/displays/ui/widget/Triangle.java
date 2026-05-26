@@ -33,7 +33,7 @@ public class Triangle extends Element<Triangle, EntityNone> implements Hoverable
         this(id, IEntityIdProvider.DEFAULT);
     }
     public Triangle(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider) {
-        super(id, entityIdProvider);
+        super(id, entityIdProvider, true);
         style.setBackgroundColor(0xFFFFFFFF);
         style.setInterpolationDurationTransformation(3);
         style.setInterpolationDurationRotation(0);
