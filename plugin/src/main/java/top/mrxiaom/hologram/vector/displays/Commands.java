@@ -10,15 +10,21 @@ import org.bukkit.entity.TextDisplay;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import top.mrxiaom.hologram.vector.displays.hologram.EntityDisplay;
 import top.mrxiaom.hologram.vector.displays.hologram.RenderMode;
 import top.mrxiaom.hologram.vector.displays.ui.EnumAlign;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.SimpleTerminal;
+import top.mrxiaom.hologram.vector.displays.ui.api.Element;
+import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
+import top.mrxiaom.hologram.vector.displays.ui.event.HoverStateChange;
+import top.mrxiaom.hologram.vector.displays.ui.widget.Button;
 import top.mrxiaom.hologram.vector.displays.ui.widget.Label;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 import top.mrxiaom.hologram.vector.displays.utils.TriangleUtils;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class Commands implements CommandExecutor, TabCompleter {
@@ -290,6 +296,51 @@ public class Commands implements CommandExecutor, TabCompleter {
                 label.setText(Component.space());
                 label.setPos(0, 15);
             });
+
+            BiConsumer<Double, Double> move = (rX, rY) -> {
+                double[] transform = terminal.getTranslation();
+                HologramUtils.add(transform, terminal.getRotatedVector(rX, rY, 0));
+                terminal.setTranslation(transform);
+                terminal.getHologram().update();
+                for (Element<?, ?> element : terminal.getElements()) {
+                    element.updateLocation();
+                    element.update();
+                }
+            };
+            Consumer<Button> directionButton = button -> {
+                button.setAlign(EnumAlign.CENTER);
+                button.setScale(0.25f);
+                button.setOnHoverStateChange(HoverStateChange.hoverBg(0xFFFFFF00, 0x80FFFF00));
+            };
+            terminal.addElement(new Button("move-up"), button -> {
+                directionButton.accept(button);
+                button.setText(Component.text("▲"));
+                button.setPos(-30, 10 - 3);
+                button.setOnElementClick((meta, e) -> move.accept(0.0, 0.25));
+            });
+            terminal.addElement(new Button("move-down"), button -> {
+                directionButton.accept(button);
+                button.setText(Component.text("▼"));
+                button.setPos(-30, 10 + 3);
+                button.setOnElementClick((meta, e) -> move.accept(0.0, -0.25));
+            });
+            terminal.addElement(new Button("move-left"), button -> {
+                directionButton.accept(button);
+                button.setText(Component.text("◀"));
+                button.setPos(-30 - 3, 10);
+                button.setOnElementClick((meta, e) -> move.accept(-0.25, 0.0));
+            });
+            terminal.addElement(new Button("move-right"), button -> {
+                directionButton.accept(button);
+                button.setText(Component.text("▶"));
+                button.setPos(-30 + 3, 10);
+                button.setOnElementClick((meta, e) -> move.accept(0.25, 0.0));
+            });
+
+            terminal.getHologram().setInterpolationDurationTransformation(10);
+            for (EntityDisplay<?> display : Terminal.resolveAllEntityDisplay(terminal)) {
+                display.setInterpolationDurationTransformation(10);
+            }
 
             TerminalManager.inst().spawn(terminal);
             sender.sendMessage("已添加测试面板");
