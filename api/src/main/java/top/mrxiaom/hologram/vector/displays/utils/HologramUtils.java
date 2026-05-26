@@ -66,7 +66,7 @@ public class HologramUtils {
     public static float[] toFloat(double... doubles) {
         float[] floats = new float[doubles.length];
         for (int i = 0; i < doubles.length; i++) {
-            floats[i] = Float.parseFloat(String.valueOf(doubles[i]));
+            floats[i] = Double.valueOf(doubles[i]).floatValue();
         }
         return floats;
     }
@@ -81,6 +81,20 @@ public class HologramUtils {
         float vNew = BigDecimal.valueOf(newLength).floatValue();
         float vOld = BigDecimal.valueOf(oldLength).floatValue();
         return vNew / vOld;
+    }
+
+    @Nullable
+    private static Location clone(@Nullable Location loc) {
+        return loc == null ? null : loc.clone();
+    }
+
+    public static void add(double[] original, double[] toAdd) {
+        if (toAdd == null || original.length != toAdd.length) {
+            return;
+        }
+        for (int i = 0; i < original.length; i++) {
+            original[i] += toAdd[i];
+        }
     }
 
     /**
@@ -115,7 +129,14 @@ public class HologramUtils {
             offsetX = offsetY = 0.0;
         }
         // 悬浮字正下方坐标
-        Location loc = element.getEntity().getLocation();
+        Location loc = clone(element.getEntity().getLocation());
+        if (loc == null) return null;
+        double[] transform = element.isFixedLocation()
+                ? element.decideTranslation()
+                : element.getAdditionalTranslation();
+        if (transform != null) {
+            loc.add(transform[0], transform[1], transform[2]);
+        }
         return raytraceElement(rotation, additionalRotation, loc, offsetX, offsetY, width, height, eyeLocation);
     }
 
@@ -622,54 +643,16 @@ public class HologramUtils {
     /**
      * 在元素坐标原点处建立平面直角坐标系，计算世界位置在元素上的投影坐标
      * @param element 元素实例
-     * @param loc 世界位置
+     * @param loc 点击的世界位置，已投影到背景悬浮字上的位置
      * @return 投影坐标 (使用文本坐标系)
      */
     public static Point2D getPoint(Element<?, ?> element, Location loc) {
         Calculator calc = element.calc();
-        if (element instanceof Triangle triangle) {
-            // 三角形使用重心作为原点坐标
-            float[] pos1 = triangle.getPos1();
-            float[] pos2 = triangle.getPos2();
-            float[] pos3 = triangle.getPos3();
-            // 正常运行到这里时，这三个坐标必不可能是 null
-            assert pos1 != null && pos2 != null && pos3 != null;
-            // 获取三角形在平面上的二维重心
-            double centerX = (pos1[0] + pos2[0] + pos3[0]) / 3.0;
-            double centerY = (pos1[1] + pos2[1] + pos3[1]) / 3.0;
-            // 三个用于确定平面的三维坐标，确保不共线
-            double[] center = calc.decideLocation(centerX, centerY, true); // 原点坐标
-            double[] p1 = calc.decideLocation(pos1[0], pos1[1], true);
-            double[] p3 = calc.decideLocation(pos3[0], pos3[1], true);
-            double[] pY = calc.decideLocation(centerX, centerY - 100, true, true); // y轴向量末端坐标
-            double[] pX = calc.decideLocation(centerX + 100, centerY, true, true); // x轴向量末端坐标
-            // 计算投影
-            double[] result = projectToPlane(center, p1, p3, toVector(center, pX), toVector(center, pY), toArray(loc));
-            // 将结果转换为文本坐标系
-            return new Point2D(HologramFont.worldToText(result[0]), HologramFont.worldToText(result[1]));
-        } else {
-            // 其它元素使用元素坐标作为原点坐标
-            double x = element.getX();
-            double y = element.getY();
-            // 三个用于确定平面的三维坐标，确保不共线
-            double[] p1 = calc.decideLocation(x, y, true); // 原点坐标
-            double[] p2 = calc.decideLocation(x - 100, y + 100, true);
-            double[] p3 = calc.decideLocation(x + 100, y + 100, true);
-            double[] pY = calc.decideLocation(x, y - 100, true, true); // y轴向量末端坐标
-            double[] pX = calc.decideLocation(x + 100, y, true, true); // x轴向量末端坐标
-            // 计算投影
-            double[] result = projectToPlane(p1, p2, p3, toVector(p1, pX), toVector(p1, pY), toArray(loc));
-            // 将结果转换为文本坐标系
-            return new Point2D(HologramFont.worldToText(result[0]), HologramFont.worldToText(result[1]));
-        }
-    }
-
-    private static double[] toArray(Location loc) {
-        return new double[] { loc.getX(), loc.getY(), loc.getZ() };
-    }
-
-    private static double[] toVector(double[] start, double[] end) {
-        return new double[] { end[0] - start[0], end[1] - start[1], end[2] - start[2] };
+        double[] pA = new double[] { loc.getX(), loc.getY(), loc.getZ() };
+        // 计算投影
+        double[] result = calc.projectToPlane(pA);
+        // 将结果转换为文本坐标系
+        return Point2D.worldToText(result);
     }
 
     /**

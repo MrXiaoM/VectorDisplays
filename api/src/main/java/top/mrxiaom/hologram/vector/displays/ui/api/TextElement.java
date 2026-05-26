@@ -21,7 +21,7 @@ public abstract class TextElement<This extends Element<This, EntityTextDisplay>>
     }
 
     public TextElement(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider) {
-        super(id, entityIdProvider);
+        super(id, entityIdProvider, true);
     }
 
     @Override
@@ -74,6 +74,11 @@ public abstract class TextElement<This extends Element<This, EntityTextDisplay>>
         this.textHeight = lines * HologramUtils.LINE_HEIGHT * scaleY;
         this.width = HologramFont.textToWorld(textWidth);
         this.height = HologramFont.textToWorld(textHeight);
+    }
+
+    @Override
+    protected void setTranslationInternal(float x, float y, float z) {
+        hologram.setTranslation(x, y, z);
     }
 
     @Override

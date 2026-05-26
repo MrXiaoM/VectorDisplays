@@ -3,6 +3,7 @@ package top.mrxiaom.hologram.vector.displays.ui.api;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.hologram.vector.displays.hologram.AbstractEntity;
@@ -24,9 +25,11 @@ import java.util.Objects;
 /**
  * 悬浮字界面元素
  */
+@SuppressWarnings("UnusedReturnValue")
 public abstract class Element<This extends Element<This, Entity>, Entity extends AbstractEntity<Entity>> {
     private final Calculator calculator = new Calculator(this);
     private final @NotNull String id;
+    private final boolean fixedLocation;
     private Terminal<?> terminal;
     private Element<?, ?> parent;
     private boolean enabled = true;
@@ -38,13 +41,18 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
     protected final @NotNull Entity hologram;
     protected final IEntityIdProvider entityIdProvider;
     private float @Nullable [] additionalRotation = null;
+    private double @Nullable [] additionalTranslation = null;
     public Element(@NotNull String id) {
         this(id, IEntityIdProvider.DEFAULT);
     }
     public Element(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider) {
+        this(id, entityIdProvider, false);
+    }
+    public Element(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, boolean fixedLocation) {
         this.id = id;
         this.entityIdProvider = entityIdProvider;
         this.hologram = createHologram();
+        this.fixedLocation = fixedLocation;
     }
 
     public Calculator calc() {
@@ -66,6 +74,13 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
     @SuppressWarnings({"unchecked"})
     public This $this() {
         return (This) this;
+    }
+
+    /**
+     * 获取当前元素的实体是否固定位置，即与终端面板位置相同
+     */
+    public boolean isFixedLocation() {
+        return fixedLocation;
     }
 
     /**
@@ -103,6 +118,7 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
      * 与 <code>getTerminal()</code> 相同，仅在内部生命周期需要进行判定时使用
      */
     @Nullable
+    @ApiStatus.Internal
     protected Terminal<?> terminal() {
         return terminal;
     }
@@ -189,6 +205,33 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
     public This setAdditionalRotation(float @Nullable [] additionalRotation) {
         this.additionalRotation = additionalRotation;
         return $this();
+    }
+
+    /**
+     * 获取元素的额外位移 (XYZ向量)
+     * @return <code>null</code> 代表不进行额外位移
+     */
+    public double @Nullable [] getAdditionalTranslation() {
+        return additionalTranslation;
+    }
+
+    /**
+     * 设置元素的额外位移 (XYZ向量)
+     * @return <code>null</code> 代表不进行额外位移
+     */
+    public This setAdditionalTranslation(double @Nullable [] additionalTranslation) {
+        this.additionalTranslation = additionalTranslation;
+        return $this();
+    }
+
+    /**
+     * 设置元素的额外位移 (XYZ向量)
+     * @param x x坐标位移
+     * @param y y坐标位移
+     * @param z z坐标位移
+     */
+    public This setAdditionalTranslation(double x, double y, double z) {
+        return setAdditionalTranslation(new double[] { x, y, z });
     }
 
     /**
@@ -303,9 +346,41 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
      * @see Element#decideLocation()
      */
     public void updateLocation() {
+        calculator.refreshPlane();
         if (!getEntity().isDead()) {
             getEntity().teleport(decideLocation());
         }
+    }
+
+    protected double[] decideTranslationRaw(double pX, double pY) {
+        // 计算世界相对坐标
+        double x = HologramFont.textToWorld(pX);
+        double y = HologramFont.textToWorld(pY);
+        // 获取 父元素 或 终端背景 的参数
+        double parentWidth, parentHeight;
+        float[] ar;
+        double[] at;
+        Element<?, ?> parent = getParent();
+        if (parent != null) {
+            parentWidth = parent.getWidth();
+            parentHeight = parent.getHeight();
+            ar = parent.getAdditionalRotation();
+            at = parent.decideTranslationRaw(parent.getX(), parent.getY());
+        } else {
+            parentWidth = terminal.getWidth();
+            parentHeight = terminal.getHeight();
+            ar = null;
+            at = null;
+        }
+        double z = (0.001 * getZIndex());
+
+        // 根据排列方式的不同，计算在世界上的初始坐标
+        double[] vec = getAlign().get(0, 0, z, parentWidth, parentHeight, x, y, getWidth(), getHeight());
+        HologramUtils.add(vec, at);
+        if (ar != null) {
+            return QuaternionUtils.rotateChildrenToDouble(new double[] { 0, 0, 0 }, ar, vec);
+        }
+        return vec;
     }
 
     protected double[] decideLocationRaw(double pX, double pY) {
@@ -342,13 +417,29 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
         }
     }
 
+    @ApiStatus.Internal
+    public double[] decideTranslation() {
+        double[] t = decideTranslationRaw(x, y);
+        HologramUtils.add(t, additionalTranslation);
+        return terminal.getRotatedVector(t[0], t[1], t[2]);
+    }
+
     /**
      * 根据 terminal 的旋转关系，计算出这个子元素的悬浮字应当出现在什么坐标处
      */
     protected Location decideLocation() {
-        double[] raw = decideLocationRaw(x, y);
-        // 根据终端旋转量进行坐标变换
-        return terminal.getRotatedLoc(raw);
+        if (fixedLocation) {
+            float[] transform = HologramUtils.toFloat(decideTranslation());
+            setTranslationInternal(transform[0], transform[1], transform[2]);
+            return terminal.getLocation();
+        } else {
+            double[] raw = decideLocationRaw(x, y);
+            // 根据终端旋转量进行坐标变换
+            return terminal.getRotatedLoc(raw);
+        }
+    }
+
+    protected void setTranslationInternal(float x, float y, float z) {
     }
 
     /**
@@ -383,6 +474,7 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
      * @see EntityTextDisplay#update()
      */
     public void update() {
+        calculator.refreshPlane();
         if (!getEntity().isDead()) getEntity().update();
     }
 
@@ -401,6 +493,9 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
     }
 
     public boolean commonPerformClick(Player player, Action action, Location eyeLocation, float[] rotation, double interactDistance) {
+        if (terminal == null) {
+            return false;
+        }
         Location clickPos = HologramUtils.raytraceElement(rotation, getAdditionalRotation(), this, eyeLocation);
         if (clickPos != null && eyeLocation.distance(clickPos) <= interactDistance) {
             // 将 clickPos 投影到 element 上，获取所点击的二维坐标

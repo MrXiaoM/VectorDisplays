@@ -1,5 +1,7 @@
 package top.mrxiaom.hologram.vector.displays.utils;
 
+import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
+
 public class Point2D {
     private double x;
     private double y;
@@ -41,5 +43,12 @@ public class Point2D {
     @Override
     public String toString() {
         return String.format("Point2D{x=%.4f,y=%.4f}", x, y);
+    }
+
+    public static Point2D worldToText(double[] point) {
+        return worldToText(point[0], point[1]);
+    }
+    public static Point2D worldToText(double x, double y) {
+        return new Point2D(HologramFont.worldToText(x), HologramFont.worldToText(y));
     }
 }

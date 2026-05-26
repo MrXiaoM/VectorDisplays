@@ -18,7 +18,7 @@ public abstract class ItemElement<This extends Element<This, EntityItemDisplay>>
     }
 
     public ItemElement(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider) {
-        super(id, entityIdProvider);
+        super(id, entityIdProvider, true);
     }
 
     @Override
@@ -71,6 +71,11 @@ public abstract class ItemElement<This extends Element<This, EntityItemDisplay>>
         // TODO: 确定大小
         this.width = HologramFont.textToWorld(scaleWidth) * scaleX;
         this.height = HologramFont.textToWorld(scaleHeight) * scaleY;
+    }
+
+    @Override
+    protected void setTranslationInternal(float x, float y, float z) {
+        hologram.setTranslation(x, y, z);
     }
 
     @Override

@@ -166,8 +166,9 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
      * @param consumer 额外参数
      */
     public <T extends Element<?, ?>> void addElement(T element, Consumer<T> consumer) {
+        bindElement(element);
         consumer.accept(element);
-        addElement(element);
+        elements.add(element);
     }
 
     /**
@@ -397,6 +398,17 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         float xy = rotation[0] * rotation[1], xz = rotation[0] * rotation[2], yz = rotation[1] * rotation[2], xw = rotation[0] * rotation[3];
         float zw = rotation[2] * rotation[3], yw = rotation[1] * rotation[3], k = 1 / (xx + yy + zz + ww);
         return new float[] {
+                Math.fma((xx - yy - zz + ww) * k, vX, Math.fma(2 * (xy - zw) * k, vY, (2 * (xz + yw) * k) * vZ)),
+                Math.fma(2 * (xy + zw) * k, vX, Math.fma((yy - xx - zz + ww) * k, vY, (2 * (yz - xw) * k) * vZ)),
+                Math.fma(2 * (xz - yw) * k, vX, Math.fma(2 * (yz + xw) * k, vY, ((zz - xx - yy + ww) * k) * vZ))
+        };
+    }
+
+    public double[] getRotatedVector(double vX, double vY, double vZ) {
+        double xx = rotation[0] * rotation[0], yy = rotation[1] * rotation[1], zz = rotation[2] * rotation[2], ww = rotation[3] * rotation[3];
+        double xy = rotation[0] * rotation[1], xz = rotation[0] * rotation[2], yz = rotation[1] * rotation[2], xw = rotation[0] * rotation[3];
+        double zw = rotation[2] * rotation[3], yw = rotation[1] * rotation[3], k = 1 / (xx + yy + zz + ww);
+        return new double[] {
                 Math.fma((xx - yy - zz + ww) * k, vX, Math.fma(2 * (xy - zw) * k, vY, (2 * (xz + yw) * k) * vZ)),
                 Math.fma(2 * (xy + zw) * k, vX, Math.fma((yy - xx - zz + ww) * k, vY, (2 * (yz - xw) * k) * vZ)),
                 Math.fma(2 * (xz - yw) * k, vX, Math.fma(2 * (yz + xw) * k, vY, ((zz - xx - yy + ww) * k) * vZ))
