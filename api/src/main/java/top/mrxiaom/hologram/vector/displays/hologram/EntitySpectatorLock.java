@@ -7,31 +7,39 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCamera;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
 import me.tofaa.entitylib.meta.EntityMeta;
-import me.tofaa.entitylib.meta.display.TextDisplayMeta;
-import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public class EntitySpectatorLock extends EntityDisplay<EntitySpectatorLock> {
+public class EntitySpectatorLock extends AbstractEntity<EntitySpectatorLock> {
 
-    private final TextDisplayMeta meta;
+    private final EntityType entityType;
+    private final EntityMeta meta;
     private final Player player;
 
     public EntitySpectatorLock(IEntityIdProvider provider, Player player) {
+        this(provider, EntityTypes.SKELETON, player);
+    }
+
+    public EntitySpectatorLock(IEntityIdProvider provider, EntityType entityType, Player player) {
         super(RenderMode.VIEWER_LIST, provider);
+        this.entityType = entityType;
+        setSilent(true);
         this.player = player;
         addViewer(player);
-        this.meta = (TextDisplayMeta) EntityMeta.createMeta(this.entityID, getEntityType());
+        this.meta = EntityMeta.createMeta(this.entityID, getEntityType());
     }
 
     public EntitySpectatorLock(Player player) {
-        this(IEntityIdProvider.DEFAULT, player);
+        this(player, EntityTypes.SKELETON);
+    }
+
+    public EntitySpectatorLock(Player player, EntityType entityType) {
+        this(IEntityIdProvider.DEFAULT, entityType, player);
     }
 
     public Player getPlayer() {
@@ -58,7 +66,7 @@ public class EntitySpectatorLock extends EntityDisplay<EntitySpectatorLock> {
 
     @Override
     protected EntityType getEntityType() {
-        return EntityTypes.TEXT_DISPLAY;
+        return entityType;
     }
 
     @Override
@@ -68,25 +76,13 @@ public class EntitySpectatorLock extends EntityDisplay<EntitySpectatorLock> {
         Vector3d pos = new Vector3d(loc.getX(), loc.getY(), loc.getZ());
         return new WrapperPlayServerSpawnEntity(
                 entityID, Optional.of(UUID.randomUUID()), getEntityType(),
-                pos, loc.getPitch(), loc.getYaw(), 0f, 0, Optional.empty()
+                pos, loc.getPitch(), loc.getYaw(), loc.getYaw(), 0, Optional.empty()
         );
     }
 
-    protected @Nullable TextDisplayMeta createMeta() {
+    protected @Nullable EntityMeta createMeta() {
         applyCommonMeta(meta);
-        applyDisplayMeta(meta);
-        meta.setText(Component.empty());
         meta.setInvisible(true);
         return meta;
-    }
-
-    @Override
-    public void spawn(@NotNull Location location) {
-        _spawn(location);
-    }
-
-    @Override
-    public EntitySpectatorLock teleport(@NotNull Location location) {
-        return _teleport(location);
     }
 }

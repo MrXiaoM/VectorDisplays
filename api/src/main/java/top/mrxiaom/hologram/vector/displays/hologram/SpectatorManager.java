@@ -4,6 +4,8 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSpectate;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSpectateEntity;
@@ -18,7 +20,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
@@ -51,14 +52,18 @@ public class SpectatorManager extends PacketListenerAbstract implements Listener
     }
 
     public void lockSpectator(@NotNull Player player) {
+        lockSpectator(player, EntityTypes.SKELETON);
+    }
+
+    public void lockSpectator(@NotNull Player player, EntityType entityType) {
         unlockSpectator(player);
         if (player.getGameMode().equals(GameMode.SPECTATOR)) {
-            EntitySpectatorLock entity = new EntitySpectatorLock(player);
-            Location location = player.getEyeLocation().clone();
+            EntitySpectatorLock entity = new EntitySpectatorLock(player, entityType);
+            Location location = player.getLocation().clone();
+            location.setYaw(player.getEyeLocation().getYaw());
             hologramManager.spawn(entity, location);
             entity.updateSpectatorTarget();
             spectatorLocks.put(player.getUniqueId(), entity);
-            player.teleport(location, PlayerTeleportEvent.TeleportCause.SPECTATE);
         }
     }
 
