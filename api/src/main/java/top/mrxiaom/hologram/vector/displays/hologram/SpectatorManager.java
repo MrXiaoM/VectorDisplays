@@ -32,11 +32,25 @@ public class SpectatorManager extends PacketListenerAbstract implements Listener
     private final PacketEventsAPI<?> api;
     private final HologramManager hologramManager;
     private final Map<UUID, EntitySpectatorLock> spectatorLocks = new HashMap<>();
+    private static final String packetTypeClient = "com.github.retrooper.packetevents.protocol.packettype.PacketType$Play$Client";
+    private boolean variety1 = isFieldPresent(packetTypeClient, "SPECTATE");
+    private boolean variety2 = isFieldPresent(packetTypeClient, "SPECTATE_ENTITY");
     public SpectatorManager(PluginWrapper plugin, HologramManager hologramManager) {
         this.hologramManager = hologramManager;
         this.api = PacketEvents.getAPI();
         this.api.getEventManager().registerListener(this);
         Bukkit.getPluginManager().registerEvents(this, plugin.getPlugin());
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private static boolean isFieldPresent(String className, String fieldName) {
+        try {
+            Class<?> type = Class.forName(className);
+            type.getDeclaredField(fieldName);
+            return true;
+        } catch (Throwable ignored) {
+            return false;
+        }
     }
 
     @Nullable
@@ -77,7 +91,7 @@ public class SpectatorManager extends PacketListenerAbstract implements Listener
 
     @Override
     public void onPacketReceive(@NotNull PacketReceiveEvent event) {
-        if (event.getPacketType().equals(PacketType.Play.Client.SPECTATE)) {
+        if (variety1 && event.getPacketType().equals(PacketType.Play.Client.SPECTATE)) {
             Player player = event.getPlayer();
             if (player.getGameMode().equals(GameMode.SPECTATOR)) {
                 WrapperPlayClientSpectate packet = new WrapperPlayClientSpectate(event);
@@ -87,7 +101,7 @@ public class SpectatorManager extends PacketListenerAbstract implements Listener
             }
             return;
         }
-        if (event.getPacketType().equals(PacketType.Play.Client.SPECTATE_ENTITY)) {
+        if (variety2 && event.getPacketType().equals(PacketType.Play.Client.SPECTATE_ENTITY)) {
             Player player = event.getPlayer();
             if (player.getGameMode().equals(GameMode.SPECTATOR)) {
                 WrapperPlayClientSpectateEntity packet = new WrapperPlayClientSpectateEntity(event);
