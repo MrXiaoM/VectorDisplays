@@ -51,13 +51,21 @@ public abstract class EntityDisplay<This extends AbstractEntity<This>> extends A
     @Override
     public void spawn(@NotNull Location location) {
         // 去掉 yaw 和 pitch 信息，以防应用了错误的旋转变换
-        super.spawn(new Location(location.getWorld(), location.getX(), location.getY(), location.getZ()));
+        _spawn(new Location(location.getWorld(), location.getX(), location.getY(), location.getZ()));
+    }
+
+    protected void _spawn(@NotNull Location location) {
+       super.spawn(location);
     }
 
     @Override
     public This teleport(@NotNull Location location) {
         // 去掉 yaw 和 pitch 信息，以防应用了错误的旋转变换
-        return super.teleport(new Location(location.getWorld(), location.getX(), location.getY(), location.getZ()));
+        return _teleport(new Location(location.getWorld(), location.getX(), location.getY(), location.getZ()));
+    }
+
+    protected This _teleport(@NotNull Location location) {
+        return super.teleport(location);
     }
 
     public This setTransformationMatrix(@NotNull Matrix4f matrix) {

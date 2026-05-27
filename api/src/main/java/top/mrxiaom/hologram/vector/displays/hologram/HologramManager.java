@@ -1,16 +1,15 @@
 package top.mrxiaom.hologram.vector.displays.hologram;
 
+import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import org.bukkit.Location;
+import org.bukkit.event.Listener;
 import top.mrxiaom.hologram.vector.displays.api.IRunTask;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class HologramManager {
+public class HologramManager extends PacketListenerAbstract implements Listener {
     private final PluginWrapper plugin;
     private final List<AbstractEntity<?>> virtualEntities = new CopyOnWriteArrayList<>();
     private final Set<Integer> virtualEntityIds = new HashSet<>();
