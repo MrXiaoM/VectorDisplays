@@ -23,6 +23,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
+import top.mrxiaom.hologram.vector.displays.hologram.spectator.EntitySpectatorLock;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,8 +34,8 @@ public class SpectatorManager extends PacketListenerAbstract implements Listener
     private final HologramManager hologramManager;
     private final Map<UUID, EntitySpectatorLock> spectatorLocks = new HashMap<>();
     private static final String packetTypeClient = "com.github.retrooper.packetevents.protocol.packettype.PacketType$Play$Client";
-    private boolean variety1 = isFieldPresent(packetTypeClient, "SPECTATE");
-    private boolean variety2 = isFieldPresent(packetTypeClient, "SPECTATE_ENTITY");
+    private final boolean variety1 = isFieldPresent(packetTypeClient, "SPECTATE");
+    private final boolean variety2 = isFieldPresent(packetTypeClient, "SPECTATE_ENTITY");
     public SpectatorManager(PluginWrapper plugin, HologramManager hologramManager) {
         this.hologramManager = hologramManager;
         this.api = PacketEvents.getAPI();

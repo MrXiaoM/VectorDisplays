@@ -1,16 +1,23 @@
-package top.mrxiaom.hologram.vector.displays.hologram;
+package top.mrxiaom.hologram.vector.displays.hologram.spectator;
 
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCamera;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityHeadLook;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityTeleport;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
+import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import me.tofaa.entitylib.meta.EntityMeta;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.mrxiaom.hologram.vector.displays.hologram.AbstractEntity;
+import top.mrxiaom.hologram.vector.displays.hologram.IEntityIdProvider;
+import top.mrxiaom.hologram.vector.displays.hologram.RenderMode;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -78,6 +85,19 @@ public class EntitySpectatorLock extends AbstractEntity<EntitySpectatorLock> {
                 entityID, Optional.of(UUID.randomUUID()), getEntityType(),
                 pos, loc.getPitch(), loc.getYaw(), loc.getYaw(), 0, Optional.empty()
         );
+    }
+
+    public EntitySpectatorLock teleport(@NotNull Location location, boolean rotateHead) {
+        if (!location.equals(this.location)) {
+            this.location = location;
+            if (getEntityType() != null) {
+                sendPacket(new WrapperPlayServerEntityTeleport(this.entityID, SpigotConversionUtil.fromBukkitLocation(location), false));
+                if (rotateHead) {
+                    sendPacket(new WrapperPlayServerEntityHeadLook(this.entityID, location.getYaw()));
+                }
+            }
+        }
+        return this;
     }
 
     protected @Nullable EntityMeta createMeta() {
