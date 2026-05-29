@@ -5,10 +5,13 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.util.NumberConversions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.mrxiaom.hologram.vector.displays.api.IRunTask;
+import top.mrxiaom.hologram.vector.displays.api.IScheduler;
 import top.mrxiaom.hologram.vector.displays.hologram.spectator.data.Node;
 import top.mrxiaom.hologram.vector.displays.hologram.spectator.data.SmoothCurve;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * 镜头平滑曲线配置
@@ -373,6 +376,39 @@ public class CameraController {
             loc.setPitch((float) Math.toDegrees(Math.atan(-pos[4] / xz)));
 
             return loc;
+        }
+
+        @NotNull
+        public AnimationTask runTaskTimer(@NotNull IScheduler scheduler, @NotNull Consumer<Location> updater) {
+            return runTaskTimer(scheduler, 1L, 1L, updater);
+        }
+
+        @NotNull
+        public AnimationTask runTaskTimer(@NotNull IScheduler scheduler, long delay, long period, @NotNull Consumer<Location> updater) {
+            return new AnimationTask(this, scheduler, delay, period, updater);
+        }
+    }
+
+    public static class AnimationTask implements Runnable {
+        private final Animation animation;
+        private final Consumer<Location> updater;
+        private IRunTask task;
+        private AnimationTask(Animation animation, IScheduler scheduler, long delay, long period, Consumer<Location> updater) {
+            this.animation = animation;
+            this.updater = updater;
+            this.task = scheduler.runTaskTimer(this, delay, period);
+        }
+        @Override
+        public void run() {
+            updater.accept(animation.getCurrentLocation());
+            if (animation.isStarted()) {
+                if (animation.isEnded() && task != null) {
+                    task.cancel();
+                    task = null;
+                }
+            } else {
+                animation.start();
+            }
         }
     }
 }
