@@ -15,6 +15,19 @@ import java.util.*;
  */
 public class CameraController {
     private final Map<Long, Node> nodes = new HashMap<>();
+    private CameraController() {}
+
+    public static CameraController create() {
+        return new CameraController();
+    }
+
+    public static CameraController create(Collection<Node> nodes) {
+        return create().addNodes(nodes);
+    }
+
+    public static CameraController create(Map<?, Node> nodes) {
+        return create().addNodes(nodes.values());
+    }
 
     /**
      * 为动画曲线添加一个相对路径点，其中 (0, 0) 是动画曲线的原点
