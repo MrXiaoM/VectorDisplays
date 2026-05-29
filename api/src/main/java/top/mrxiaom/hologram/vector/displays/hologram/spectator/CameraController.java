@@ -1,6 +1,7 @@
 package top.mrxiaom.hologram.vector.displays.hologram.spectator;
 
 import org.bukkit.Location;
+import org.bukkit.block.BlockFace;
 import org.bukkit.util.NumberConversions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -172,13 +173,44 @@ public class CameraController {
         return new Animation(origin);
     }
 
+    /**
+     * 创建一个新的动画机实例
+     * @param origin 动画曲线的原点坐标
+     * @param customRotation 偏航角度 yaw，用于旋转动画曲线
+     */
+    @NotNull
+    public Animation createNew(@NotNull Location origin, float customRotation) {
+        return new Animation(origin, customRotation);
+    }
+
+    /**
+     * 创建一个新的动画机实例
+     * @param origin 动画曲线的原点坐标
+     * @param face 用于转换为偏航角度 yaw，以旋转动画曲线
+     */
+    @NotNull
+    public Animation createNew(@NotNull Location origin, BlockFace face) {
+        int x = face.getModX();
+        int z = face.getModZ();
+        if (x == 0 && z == 0) {
+            return new Animation(origin);
+        } else {
+            final double _2PI = 2 * Math.PI;
+            float customRotation = (float) Math.toDegrees((Math.atan2(-x, z) + _2PI) % _2PI);
+            return new Animation(origin, customRotation);
+        }
+    }
+
     @SuppressWarnings("UnusedReturnValue")
     public class Animation {
         private @Nullable Long startTime = null;
         private @NotNull Location origin;
         private @NotNull SmoothCurve curve;
         public Animation(@NotNull Location origin) {
-            setOrigin(origin, false);
+            setOrigin(origin, origin.getYaw());
+        }
+        public Animation(@NotNull Location origin, float customRotation) {
+            setOrigin(origin, customRotation);
         }
 
         /**
@@ -194,28 +226,28 @@ public class CameraController {
          * @param origin 原点坐标
          */
         public Animation setOrigin(@NotNull Location origin) {
-            return setOrigin(origin, false);
+            return setOrigin(origin, origin.getYaw());
         }
 
         /**
          * 设置动画曲线原点，并重新计算动画曲线
          * @param origin 原点坐标
-         * @param noRotation 是否不应用原点坐标携带的方向来旋转曲线
+         * @param customRotation 不为 <code>null</code>时，使用自定义偏航角度 yaw 来旋转动画曲线
          */
-        public Animation setOrigin(@NotNull Location origin, boolean noRotation) {
+        public Animation setOrigin(@NotNull Location origin, Float customRotation) {
             this.origin = origin.clone();
             List<Node> list = new ArrayList<>();
             // 初始点需要与玩家视角相同
             float yaw = this.origin.getYaw();
             float pitch = this.origin.getPitch();
             list.add(Node.of(0, 0, 0, 0, yaw, pitch));
-            if (noRotation) {
+            if (customRotation == null) {
                 list.addAll(nodes.values());
             } else {
                 // 将其它点的位置和摄像机朝向，从世界坐标系转换为玩家坐标系
                 // yaw % 360 == 0 时，玩家坐标系与世界坐标系的坐标轴方向完全相同
                 for (Node node : nodes.values()) {
-                    list.add(node.rotateYaw(yaw));
+                    list.add(node.rotateYaw(customRotation));
                 }
             }
             this.curve = new SmoothCurve(list);
