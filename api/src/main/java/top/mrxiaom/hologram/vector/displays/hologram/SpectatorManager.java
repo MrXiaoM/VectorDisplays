@@ -66,11 +66,13 @@ public class SpectatorManager extends PacketListenerAbstract implements Listener
         }
     }
 
-    public void lockSpectator(@NotNull Player player) {
-        lockSpectator(player, EntityTypes.SKELETON);
+    @Nullable
+    public EntitySpectatorLock lockSpectator(@NotNull Player player) {
+        return lockSpectator(player, EntityTypes.SKELETON);
     }
 
-    public void lockSpectator(@NotNull Player player, EntityType entityType) {
+    @Nullable
+    public EntitySpectatorLock lockSpectator(@NotNull Player player, EntityType entityType) {
         unlockSpectator(player);
         if (player.getGameMode().equals(GameMode.SPECTATOR)) {
             EntitySpectatorLock entity = new EntitySpectatorLock(player, entityType);
@@ -79,7 +81,9 @@ public class SpectatorManager extends PacketListenerAbstract implements Listener
             hologramManager.spawn(entity, location);
             entity.updateSpectatorTarget();
             spectatorLocks.put(player.getUniqueId(), entity);
+            return entity;
         }
+        return null;
     }
 
     private void onPlayerLeaveSpectate(Player player, PacketReceiveEvent event) {
