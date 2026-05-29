@@ -380,22 +380,33 @@ public class CameraController {
 
         @NotNull
         public AnimationTask runTaskTimer(@NotNull IScheduler scheduler, @NotNull Consumer<Location> updater) {
-            return runTaskTimer(scheduler, 1L, 1L, updater);
+            return runTaskTimer(scheduler, 1L, 1L, updater, null);
+        }
+
+        @NotNull
+        public AnimationTask runTaskTimer(@NotNull IScheduler scheduler, @NotNull Consumer<Location> updater, @Nullable Runnable onEnd) {
+            return runTaskTimer(scheduler, 1L, 1L, updater, onEnd);
         }
 
         @NotNull
         public AnimationTask runTaskTimer(@NotNull IScheduler scheduler, long delay, long period, @NotNull Consumer<Location> updater) {
-            return new AnimationTask(this, scheduler, delay, period, updater);
+            return runTaskTimer(scheduler, delay, period, updater, null);
+        }
+        @NotNull
+        public AnimationTask runTaskTimer(@NotNull IScheduler scheduler, long delay, long period, @NotNull Consumer<Location> updater, @Nullable Runnable onEnd) {
+            return new AnimationTask(this, scheduler, delay, period, updater, onEnd);
         }
     }
 
     public static class AnimationTask implements Runnable {
-        private final Animation animation;
-        private final Consumer<Location> updater;
+        private final @NotNull Animation animation;
+        private final @NotNull Consumer<Location> updater;
+        private final @Nullable Runnable onEnd;
         private IRunTask task;
-        private AnimationTask(Animation animation, IScheduler scheduler, long delay, long period, Consumer<Location> updater) {
+        private AnimationTask(@NotNull Animation animation, IScheduler scheduler, long delay, long period, @NotNull Consumer<Location> updater, @Nullable Runnable onEnd) {
             this.animation = animation;
             this.updater = updater;
+            this.onEnd = onEnd;
             this.task = scheduler.runTaskTimer(this, delay, period);
         }
         @Override
@@ -405,6 +416,9 @@ public class CameraController {
                 if (animation.isEnded() && task != null) {
                     task.cancel();
                     task = null;
+                    if (onEnd != null) {
+                        onEnd.run();
+                    }
                 }
             } else {
                 animation.start();
