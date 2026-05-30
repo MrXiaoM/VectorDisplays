@@ -1,7 +1,5 @@
 package top.mrxiaom.hologram.vector.displays.api;
 
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -15,7 +13,6 @@ import org.vivecraft.api.VRAPI;
 import org.vivecraft.api.data.VRBodyPart;
 import org.vivecraft.api.data.VRBodyPartData;
 import org.vivecraft.api.data.VRPose;
-import top.mrxiaom.hologram.vector.displays.TerminalManager;
 import top.mrxiaom.hologram.vector.displays.VectorDisplays;
 
 import java.util.HashMap;
@@ -26,7 +23,7 @@ public class ViveCraftEyeLocation implements IEyeLocationAdapter, Listener {
     private final Map<UUID, Location> cacheMap = new HashMap<>();
     public ViveCraftEyeLocation(VectorDisplays plugin) {
         Bukkit.getPluginManager().registerEvents(this, plugin);
-        TerminalManager.inst().getPlugin().getScheduler().runTaskTimerAsync(() -> {
+        plugin.getScheduler().runTaskTimerAsync(() -> {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 VRPose pose = VRAPI.instance().getVRPose(p);
                 if (pose == null) continue;

@@ -1,7 +1,8 @@
 rootProject.name = "VectorDisplays"
 
 val onlyEnableNMS: List<String> = listOf(
-    //"v1_20_R3"
+    //"v1_21_R7",
+    //"mojmap_1_21_11",
 )
 
 include(":api")
@@ -14,5 +15,4 @@ File(rootDir, "nms").listFiles()?.forEach { file ->
         }
     }
 }
-include(":vive-api")
 include(":plugin")

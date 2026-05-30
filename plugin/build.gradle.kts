@@ -16,6 +16,7 @@ repositories {
     maven("https://maven.pvphub.me/tofaa/")
     maven("https://repo.helpch.at/releases/")
     maven("https://jitpack.io")
+    maven("https://api.modrinth.com/maven")
 }
 
 val shadowLink: Configuration = configurations.create("shadowLink")
@@ -28,7 +29,7 @@ dependencies {
     compileOnly("it.unimi.dsi:fastutil:8.5.12")
     compileOnly("me.clip:placeholderapi:2.12.2")
     compileOnly("com.github.retrooper:packetevents-spigot:2.12.1")
-    compileOnly(project(":vive-api"))
+    compileOnly("maven.modrinth:vivecraft-spigot-extension:1.3.7-1")
 
     implementation(project(":api"))
     implementation("com.github.technicallycoded:FoliaLib:0.4.4") {
