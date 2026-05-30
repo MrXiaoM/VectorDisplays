@@ -281,11 +281,32 @@ public class CameraController {
             return startTime;
         }
 
+        /**
+         * 重置时间流速变换方式
+         */
+        public Animation resetOverrideTime() {
+            this.overrideTime = null;
+            return this;
+        }
+
+        /**
+         * 设置时间流速变换方式
+         * <pre><code>
+         * (currentTime, endTime) -> {
+         *     return currentTime; // changeme
+         * }
+         * </code></pre>
+         * @param overrideTime 输入分别是<code>当前时间</code>、<code>结束时间</code>，输出为<code>变换后的时间</code>
+         */
         public Animation setOverrideTime(@Nullable BiFunction<Long, Long, Long> overrideTime) {
             this.overrideTime = overrideTime;
             return this;
         }
 
+        /**
+         * 设置时间流速变换方式
+         * @param bezier3 贝塞尔曲线实例
+         */
         public Animation setOverrideTime(@Nullable Bezier3 bezier3) {
             if (bezier3 == null) {
                 this.overrideTime = null;
