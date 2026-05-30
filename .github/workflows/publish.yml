@@ -20,7 +20,7 @@ jobs:
           java-version: '25'
           distribution: 'graalvm'
       - name: Publish Package to Stage Repository
-        run: ./gradlew cleanMavenPublishingStage build publishAllPublicationsToMavenStageRepository
+        run: ./gradlew cleanMavenPublishingStage build release publishAllPublicationsToMavenStageRepository
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}

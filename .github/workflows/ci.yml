@@ -28,4 +28,4 @@ jobs:
           java-version: '25'
           distribution: 'graalvm'
       - name: Build
-        run: ./gradlew clean build
+        run: ./gradlew clean build release

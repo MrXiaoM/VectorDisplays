@@ -19,6 +19,9 @@ repositories {
 }
 
 val shadowLink: Configuration = configurations.create("shadowLink")
+val isRelease = gradle.startParameter.taskNames.run {
+    contains("release") || contains("publishToMavenLocal")
+}
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
@@ -43,6 +46,12 @@ dependencies {
     }
 }
 
+if (isRelease) {
+    sourceSets.main.get().java {
+        exclude("top/mrxiaom/hologram/vector/displays/lab/*")
+    }
+}
+
 tasks {
     shadowJar {
         configurations.add(shadowLink)
@@ -55,6 +64,7 @@ tasks {
             relocate(original, "${ext["shadowTarget"]}.$target")
         }
     }
+    register("release")
     val copyTask = register<Copy>("copyBuildArtifact") {
         dependsOn(shadowJar)
         from(shadowJar.get().outputs)
