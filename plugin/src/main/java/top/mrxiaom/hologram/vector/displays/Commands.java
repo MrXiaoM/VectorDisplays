@@ -10,8 +10,7 @@ import org.bukkit.entity.TextDisplay;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import top.mrxiaom.hologram.vector.displays.hologram.EntityDisplay;
-import top.mrxiaom.hologram.vector.displays.hologram.RenderMode;
+import top.mrxiaom.hologram.vector.displays.hologram.*;
 import top.mrxiaom.hologram.vector.displays.ui.EnumAlign;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.ui.SimpleTerminal;
@@ -23,20 +22,37 @@ import top.mrxiaom.hologram.vector.displays.ui.widget.Label;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 import top.mrxiaom.hologram.vector.displays.utils.TriangleUtils;
 
+import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class Commands implements CommandExecutor, TabCompleter {
     private final VectorDisplays plugin;
+    private final List<String> rootCommands = new ArrayList<>();
     private SimpleTerminal terminal;
     private Label animatedLabel;
+    private CommandExecutor extraExecutor;
+    private TabCompleter extraCompleter;
     protected Commands(VectorDisplays plugin) {
         this.plugin = plugin;
         PluginCommand command = plugin.getCommand("vectordisplays");
         if (command == null) {
             throw new IllegalStateException("无法初始化命令 /vectordisplays");
         }
+        rootCommands.add("measure");
+        rootCommands.add("test");
+        rootCommands.add("reload");
+
+        try {
+            Class<?> type = Class.forName("top.mrxiaom.hologram.vector.displays.lab.TestCommands");
+            Constructor<?> constructor = type.getConstructor(VectorDisplays.class, List.class);
+            Object test = constructor.newInstance(plugin, rootCommands);
+            if (test instanceof CommandExecutor) extraExecutor = (CommandExecutor) test;
+            if (test instanceof TabCompleter) extraCompleter = (TabCompleter) test;
+        } catch (Throwable ignored) {
+        }
+
         command.setExecutor(this);
         command.setTabCompleter(this);
         plugin.getScheduler().runTaskTimer(new Runnable() {
@@ -69,6 +85,9 @@ public class Commands implements CommandExecutor, TabCompleter {
     }
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String l, @NotNull String[] args) {
+        if (extraExecutor != null) {
+            if (extraExecutor.onCommand(sender, command, l, args)) return true;
+        }
         if (args.length > 1 && "measure".equalsIgnoreCase(args[0]) && sender.hasPermission("vectordisplays.measure")) {
             StringJoiner joiner = new StringJoiner(" ");
             for (int i = 1; i < args.length; i++) {
@@ -366,11 +385,17 @@ public class Commands implements CommandExecutor, TabCompleter {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if (extraCompleter != null) {
+            List<String> list = extraCompleter.onTabComplete(sender, command, label, args);
+            if (list != null) {
+                return list;
+            }
+        }
         if (args.length == 1) {
             List<String> list = new ArrayList<>();
-            add(sender, list, "measure");
-            add(sender, list, "test");
-            add(sender, list, "reload");
+            for (String rootCommand : rootCommands) {
+                add(sender, list, rootCommand);
+            }
             return startsWith(list, args[0]);
         }
         return Collections.emptyList();
