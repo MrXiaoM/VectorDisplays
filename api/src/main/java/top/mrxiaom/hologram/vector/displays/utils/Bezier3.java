@@ -89,6 +89,22 @@ public class Bezier3 {
     }
 
     /**
+     * @see Bezier3#getPoint(float)
+     */
+    public double[] getPointD(double t) {
+        if (t < 0.0) t = 0.0;
+        if (t > 1.0) t = 1.0;
+        double a = (1.0 - t) * (1.0 - t) * (1.0 - t);
+        double b = 3.0 * t * (1.0 - t) * (1.0 - t);
+        double c = 3.0 * t * t * (1.0 - t);
+        double d = t * t * t;
+        return new double[] {
+                a * px0 + b * px1 + c * px2 + d * px3,
+                a * py0 + b * py1 + c * py2 + d * py3
+        };
+    }
+
+    /**
      * 与 CSS 中的 <code>cubic-bezier(a,b,c,d)</code> 用法相同
      *
      * @see <a href="https://cubic-bezier.com/">cubic-bezier.com</a>

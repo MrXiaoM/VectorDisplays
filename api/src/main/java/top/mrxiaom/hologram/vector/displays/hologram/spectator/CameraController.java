@@ -9,8 +9,10 @@ import top.mrxiaom.hologram.vector.displays.api.IRunTask;
 import top.mrxiaom.hologram.vector.displays.api.IScheduler;
 import top.mrxiaom.hologram.vector.displays.hologram.spectator.data.Node;
 import top.mrxiaom.hologram.vector.displays.hologram.spectator.data.SmoothCurve;
+import top.mrxiaom.hologram.vector.displays.utils.Bezier3;
 
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 /**
@@ -222,6 +224,7 @@ public class CameraController {
         private @Nullable Long startTime = null;
         private @NotNull Location origin;
         private @NotNull SmoothCurve curve;
+        private @Nullable BiFunction<Long, Long, Long> overrideTime;
         public Animation(@NotNull Location origin) {
             setOrigin(origin, origin.getYaw());
         }
@@ -278,6 +281,25 @@ public class CameraController {
             return startTime;
         }
 
+        public Animation setOverrideTime(@Nullable BiFunction<Long, Long, Long> overrideTime) {
+            this.overrideTime = overrideTime;
+            return this;
+        }
+
+        public Animation setOverrideTime(@Nullable Bezier3 bezier3) {
+            if (bezier3 == null) {
+                this.overrideTime = null;
+            } else {
+                this.overrideTime = (currentTime, endTime) -> {
+                    if (currentTime < 0L) return 0L;
+                    if (currentTime > endTime) return currentTime;
+                    double t = (double) currentTime / endTime;
+                    return (long) (bezier3.getPointD(t)[1] * endTime);
+                };
+            }
+            return this;
+        }
+
         /**
          * 获取当前播放进度
          */
@@ -285,7 +307,12 @@ public class CameraController {
             if (startTime == null) {
                 return 0L;
             }
-            return System.currentTimeMillis() - startTime;
+            long currentTime = System.currentTimeMillis() - startTime;
+            if (overrideTime != null) {
+                return overrideTime.apply(currentTime, curve.lastNode().timelineMills());
+            } else {
+                return currentTime;
+            }
         }
 
         /**
