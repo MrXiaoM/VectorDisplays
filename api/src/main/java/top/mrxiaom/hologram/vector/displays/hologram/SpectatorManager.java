@@ -68,14 +68,24 @@ public class SpectatorManager extends PacketListenerAbstract implements Listener
 
     @Nullable
     public EntitySpectatorLock lockSpectator(@NotNull Player player) {
-        return lockSpectator(player, EntityTypes.SKELETON);
+        return lockSpectator(player, EntityTypes.SKELETON, null);
+    }
+
+    @Nullable
+    public EntitySpectatorLock lockSpectator(@NotNull Player player, Object data) {
+        return lockSpectator(player, EntityTypes.SKELETON, data);
     }
 
     @Nullable
     public EntitySpectatorLock lockSpectator(@NotNull Player player, EntityType entityType) {
+        return lockSpectator(player, entityType, null);
+    }
+
+    @Nullable
+    public EntitySpectatorLock lockSpectator(@NotNull Player player, EntityType entityType, Object data) {
         unlockSpectator(player);
         if (player.getGameMode().equals(GameMode.SPECTATOR)) {
-            EntitySpectatorLock entity = new EntitySpectatorLock(player, entityType);
+            EntitySpectatorLock entity = new EntitySpectatorLock(player, entityType, data);
             Location location = player.getLocation().clone();
             location.setYaw(player.getEyeLocation().getYaw());
             hologramManager.spawn(entity, location);

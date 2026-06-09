@@ -28,15 +28,26 @@ public class EntitySpectatorLock extends AbstractEntity<EntitySpectatorLock> {
     private final EntityMeta meta;
     private final Player player;
 
+    private Object data;
+
     public EntitySpectatorLock(IEntityIdProvider provider, Player player) {
+        this(provider, EntityTypes.SKELETON, player, null);
+    }
+
+    public EntitySpectatorLock(IEntityIdProvider provider, Player player, Object data) {
         this(provider, EntityTypes.SKELETON, player);
     }
 
     public EntitySpectatorLock(IEntityIdProvider provider, EntityType entityType, Player player) {
+        this(provider, entityType, player, null);
+    }
+
+    public EntitySpectatorLock(IEntityIdProvider provider, EntityType entityType, Player player, Object data) {
         super(RenderMode.VIEWER_LIST, provider);
         this.entityType = entityType;
         setSilent(true);
         this.player = player;
+        this.data = data;
         addViewer(player);
         this.meta = EntityMeta.createMeta(this.entityID, getEntityType());
     }
@@ -45,12 +56,34 @@ public class EntitySpectatorLock extends AbstractEntity<EntitySpectatorLock> {
         this(player, EntityTypes.SKELETON);
     }
 
+    public EntitySpectatorLock(Player player, Object data) {
+        this(player, EntityTypes.SKELETON, data);
+    }
+
     public EntitySpectatorLock(Player player, EntityType entityType) {
-        this(IEntityIdProvider.DEFAULT, entityType, player);
+
+        this(IEntityIdProvider.DEFAULT, entityType, player, null);
+    }
+
+    public EntitySpectatorLock(Player player, EntityType entityType, Object data) {
+        this(IEntityIdProvider.DEFAULT, entityType, player, data);
     }
 
     public Player getPlayer() {
         return player;
+    }
+
+    public <T> T getData() {
+        if (data == null) {
+            return null;
+        }
+        //noinspection unchecked
+        return (T) data;
+    }
+
+    public EntitySpectatorLock setData(@Nullable Object data) {
+        this.data = data;
+        return this;
     }
 
     public void updateSpectatorTarget() {
@@ -102,6 +135,7 @@ public class EntitySpectatorLock extends AbstractEntity<EntitySpectatorLock> {
 
     protected @Nullable EntityMeta createMeta() {
         applyCommonMeta(meta);
+        meta.setHasNoGravity(true);
         meta.setInvisible(true);
         return meta;
     }
