@@ -21,6 +21,7 @@ public class NMS {
         int minor = parse(version, 1, 0);
         int patch = parse(version, 2, 0);
         String craft = null;
+        Logger logger = Logger.getLogger("VectorDisplays");
         if (major == 1) {
             if (minor < 19 || (minor == 19 && patch < 4)) { // 1.19.4 以下
                 throw new IllegalStateException("当前版本不受支持 (小于 1.19.4)");
@@ -59,15 +60,20 @@ public class NMS {
                 */
 
                 if (minor > 21) {
-                    Logger.getLogger("VectorDisplays").warning("看起来你正在使用一个不受支持的未来版本，已尝试使用本插件所支持的最新版本，插件可能无法正常工作");
+                    logger.warning("看起来你正在使用一个不受支持的未来版本，已尝试使用本插件所支持的最新版本，插件可能无法正常工作");
                 }
             }
         }
-        if (major == 26) { // 26.1
-            craft = "mojmap.v26_1";
-            if (minor > 1) {
-                Logger.getLogger("VectorDisplays").warning("看起来你正在使用一个不受支持的未来版本，已尝试使用本插件所支持的最新版本，插件可能无法正常工作");
+        if (major == 26) { // 26.x
+            if (minor == 1) {
+                craft = "mojmap.v26_1";
+            } else if (minor == 2) {
+                craft = "mojmap.v26_2";
             }
+        }
+        if (major > 26 || (major == 26 && craft == null)) {
+            craft = "mojmap.v26_2";
+            logger.warning("看起来你正在使用一个不受支持的未来版本，已尝试使用本插件所支持的最新版本（" + craft + "），插件可能无法正常工作");
         }
         if (craft == null) {
             throw new IllegalStateException("当前版本不受支持 (" + String.format("%d.%d.%d", major, minor, patch)+ ")");

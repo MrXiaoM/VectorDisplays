@@ -1,4 +1,4 @@
-package top.mrxiaom.hologram.vector.displays.minecraft.nms.mojmap.v26_1;
+package top.mrxiaom.hologram.vector.displays.minecraft.nms.mojmap.v26_2;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -42,7 +42,7 @@ public class Factory implements NMSFactory {
 
     @Override
     public @NotNull String getName() {
-        return "Mojmap 26.1 (26.1 - 26.1.2)";
+        return "Mojmap 26.2 (26.2)";
     }
 
     public String getFontId(FontDescription font) {
