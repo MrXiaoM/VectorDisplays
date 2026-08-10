@@ -4,7 +4,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.nbt.*;
 import net.minecraft.network.chat.FontDescription;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerLevel;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +27,7 @@ public class Factory implements NMSFactory {
     AtomicInteger ENTITY_COUNTER;
     public Factory() {
         try {
-            for (Field field : Entity.class.getDeclaredFields()) {
+            for (Field field : ServerLevel.class.getDeclaredFields()) {
                 if (field.getType().equals(AtomicInteger.class) && Modifier.isStatic(field.getModifiers())) {
                     field.setAccessible(true);
                     ENTITY_COUNTER = (AtomicInteger) field.get(null);
