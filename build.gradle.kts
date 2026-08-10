@@ -9,6 +9,9 @@ plugins {
 group = ext["project.group"].toString()
 version = ext["project.version"].toString()
 
+println("Group:   ${rootProject.group}")
+println("Version: ${rootProject.version}")
+
 allprojects {
     group = rootProject.group
 
