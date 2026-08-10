@@ -44,7 +44,7 @@ dependencies {
     compileOnly("it.unimi.dsi:fastutil:8.5.12")
     compileOnly("dev.lone:api-itemsadder:4.0.10") { isTransitive = false }
     compileOnly("io.github.tofaa2:spigot:3.3.2-SNAPSHOT")
-    add("shadowLinkWithLib", "io.github.tofaa2:spigot:3.3.2-SNAPSHOT") {
+    add("shadowLinkWithLib", "io.github.tofaa2:spigot:3.3.7-SNAPSHOT") {
         exclude("org.jetbrains", "annotations")
     }
     compileOnly("com.github.retrooper:packetevents-spigot:2.12.1")

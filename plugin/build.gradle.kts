@@ -27,7 +27,7 @@ val isRelease = gradle.startParameter.taskNames.run {
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("it.unimi.dsi:fastutil:8.5.12")
-    compileOnly("me.clip:placeholderapi:2.12.2")
+    compileOnly("me.clip:placeholderapi:2.12.3")
     compileOnly("com.github.retrooper:packetevents-spigot:2.12.1")
     compileOnly("maven.modrinth:vivecraft-spigot-extension:1.3.7-1")
 
@@ -35,7 +35,7 @@ dependencies {
     implementation("com.github.technicallycoded:FoliaLib:0.4.4") {
         exclude("org.jetbrains", "annotations")
     }
-    implementation("io.github.tofaa2:spigot:3.3.2-SNAPSHOT") {
+    implementation("io.github.tofaa2:spigot:3.3.7-SNAPSHOT") {
         exclude("org.jetbrains", "annotations")
     }
     implementation("net.kyori:adventure-text-minimessage:4.26.1") { isTransitive = false }
