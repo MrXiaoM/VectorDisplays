@@ -277,18 +277,19 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         // 如果这个实体有父实体
         if (parent != null) {
             // 获取父实体的可视玩家列表
-            List<Player> playerList = parent.getViewers();
-            for (Player viewer : playerList) {
+            List<PlayerMeta> playerList = parent.getViewerList();
+            for (PlayerMeta viewer : playerList) {
                 // 将未添加的玩家添加进去
-                if (viewers.containsKey(viewer.getUniqueId())) continue;
-                if (viewer.isOnline()) {
+                Player player = viewer.player();
+                if (viewers.containsKey(player.getUniqueId())) continue;
+                if (player.isOnline()) {
                     addViewer(viewer);
                 }
             }
             // 将不在父实体的可视玩家列表中的玩家移出去
             viewers.forEach((uuid, meta) -> {
                 Player player = meta.player();
-                if (!playerList.contains(player) || !player.isOnline()) {
+                if (!playerList.contains(meta) || !player.isOnline()) {
                     removeViewer(player);
                 }
             });
@@ -438,6 +439,19 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
         List<Player> list = new ArrayList<>();
         viewers.forEach((uuid, meta) -> list.add(meta.player()));
         return list;
+    }
+
+    @NotNull
+    public List<PlayerMeta> getViewerList() {
+        return new ArrayList<>(viewers.values());
+    }
+
+    public PlayerMeta getViewer(Player player) {
+        return getViewer(player.getUniqueId());
+    }
+
+    public PlayerMeta getViewer(UUID uuid) {
+        return viewers.get(uuid);
     }
 
     public boolean isDead() {

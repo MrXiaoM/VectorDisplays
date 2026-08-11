@@ -309,7 +309,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
      * @param player 玩家
      */
     public void addViewer(Player player) {
-        if (!hologram.getViewers().contains(player)) {
+        if (hologram.getViewer(player) == null) {
             hologram.addViewer(player);
         }
         for (Element<?, ?> element : elements) {
@@ -321,7 +321,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         for (Element<?, ?> element : elements) {
             AbstractEntity<?> hologram = element.getEntity();
             for (Player player : getViewers()) {
-                if (!hologram.getViewers().contains(player)) {
+                if (hologram.getViewer(player) == null) {
                     hologram.addViewer(player);
                 }
             }
