@@ -61,9 +61,6 @@ dependencies {
             add("shadowLink", item)
         }
     }
-    testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.11.4")
-    testImplementation("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
 }
 tasks {
     getByName<Jar>(sourceSets.main.get().sourcesJarTaskName) {
@@ -94,9 +91,6 @@ tasks {
     }
     build {
         dependsOn(shadowJar)
-    }
-    test {
-        useJUnitPlatform()
     }
     getByName<Javadoc>(sourceSets.main.get().javadocTaskName) {
         val task = project(":nms:shared").run {
