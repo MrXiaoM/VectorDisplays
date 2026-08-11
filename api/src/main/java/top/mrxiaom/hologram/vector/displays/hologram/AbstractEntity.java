@@ -19,8 +19,8 @@ import org.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.api.IRunTask;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 @SuppressWarnings("UnusedReturnValue")
@@ -40,8 +40,8 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
 
     protected RenderMode renderMode;
     protected Location location;
-    protected final List<Player> viewers = new ArrayList<>();
-    protected final List<Player> leftViewers = new ArrayList<>();
+    protected final Map<UUID, PlayerMeta> viewers = new ConcurrentHashMap<>();
+    protected final Map<UUID, PlayerMeta> leftViewers = new ConcurrentHashMap<>();
     protected boolean dead = true;
 
     protected AbstractEntity(RenderMode renderMode) {
@@ -211,15 +211,34 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
 
     public This addViewer(@NotNull Player player) {
         boolean respawn = false;
-        if (!viewers.contains(player)) {
-            this.viewers.add(player);
+        UUID uuid = player.getUniqueId();
+        PlayerMeta meta = viewers.get(uuid);
+        if (meta == null) {
+            meta = new PlayerMeta(player);
+            this.viewers.put(uuid, meta);
             respawn = true;
         }
-        if (this.leftViewers.remove(player)) {
+        if (this.leftViewers.remove(uuid) != null) {
             respawn = true;
         }
         if (respawn && !dead && location != null) {
             respawnFor(player);
+        }
+        return $this();
+    }
+
+    public This addViewer(@NotNull PlayerMeta meta) {
+        boolean respawn = false;
+        UUID uuid = meta.player().getUniqueId();
+        if (!viewers.containsKey(uuid)) {
+            this.viewers.put(uuid, meta);
+            respawn = true;
+        }
+        if (this.leftViewers.remove(uuid) != null) {
+            respawn = true;
+        }
+        if (respawn && !dead && location != null) {
+            respawnFor(meta.player());
         }
         return $this();
     }
@@ -233,8 +252,8 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     }
 
     public This removeViewer(@NotNull Player player) {
-        this.viewers.remove(player);
-        this.leftViewers.remove(player);
+        this.viewers.remove(player.getUniqueId());
+        this.leftViewers.remove(player.getUniqueId());
         if (!dead && getEntityType() != null) {
             sendPacket(player, new WrapperPlayServerDestroyEntities(this.entityID));
         }
@@ -261,24 +280,24 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
             List<Player> playerList = parent.getViewers();
             for (Player viewer : playerList) {
                 // 将未添加的玩家添加进去
-                if (viewers.contains(viewer)) continue;
+                if (viewers.containsKey(viewer.getUniqueId())) continue;
                 if (viewer.isOnline()) {
                     addViewer(viewer);
                 }
             }
             // 将不在父实体的可视玩家列表中的玩家移出去
-            for (Object o : viewers.toArray()) {
-                Player player = (Player) o;
+            viewers.forEach((uuid, meta) -> {
+                Player player = meta.player();
                 if (!playerList.contains(player) || !player.isOnline()) {
                     removeViewer(player);
                 }
-            }
+            });
             return;
         }
         World world = this.location.getWorld();
         double viewDistance = nearbyEntityScanningDistance;
-        for (Object o : viewers.toArray()) { // 超出可视范围自动销毁实体
-            Player player = (Player) o;
+        viewers.forEach((uuid, meta) -> { // 超出可视范围自动销毁实体
+            Player player = meta.player();
             if (player.isOnline() && (player.getWorld() != world || player.getLocation().distance(this.location) > viewDistance)) {
                 if (this.renderMode == RenderMode.NEARBY) {
                     removeViewer(player);
@@ -286,24 +305,24 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
                     if (getEntityType() != null) {
                         sendPacket(player, new WrapperPlayServerDestroyEntities(this.entityID));
                     }
-                    if (this.renderMode == RenderMode.VIEWER_LIST && !leftViewers.contains(player)) {
-                        leftViewers.add(player);
+                    if (this.renderMode == RenderMode.VIEWER_LIST && !leftViewers.containsKey(uuid)) {
+                        leftViewers.put(uuid, meta);
                     }
                 }
             }
             if (!player.isOnline()) {
                 removeViewer(player);
             }
-        }
+        });
 
         if (this.renderMode == RenderMode.VIEWER_LIST) {
             // 将回到可视范围的玩家添加回来
-            for (Object o : leftViewers.toArray()) {
-                Player player = (Player) o;
+            leftViewers.forEach((uuid, meta) -> {
+                Player player = meta.player();
                 if (player.isOnline() && player.getWorld() == world && player.getLocation().distance(this.location) <= viewDistance) {
-                    addViewer(player);
+                    addViewer(meta);
                 }
-            }
+            });
             return;
         }
 
@@ -311,7 +330,7 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
             // 将附近的玩家添加进来
             for (Player player : world.getPlayers()) {
                 if (player.getLocation().distance(this.location) > viewDistance) continue;
-                if (!this.viewers.contains(player) && nearbyPlayerFilter.test(player)) {
+                if (!viewers.containsKey(player.getUniqueId()) && nearbyPlayerFilter.test(player)) {
                     addViewer(player);
                 }
             }
@@ -320,16 +339,26 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
 
     protected void sendPacket(@Nullable PacketWrapper<?> packet) {
         if (this.renderMode == RenderMode.NONE || packet == null) return;
-        for (Object obj : viewers.toArray()) {
-            if (obj instanceof Player player) {
-                sendPacket(player, packet);
-            }
+        viewers.forEach((uuid, meta) -> sendPacket(meta, packet));
+    }
+
+    protected void sendPacket(@NotNull PlayerMeta meta, @Nullable PacketWrapper<?> packet) {
+        Player player = meta.player();
+        if (packet != null && player.isOnline()) {
+            PacketWrapper<?> finalPacket = meta.processPacket(packet);
+            HologramAPI.getPlayerManager().sendPacket(player, finalPacket);
         }
     }
 
     protected void sendPacket(@NotNull Player player, @Nullable PacketWrapper<?> packet) {
         if (packet != null && player.isOnline()) {
-            HologramAPI.getPlayerManager().sendPacket(player, packet);
+            PlayerMeta meta = viewers.get(player.getUniqueId());
+            if (meta != null) {
+                PacketWrapper<?> finalPacket = meta.processPacket(packet);
+                HologramAPI.getPlayerManager().sendPacket(player, finalPacket);
+            } else {
+                HologramAPI.getPlayerManager().sendPacket(player, packet);
+            }
         }
     }
 
@@ -406,7 +435,9 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
 
     @NotNull
     public List<Player> getViewers() {
-        return viewers;
+        List<Player> list = new ArrayList<>();
+        viewers.forEach((uuid, meta) -> list.add(meta.player()));
+        return list;
     }
 
     public boolean isDead() {
