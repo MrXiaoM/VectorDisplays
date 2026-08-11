@@ -2,12 +2,14 @@ package top.mrxiaom.hologram.vector.displays.utils;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.hologram.vector.displays.api.IEyeLocationAdapter;
+import top.mrxiaom.hologram.vector.displays.hologram.EntityDisplay;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityItemDisplay;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
@@ -88,6 +90,65 @@ public class HologramUtils {
         return loc == null ? null : loc.clone();
     }
 
+    /**
+     * 获取客户端为展示实体附加的 billboard 旋转。
+     * <p>
+     * Minecraft 客户端会使用反向相机偏航和负相机俯仰来构造该旋转；
+     * 该旋转只应在拥有玩家视角的命中计算中使用，不能参与面板常规定位。
+     *
+     * @param billboard 展示实体的 billboard 约束
+     * @param eyeLocation 玩家眼部位置及视线方向
+     * @return 用于应用到既有世界旋转之前的四元数
+     */
+    public static float[] getBillboardRotation(@NotNull Display.Billboard billboard, @NotNull Location eyeLocation) {
+        // QuaternionUtils 的正 Y 轴旋转方向与 Bukkit yaw 的正方向相反，
+        // 因此客户端的“反向相机 yaw”在该坐标约定中为 180 - yaw。
+        float yaw = 180.0F - eyeLocation.getYaw();
+        float pitch = -eyeLocation.getPitch();
+        switch (billboard) {
+            case VERTICAL:
+                return QuaternionUtils.fromEulerYXZtoQuaternion(yaw, 0.0F, 0.0F);
+            case HORIZONTAL:
+                return QuaternionUtils.fromEulerYXZtoQuaternion(0.0F, pitch, 0.0F);
+            case CENTER:
+                return QuaternionUtils.fromEulerYXZtoQuaternion(yaw, pitch, 0.0F);
+            case FIXED:
+            default:
+                return new float[] { 0.0F, 0.0F, 0.0F, 1.0F };
+        }
+    }
+
+    /**
+     * 将 billboard 旋转应用到元素原有的面板旋转。
+     * billboard 是客户端在元素已有变换之外施加的世界旋转，因此应左乘。
+     */
+    public static float[] getEffectiveRotation(float @NotNull [] rotation, @NotNull Display.Billboard billboard, @NotNull Location eyeLocation) {
+        if (billboard == Display.Billboard.FIXED) {
+            return rotation;
+        }
+        return QuaternionUtils.multiplyF(getBillboardRotation(billboard, eyeLocation), rotation);
+    }
+
+    private static Display.Billboard getBillboard(@NotNull Element<?, ?> element) {
+        if (element.getEntity() instanceof EntityDisplay<?> display) {
+            return display.getBillboard();
+        }
+        return Display.Billboard.FIXED;
+    }
+
+    @Nullable
+    private static Location getRaytraceAnchor(@NotNull Element<?, ?> element) {
+        Location loc = clone(element.getEntity().getLocation());
+        if (loc == null) return null;
+        double[] transform = element.isFixedLocation()
+                ? element.decideTranslation()
+                : element.getAdditionalTranslation();
+        if (transform != null) {
+            loc.add(transform[0], transform[1], transform[2]);
+        }
+        return loc;
+    }
+
     public static void add(double[] original, double[] toAdd) {
         if (toAdd == null || original.length != toAdd.length) {
             return;
@@ -137,16 +198,9 @@ public class HologramUtils {
         } else {
             offsetX = offsetY = 0.0;
         }
-        // 悬浮字正下方坐标
-        Location loc = clone(element.getEntity().getLocation());
+        Location loc = getRaytraceAnchor(element);
         if (loc == null) return null;
-        double[] transform = element.isFixedLocation()
-                ? element.decideTranslation()
-                : element.getAdditionalTranslation();
-        if (transform != null) {
-            loc.add(transform[0], transform[1], transform[2]);
-        }
-        return raytraceElement(rotation, additionalRotation, loc, offsetX, offsetY, width, height, eyeLocation);
+        return raytraceElement(rotation, additionalRotation, getBillboard(element), loc, offsetX, offsetY, width, height, eyeLocation);
     }
 
     /**
@@ -154,7 +208,7 @@ public class HologramUtils {
      */
     @Nullable
     public static Location raytraceElement(float @NotNull [] rotation, float @Nullable [] additionalRotation, @Nullable Location loc, double width, double height, @NotNull Location eyeLocation) {
-        return raytraceElement(rotation, additionalRotation, loc, 0, 0, width, height, eyeLocation);
+        return raytraceElement(rotation, additionalRotation, Display.Billboard.FIXED, loc, 0, 0, width, height, eyeLocation);
     }
     /**
      * 获取玩家的视线落在了元素的实体上的世界坐标
@@ -171,6 +225,25 @@ public class HologramUtils {
      */
     @Nullable
     public static Location raytraceElement(float @NotNull [] rotation, float @Nullable [] additionalRotation, @Nullable Location loc, double offsetX, double offsetY, double width, double height, @NotNull Location eyeLocation) {
+        return raytraceElement(rotation, additionalRotation, Display.Billboard.FIXED, loc, offsetX, offsetY, width, height, eyeLocation);
+    }
+
+    /**
+     * 获取玩家视线与按 billboard 约束旋转后的元素矩形的交点。
+     * 没有玩家视角的旧重载会始终保持 {@link Display.Billboard#FIXED} 语义。
+     */
+    @Nullable
+    public static Location raytraceElement(
+            float @NotNull [] rotation,
+            float @Nullable [] additionalRotation,
+            @NotNull Display.Billboard billboard,
+            @Nullable Location loc,
+            double offsetX,
+            double offsetY,
+            double width,
+            double height,
+            @NotNull Location eyeLocation
+    ) {
         if (loc == null) return null;
         // 悬浮字四角顶点
         double paddingHorizontal = 0.02;
@@ -195,6 +268,7 @@ public class HologramUtils {
             // 如果有额外旋转，先进行额外旋转（悬浮字本地旋转），再进行父组件的旋转
             r = QuaternionUtils.multiplyF(rotation, additionalRotation);
         }
+        r = getEffectiveRotation(r, billboard, eyeLocation);
         // 计算交点
         return calculateIntersection(loc, r, loc1, loc2, loc3, loc4, eyeLocation);
     }
@@ -662,6 +736,23 @@ public class HologramUtils {
         double[] result = calc.projectToPlane(pA);
         // 将结果转换为文本坐标系
         return Point2D.worldToText(result);
+    }
+
+    /**
+     * 将按 billboard 旋转后的命中点还原到元素原有平面，再计算文本坐标。
+     * 这使定位算法继续使用固定坐标系，而点击坐标与玩家实际看到的元素一致。
+     */
+    @Nullable
+    public static Point2D getPoint(@NotNull Element<?, ?> element, @NotNull Location loc, @NotNull Location eyeLocation) {
+        Location anchor = getRaytraceAnchor(element);
+        if (anchor == null) return null;
+
+        float[] billboardRotation = getBillboardRotation(getBillboard(element), eyeLocation);
+        float[] inverseBillboardRotation = new float[] {
+                -billboardRotation[0], -billboardRotation[1], -billboardRotation[2], billboardRotation[3]
+        };
+        Location unrotated = QuaternionUtils.rotateChildren(anchor, inverseBillboardRotation, loc);
+        return getPoint(element, unrotated);
     }
 
     /**

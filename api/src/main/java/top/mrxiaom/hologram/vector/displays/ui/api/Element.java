@@ -500,8 +500,11 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
         }
         Location clickPos = HologramUtils.raytraceElement(rotation, getAdditionalRotation(), this, eyeLocation);
         if (clickPos != null && eyeLocation.distance(clickPos) <= interactDistance) {
-            // 将 clickPos 投影到 element 上，获取所点击的二维坐标
-            Point2D whereClicked = HologramUtils.getPoint(this, clickPos);
+            // 将 clickPos 还原到 billboard 旋转前的元素平面，再获取二维坐标
+            Point2D whereClicked = HologramUtils.getPoint(this, clickPos, eyeLocation);
+            if (whereClicked == null) {
+                return false;
+            }
             ClickMeta meta = new ClickMeta(player, action, whereClicked);
             performClick(meta);
             return true; // 一次只允许点击一个元素
