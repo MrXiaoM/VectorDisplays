@@ -25,16 +25,13 @@ val isRelease = gradle.startParameter.taskNames.run {
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
+    compileOnly("dev.folia:folia-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("it.unimi.dsi:fastutil:8.5.12")
     compileOnly("me.clip:placeholderapi:2.12.3")
     compileOnly("com.github.retrooper:packetevents-spigot:2.12.1")
     compileOnly("maven.modrinth:vivecraft-spigot-extension:1.3.7-1")
 
     implementation(project(":api"))
-    implementation("com.github.technicallycoded:FoliaLib:0.4.4") {
-        exclude("org.jetbrains", "annotations")
-    }
     implementation("io.github.tofaa2:spigot:3.3.7-SNAPSHOT") {
         exclude("org.jetbrains", "annotations")
     }
@@ -58,7 +55,6 @@ tasks {
         configurations.add(shadowLink)
         configurations.add(project.configurations.runtimeClasspath.get())
         mapOf(
-            "com.tcoded.folialib" to "folialib",
             "me.tofaa.entitylib" to "entitylib",
             "net.kyori.adventure.text.minimessage" to "text.minimessage",
         ).forEach { (original, target) ->

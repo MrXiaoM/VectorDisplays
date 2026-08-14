@@ -3,10 +3,7 @@ package top.mrxiaom.hologram.vector.displays;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-import top.mrxiaom.hologram.vector.displays.api.FoliaLibScheduler;
-import top.mrxiaom.hologram.vector.displays.api.IScheduler;
-import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
-import top.mrxiaom.hologram.vector.displays.api.ViveCraftEyeLocation;
+import top.mrxiaom.hologram.vector.displays.api.*;
 import top.mrxiaom.hologram.vector.displays.config.FontConfig;
 import top.mrxiaom.hologram.vector.displays.config.IConfig;
 import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
@@ -20,7 +17,7 @@ public class VectorDisplays extends JavaPlugin {
     private final List<IConfig> configList = new ArrayList<>();
     public VectorDisplays() {
         this.manager = new PluginWrapper(this)
-                .setScheduler(new FoliaLibScheduler(this))
+                .setScheduler(Schedulers.create(this))
                 .createTerminalManager();
     }
 
