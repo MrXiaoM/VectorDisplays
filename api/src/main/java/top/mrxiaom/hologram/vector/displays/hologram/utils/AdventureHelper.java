@@ -1,37 +1,35 @@
 package top.mrxiaom.hologram.vector.displays.hologram.utils;
 
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.ShadowColor;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
+import top.mrxiaom.hologram.vector.displays.hologram.utils.test.*;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class AdventureHelper {
     private static Field resolversField;
-    private static final Map<String, Consumer<Component>> tagImplMap = new HashMap<>() {{
-        put("shadow", c -> c.style().shadowColor(ShadowColor.none()));
-        put("font", c -> c.style().font(Key.key("default")));
-        put("gradient", c -> c.style().color(TextColor.color(255, 255, 255)));
-    }};
     private static final List<String> disabledTags = new ArrayList<>();
     private static final MiniMessage miniMessage;
 
     static {
+        Map<String, IAdventureTest> tagImplMap = new HashMap<>();
+        tagImplMap.put("shadow", new TestShadow());
+        tagImplMap.put("font", new TestFont());
+        tagImplMap.put("gradient", new TestGradient());
+        tagImplMap.put("head", new TestHead());
+        tagImplMap.put("sprite", new TestSprite());
         disabledTags.add("pride");
         tagImplMap.forEach((tag, type) -> {
             try {
-                type.accept(Component.empty());
-            } catch (LinkageError e) {
+                type.test();
+            } catch (Throwable e) {
                 disabledTags.add(tag);
             }
         });
