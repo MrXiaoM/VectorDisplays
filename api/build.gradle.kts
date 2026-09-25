@@ -19,7 +19,6 @@ repositories {
     maven("https://repo.codemc.io/repository/maven-releases/")
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://maven.pvphub.me/tofaa/")
-    maven("https://maven.devs.beer/")
     maven("https://jitpack.io")
 }
 
@@ -42,7 +41,7 @@ val shadowLinkWithLib = configurations.create("shadowLinkWithLib")
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("it.unimi.dsi:fastutil:8.5.12")
-    compileOnly("dev.lone:api-itemsadder:4.0.10") { isTransitive = false }
+    compileOnly("com.github.LoneDev6:API-ItemsAdder:3.6.3-beta-14")
     compileOnly("io.github.tofaa2:spigot:3.3.2-SNAPSHOT")
     add("shadowLinkWithLib", "io.github.tofaa2:spigot:3.3.7-SNAPSHOT") {
         exclude("org.jetbrains", "annotations")
