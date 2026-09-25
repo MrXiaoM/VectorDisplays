@@ -69,10 +69,12 @@ public class NMS {
                 craft = "mojmap.v26_1";
             } else if (minor == 2) {
                 craft = "mojmap.v26_2";
+            } else if (minor == 3) {
+                craft = "mojmap.v26_3";
             }
         }
         if (major > 26 || (major == 26 && craft == null)) {
-            craft = "mojmap.v26_2";
+            craft = "mojmap.v26_3";
             logger.warning("看起来你正在使用一个不受支持的未来版本，已尝试使用本插件所支持的最新版本（" + craft + "），插件可能无法正常工作");
         }
         if (craft == null) {
