@@ -21,21 +21,19 @@ allprojects {
         fun setJavaVersion(targetJavaVersion: Int) {
             extensions.configure<JavaPluginExtension> {
                 disableAutoTargetJvm()
-                val javaVersion = JavaVersion.toVersion(targetJavaVersion)
-                if (JavaVersion.current() < javaVersion) {
-                    toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
-                }
             }
             tasks.withType<JavaCompile>().configureEach {
                 options.encoding = "UTF-8"
-                if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible) {
-                    options.release.set(targetJavaVersion)
-                }
+                options.release.set(targetJavaVersion)
             }
         }
         setJavaVersion(rootProject.ext["sdkVersion"].toString().toInt())
         ext["setJavaVersion"] = ::setJavaVersion
         ext["shadowTarget"] = "top.mrxiaom.hologram.vector.displays.libs"
+
+        configurations.findByName("compileOnly")?.apply {
+            exclude(group="org.jspecify", module="jspecify")
+        }
     }
 }
 
