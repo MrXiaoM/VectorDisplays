@@ -16,7 +16,7 @@ public enum EmptyGlyph implements Glyph {
     }
 
     public float getAdvance() {
-        return (float)(this.width + 1);
+        return (float) (this.width + 1);
     }
 
     public static Font blank() {
@@ -29,6 +29,7 @@ public enum EmptyGlyph implements Glyph {
             public Glyph getGlyph(int codePoint) {
                 return MISSING;
             }
+
             @Override
             public IntSet getProvidedGlyphs() {
                 return IntSets.EMPTY_SET;

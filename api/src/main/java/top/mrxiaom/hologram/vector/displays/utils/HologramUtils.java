@@ -21,7 +21,7 @@ import java.util.List;
 
 public class HologramUtils {
     private static IEyeLocationAdapter eyeLocationAdapter = IEyeLocationAdapter.DEFAULT;
-    public static double LINE_HEIGHT = 12.5;
+    public static double LINE_HEIGHT = 10.0;
     private static final double EPSILON = 1e-10; // 用于处理浮点数精度问题
 
     public static void setEyeLocationAdapter(@NotNull IEyeLocationAdapter eyeLocationAdapter) {

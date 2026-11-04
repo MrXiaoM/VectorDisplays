@@ -18,6 +18,7 @@ import org.jetbrains.annotations.ApiStatus;
 import top.mrxiaom.hologram.vector.displays.api.PluginWrapper;
 import top.mrxiaom.hologram.vector.displays.hologram.utils.ItemsAdderHolder;
 import top.mrxiaom.hologram.vector.displays.hologram.utils.ReplaceText;
+import top.mrxiaom.hologram.vector.displays.minecraft.nms.NMS;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -57,6 +58,7 @@ public class HologramAPI implements Listener {
     }
 
     private final PluginWrapper plugin;
+
     public HologramAPI(PluginWrapper plugin) {
         this.plugin = plugin;
     }
@@ -89,6 +91,8 @@ public class HologramAPI implements Listener {
                 .usePlatformLogger();
 
         EntityLib.init(platform, settings);
+
+        plugin.getPlugin().getLogger().info("已加载服务端版本支持 " + NMS.getFactory().getName());
 
         playerManager = PacketEvents.getAPI().getPlayerManager();
         hologram = new HologramManager(plugin);

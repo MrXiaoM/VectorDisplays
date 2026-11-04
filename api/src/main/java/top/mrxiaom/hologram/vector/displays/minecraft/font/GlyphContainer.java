@@ -85,10 +85,10 @@ public class GlyphContainer<T> {
     }
 
     public void forEachGlyph(GlyphConsumer<T> glyphConsumer) {
-        for(int i = 0; i < this.rows.length; ++i) {
+        for (int i = 0; i < this.rows.length; ++i) {
             T[] objects = this.rows[i];
             if (objects != this.defaultRow) {
-                for(int j = 0; j < objects.length; ++j) {
+                for (int j = 0; j < objects.length; ++j) {
                     T object = objects[j];
                     if (object != null) {
                         int k = i << ROW_SHIFT | j;
@@ -97,7 +97,6 @@ public class GlyphContainer<T> {
                 }
             }
         }
-
     }
 
     public IntSet getProvidedGlyphs() {

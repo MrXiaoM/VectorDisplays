@@ -12,8 +12,6 @@ import top.mrxiaom.hologram.vector.displays.ui.api.TextElement;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
 
-import java.math.BigDecimal;
-
 public class Line extends TextElement<Line> {
     private final double spaceWidth = HologramFont.getTextRenderer().getWidth(Component.text(" "));
     private double x1, y1, x2, y2;
@@ -138,15 +136,10 @@ public class Line extends TextElement<Line> {
                 getParentRotation()
         );
 
-        // 根据 thickness (宽度) 与悬浮字单行标准高度的比值，计算缩放大小
-        double scale = thickness / HologramUtils.LINE_HEIGHT;
-        this.setScale(new BigDecimal(String.format("%.8f", scale)).floatValue());
-        // 计算最少需要的空格数量
-        int spaceCount = (int) Math.floor(length / (this.spaceWidth * scale));
-        // 最大长度管够
+        // 一个空格的背景即可伸缩为精确线段，无须用空格数量向下取整。
         getEntity().setMaxLineWidth(1000);
-        // 设置空格字符
-        getEntity().setText(Component.text(" ".repeat(spaceCount)));
+        getEntity().setText(Component.space());
+        this.setScale((float) (length / (spaceWidth + 1)), (float) (thickness / 10.0));
     }
 
     @Override

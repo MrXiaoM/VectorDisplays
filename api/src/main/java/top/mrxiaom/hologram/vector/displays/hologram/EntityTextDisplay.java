@@ -66,10 +66,14 @@ public class EntityTextDisplay extends EntityDisplay<EntityTextDisplay> {
         meta.setTextOpacity(this.textOpacity);
         meta.setShadow(this.shadow);
         meta.setSeeThrough(this.seeThroughBlocks);
+        boolean alignLeft = false;
+        boolean alignRight = false;
         switch (this.alignment) {
-            case LEFT -> meta.setAlignLeft(true);
-            case RIGHT -> meta.setAlignRight(true);
+            case LEFT -> alignLeft = true;
+            case RIGHT -> alignRight = true;
         }
+        meta.setAlignLeft(alignLeft);
+        meta.setAlignRight(alignRight);
         return meta;
     }
 

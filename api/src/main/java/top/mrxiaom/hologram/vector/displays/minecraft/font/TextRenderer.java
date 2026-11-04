@@ -3,8 +3,8 @@ package top.mrxiaom.hologram.vector.displays.minecraft.font;
 import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.google.gson.JsonElement;
 import net.kyori.adventure.text.Component;
+import top.mrxiaom.hologram.vector.displays.minecraft.font.api.ITextHandler;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.api.ITextRenderer;
-import top.mrxiaom.hologram.vector.displays.minecraft.nms.ITextHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,10 @@ import java.util.List;
 @SuppressWarnings({"unused"})
 public class TextRenderer implements ITextRenderer {
     private final ITextHandler handler;
-    private final AdventureSerializer serializer = AdventureSerializer.serializer();
+
+    private static AdventureSerializer serializer() {
+        return AdventureSerializer.serializer();
+    }
 
     public TextRenderer(FontManager fontManager, ITextHandler handler) {
         this.handler = handler;
@@ -25,8 +28,10 @@ public class TextRenderer implements ITextRenderer {
 
     @Override
     public int getLines(Component text) {
-        JsonElement json = serializer.asJsonTree(text);
-        return handler.getLines(json);
+        if (handler instanceof AdventureTextHandler common) {
+            return common.getLines(text);
+        }
+        return handler.getLines(serializer().asJsonTree(text));
     }
 
     @Override
@@ -36,8 +41,10 @@ public class TextRenderer implements ITextRenderer {
 
     @Override
     public int getWidth(Component text) {
-        JsonElement json = serializer.asJsonTree(text);
-        return ceil(handler.getWidth(json));
+        if (handler instanceof AdventureTextHandler common) {
+            return ceil(common.getWidth(text));
+        }
+        return ceil(handler.getWidth(serializer().asJsonTree(text)));
     }
 
     @Override
@@ -48,7 +55,9 @@ public class TextRenderer implements ITextRenderer {
 
     @Override
     public String trimToWidth(String text, int maxWidth, boolean backwards) {
-        return backwards ? this.handler.trimToWidthBackwards(text, maxWidth) : this.handler.trimToWidth(text, maxWidth);
+        return backwards
+                ? this.handler.trimToWidthBackwards(text, maxWidth)
+                : this.handler.trimToWidth(text, maxWidth);
     }
 
     @Override
@@ -58,8 +67,11 @@ public class TextRenderer implements ITextRenderer {
 
     @Override
     public Component trimToWidth(Component text, int width) {
-        JsonElement trimmed = this.handler.trimToWidth(serializer.asJsonTree(text), width);
-        return serializer.fromJsonTree(trimmed);
+        if (handler instanceof AdventureTextHandler common) {
+            return common.trimToWidth(text, width);
+        }
+        JsonElement trimmed = this.handler.trimToWidth(serializer().asJsonTree(text), width);
+        return serializer().fromJsonTree(trimmed);
     }
 
     @Override
@@ -69,15 +81,18 @@ public class TextRenderer implements ITextRenderer {
 
     @Override
     public int getWrappedLinesHeight(Component text, int maxWidth) {
-        return 9 * this.handler.wrapLinesSize(serializer.asJsonTree(text), maxWidth);
+        return 9 * wrapLines(text, maxWidth).size();
     }
 
     @Override
     public List<Component> wrapLines(Component text, int width) {
-        List<JsonElement> lines = this.handler.wrapLines(serializer.asJsonTree(text), width);
+        if (handler instanceof AdventureTextHandler common) {
+            return common.wrapLines(text, width);
+        }
+        List<JsonElement> lines = this.handler.wrapLines(serializer().asJsonTree(text), width);
         List<Component> components = new ArrayList<>();
         for (JsonElement line : lines) {
-            components.add(serializer.fromJsonTree(line));
+            components.add(serializer().fromJsonTree(line));
         }
         return components;
     }
@@ -87,7 +102,7 @@ public class TextRenderer implements ITextRenderer {
     }
 
     private static int ceil(float value) {
-        int i = (int)value;
-        return value > (float)i ? i + 1 : i;
+        int i = (int) value;
+        return value > (float) i ? i + 1 : i;
     }
 }

@@ -1,15 +1,10 @@
 package top.mrxiaom.hologram.vector.displays.minecraft.nms;
 
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import me.tofaa.entitylib.wrapper.WrapperEntity;
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
 import org.joml.Matrix4f;
 
-import java.io.InputStream;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.logging.Logger;
 
 public class NMS {
@@ -78,7 +73,7 @@ public class NMS {
             logger.warning("看起来你正在使用一个不受支持的未来版本，已尝试使用本插件所支持的最新版本（" + craft + "），插件可能无法正常工作");
         }
         if (craft == null) {
-            throw new IllegalStateException("当前版本不受支持 (" + String.format("%d.%d.%d", major, minor, patch)+ ")");
+            throw new IllegalStateException("当前版本不受支持 (" + String.format("%d.%d.%d", major, minor, patch) + ")");
         }
         String className = NMS.class.getPackageName() + "." + craft + ".Factory";
         try {
@@ -112,12 +107,10 @@ public class NMS {
         return nmsFactory.textDisplayUnitSquare();
     }
 
-    public static <T> void reloadFontsViaNBTFile(InputStream stream, BiFunction<Integer, Float, T> glyph, BiConsumer<NamespacedKey, Int2ObjectMap<T>> loaded) throws Exception {
-        nmsFactory.reloadFontsViaNBTFile(stream, glyph, loaded);
-    }
-
     private static int parse(String[] split, int index, int def) {
-        if (index >= split.length) return def;
+        if (index >= split.length) {
+            return def;
+        }
         try {
             return Integer.parseInt(split[index]);
         } catch (NumberFormatException e) {

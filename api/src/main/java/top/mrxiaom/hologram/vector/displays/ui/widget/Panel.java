@@ -44,7 +44,7 @@ public class Panel extends TextElement<Panel> {
     public Panel(@NotNull String id, @NotNull IEntityIdProvider entityIdProvider, boolean fixedLocation, double width, double height) {
         super(id, entityIdProvider, fixedLocation);
         this.getEntity().setText(Component.text("                "));
-        this.spaceWidth = HologramFont.getTextRenderer().getWidth(getEntity().getTextAsComponent());
+        this.spaceWidth = HologramFont.getTextRenderer().getWidth(getEntity().getTextAsComponent()) + 1;
         this.setPanelSize(width, height);
     }
 
@@ -258,6 +258,7 @@ public class Panel extends TextElement<Panel> {
         this.scaleY = this.mainScale[1] * this.extraScale[1];
         float scaleZ = this.mainScale[2] * this.extraScale[2];
         this.getEntity().setScale(scaleX, scaleY, scaleZ);
+        calculateSize();
     }
 
     @Override

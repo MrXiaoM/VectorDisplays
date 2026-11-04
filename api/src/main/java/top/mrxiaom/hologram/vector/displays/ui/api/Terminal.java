@@ -9,14 +9,13 @@ import org.bukkit.event.block.Action;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
-import org.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.hologram.*;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
+import top.mrxiaom.hologram.vector.displays.minecraft.font.TextDisplayLayout;
 import top.mrxiaom.hologram.vector.displays.ui.api.wrapper.EntityTextDisplayWrapper;
 import top.mrxiaom.hologram.vector.displays.ui.widget.Panel;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 import top.mrxiaom.hologram.vector.displays.utils.QuaternionUtils;
-import top.mrxiaom.hologram.vector.displays.utils.TriangleUtils;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -378,7 +377,8 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         this.translation = translation;
         float[] transform = HologramUtils.toFloat(translation);
         // 根据悬浮字宽度来修正自身渲染位置
-        HologramUtils.addF(transform, getRotatedVector(-Double.valueOf(width).floatValue() * 0.1f, 0.0f, 0.0f));
+        float originCorrection = (float) (-0.5 * TextDisplayLayout.PIXEL_SIZE * hologram.getScale().x);
+        HologramUtils.addF(transform, getRotatedVector(originCorrection, 0.0f, 0.0f));
         this.hologram.setTranslation(transform);
     }
 
@@ -521,10 +521,11 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         Double width = HologramFont.textToWorld(textWidth);
         Double height = HologramFont.textToWorld(textHeight);
 
-        // 获取“将空格转换为1x1方块大小”的缩放配置，然后乘以其世界宽度，获得最终缩放配置
-        Vector3f square = TriangleUtils.textDisplayUnitSquare().getScale(new Vector3f());
-        float scaleX = square.x() * width.floatValue();
-        float scaleY = square.y() * height.floatValue();
+        // 直接使用实际空格背景尺寸
+        TextDisplayLayout layout = TextDisplayLayout.measure(
+                HologramFont.getTextRenderer(), Component.space(), hologram.getMaxLineWidth());
+        float scaleX = (float) (textWidth / layout.backgroundWidth());
+        float scaleY = (float) (textHeight / layout.backgroundHeight());
         hologram.setScale(scaleX, scaleY, 1.0f);
 
         this.textWidth = textWidth;

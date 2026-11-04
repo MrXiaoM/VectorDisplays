@@ -1,5 +1,5 @@
 subprojects {
-    apply(plugin="java")
+    apply(plugin = "java")
     repositories {
         if (java.util.Locale.getDefault().country == "CN") {
             maven("https://mirrors.huaweicloud.com/repository/maven/")

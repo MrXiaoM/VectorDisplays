@@ -1,14 +1,14 @@
 package top.mrxiaom.hologram.vector.displays.ui;
 
 import net.kyori.adventure.text.Component;
-import org.joml.Vector3f;
+import top.mrxiaom.hologram.vector.displays.minecraft.font.TextDisplayLayout;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.api.ITextRenderer;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
-import top.mrxiaom.hologram.vector.displays.utils.TriangleUtils;
 
 public class HologramFont {
+    private static final double ratioX = TextDisplayLayout.PIXEL_SIZE;
     private static ITextRenderer textRenderer;
-    private static double ratioX;
+
     public static void setTextRenderer(ITextRenderer textRenderer) {
         HologramFont.textRenderer = textRenderer;
     }
@@ -17,14 +17,14 @@ public class HologramFont {
         return textRenderer;
     }
 
+    @Deprecated
     public static void recalcRatio() {
-        Vector3f scale = TriangleUtils.textDisplayUnitSquare().getScale(new Vector3f());
-        ratioX = (1.0 / scale.x()) / textRenderer.getWidth(Component.space());
+        // 已经研究明白缩放比例，不再需要计算
     }
 
     /**
      * 获取悬浮字的文本与世界方块尺寸之间的缩放关系
-     * @see HologramFont#getRatioX()
+     * @see TextDisplayLayout#PIXEL_SIZE
      */
     @Deprecated
     public static double getCharScale() {
@@ -33,6 +33,7 @@ public class HologramFont {
 
     /**
      * 获取悬浮字的文本与世界方块尺寸之间的缩放关系
+     * @see TextDisplayLayout#PIXEL_SIZE
      */
     public static double getRatioX() {
         return ratioX;

@@ -114,7 +114,7 @@ public class ProgressBar extends TextElement<ProgressBar> implements EntityTextD
                 .setInterpolationDurationTransformation(2)
                 .setText(Component.text("                "))
                 .setShadow(false);
-        this.spaceWidth = HologramFont.getTextRenderer().getWidth(hologramMark.getTextAsComponent());
+        this.spaceWidth = HologramFont.getTextRenderer().getWidth(hologramMark.getTextAsComponent()) + 1;
         this.hologramMark.setParent(getHologram());
         this.setBackgroundColor(0x20FFFFFF);
         this.setForegroundColor(0xFFFFFFFF);
@@ -173,19 +173,16 @@ public class ProgressBar extends TextElement<ProgressBar> implements EntityTextD
      * 根据 terminal 的旋转关系，计算出这个子元素的悬浮字应当出现在什么坐标处
      */
     protected Location decideMarkLocation() {
-        double x = switch (getAlign()) {
-            case LEFT_TOP, LEFT_CENTER, LEFT_BOTTOM -> getX() + (markTextWidth / 2.0);
-            case CENTER_TOP, CENTER, CENTER_BOTTOM -> getX() - (getTextWidth() / 2.0) + (markTextWidth / 2.0);
-            case RIGHT_TOP, RIGHT_CENTER, RIGHT_BOTTOM -> getX() - getTextWidth() - (markTextWidth / 2.0);
-        };
-        double[] raw = decideMarkLocationRaw(x, getY());
-
-        // 根据终端旋转量进行坐标变换
-        float[] ar = getAdditionalRotation();
-        double[] loc = ar != null
-                ? QuaternionUtils.rotateChildrenToDouble(decideLocationRaw(getX(), getY()), ar, raw)
-                : raw;
-        return getTerminal().getRotatedLoc(loc);
+        double[] center = calc().decideLocation(getX(), getY(), true);
+        double offsetX = (markWidth - getWidth()) / 2.0;
+        double[] offset = QuaternionUtils.rotateChildrenToDouble(
+                new double[] { 0, 0, 0 }, getRotation(), new double[] { offsetX, 0, 0.001 });
+        HologramUtils.add(center, offset);
+        double[] correction = QuaternionUtils.rotateChildrenToDouble(
+                new double[] { 0, 0, 0 }, getRotation(),
+                new double[] { -0.5 * 0.025 * hologramMark.getScale().x, 0, 0 });
+        hologramMark.setTranslation((float) correction[0], (float) correction[1], (float) correction[2]);
+        return new Location(getTerminal().getWorld(), center[0], center[1], center[2]);
     }
 
     /**
@@ -265,7 +262,7 @@ public class ProgressBar extends TextElement<ProgressBar> implements EntityTextD
 
         this.markTextWidth = this.barWidth * this.progress;
         float spaceScaleX = HologramUtils.calculateScale(spaceWidth, this.markTextWidth);
-        markWidth = HologramFont.textToWorld(HologramUtils.LINE_HEIGHT) * scaleY;
+        markWidth = HologramFont.textToWorld(this.markTextWidth);
         markHeight = HologramFont.textToWorld(HologramUtils.LINE_HEIGHT) * scaleY;
         hologramMark.setScale(spaceScaleX, scaleY, 1.0f);
         if (!hologramMark.isDead()) {

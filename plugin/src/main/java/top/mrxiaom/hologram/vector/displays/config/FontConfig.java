@@ -6,8 +6,6 @@ import top.mrxiaom.hologram.vector.displays.TerminalManager;
 import top.mrxiaom.hologram.vector.displays.VectorDisplays;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.FontManager;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.api.Font;
-import top.mrxiaom.hologram.vector.displays.minecraft.nms.NMS;
-import top.mrxiaom.hologram.vector.displays.minecraft.nms.NMSFactory;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
 
@@ -20,12 +18,11 @@ public class FontConfig implements IConfig {
     private final VectorDisplays plugin;
     private final FontManager manager;
     private boolean forcesUnicodeFont;
+
     public FontConfig(VectorDisplays plugin) {
-        NMSFactory factory = NMS.getFactory();
         this.plugin = plugin;
-        this.manager = new FontManager(factory);
+        this.manager = new FontManager();
         HologramFont.setTextRenderer(manager.createTextRenderer());
-        plugin.getLogger().info("已加载服务端版本支持 " + factory.getName());
     }
 
     @Override
@@ -33,7 +30,7 @@ public class FontConfig implements IConfig {
         long timerPeriod = config.getLong("timer-period", 1L);
         TerminalManager.inst().setTimerPeriod(Math.max(1L, timerPeriod));
 
-        HologramUtils.LINE_HEIGHT = config.getDouble("line-height", 13);
+        HologramUtils.LINE_HEIGHT = config.getDouble("line-height", 10);
 
         Map<Integer, Float> advanceOverrides = manager.getAdvanceOverrides();
         advanceOverrides.clear();
