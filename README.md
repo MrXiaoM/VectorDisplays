@@ -70,3 +70,4 @@
 + [retrooper/packetevents](https://github.com/retrooper/packetevents) 用于发包控制虚拟悬浮字
 + [TheCymaera](https://github.com/TheCymaera/minecraft-hologram) 提供三角形渲染方案
 + [豆包AI](https://doubao.com/) 复杂数学运算的原型代码参考
++ [GPT](https://chatgpt.com/) 算法优化与修正
