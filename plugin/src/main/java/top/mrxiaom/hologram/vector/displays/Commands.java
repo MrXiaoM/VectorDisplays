@@ -360,6 +360,7 @@ public class Commands implements CommandExecutor, TabCompleter {
             for (EntityDisplay<?> display : Terminal.resolveAllEntityDisplay(terminal)) {
                 display.setInterpolationDurationTransformation(10);
             }
+            animatedLabel.getEntity().setInterpolationDurationTransformation(0);
 
             TerminalManager.inst().spawn(terminal);
             sender.sendMessage("已添加测试面板");
