@@ -28,7 +28,7 @@ dependencies {
     compileOnly("dev.folia:folia-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("it.unimi.dsi:fastutil:8.5.12")
     compileOnly("me.clip:placeholderapi:2.12.3")
-    compileOnly("com.github.retrooper:packetevents-spigot:2.12.1")
+    compileOnly("com.github.retrooper:packetevents-spigot:2.13.0")
     compileOnly("maven.modrinth:vivecraft-spigot-extension:1.3.7-1")
 
     implementation(project(":api"))

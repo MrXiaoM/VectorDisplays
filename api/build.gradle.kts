@@ -42,11 +42,11 @@ dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("it.unimi.dsi:fastutil:8.5.12")
     compileOnly("com.github.LoneDev6:API-ItemsAdder:3.6.3-beta-14")
-    compileOnly("io.github.tofaa2:spigot:3.3.2-SNAPSHOT")
+    compileOnly("io.github.tofaa2:spigot:3.3.7-SNAPSHOT")
     add("shadowLinkWithLib", "io.github.tofaa2:spigot:3.3.7-SNAPSHOT") {
         exclude("org.jetbrains", "annotations")
     }
-    compileOnly("com.github.retrooper:packetevents-spigot:2.12.1")
+    compileOnly("com.github.retrooper:packetevents-spigot:2.13.0")
 
     compileOnly("net.kyori:adventure-text-minimessage:4.26.1")
     add("shadowLink", "net.kyori:adventure-text-minimessage:4.26.1") { isTransitive = false }

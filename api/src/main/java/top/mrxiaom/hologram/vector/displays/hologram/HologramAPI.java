@@ -2,6 +2,7 @@ package top.mrxiaom.hologram.vector.displays.hologram;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import me.tofaa.entitylib.APIConfig;
 import me.tofaa.entitylib.EntityLib;
@@ -86,6 +87,10 @@ public class HologramAPI implements Listener {
             PacketEvents.getAPI().init();
         }
 
+        if (ServerVersion.getLatest().getProtocolVersion() < 776) {
+            throw new UnsupportedOperationException("packetevents 版本过低，请更新到 2.13.0 或以上");
+        }
+
         SpigotEntityLibPlatform platform = new SpigotEntityLibPlatform(plugin.getPlugin());
         APIConfig settings = new APIConfig(PacketEvents.getAPI())
                 .usePlatformLogger();
@@ -123,8 +128,12 @@ public class HologramAPI implements Listener {
     }
 
     public void onDisable() {
-        hologram.onDisable();
-        spectator.onDisable();
+        if (hologram != null) {
+            hologram.onDisable();
+        }
+        if (spectator != null) {
+            spectator.onDisable();
+        }
         if (!PacketEvents.class.getName().startsWith(apiPackage)) {
             PacketEvents.getAPI().terminate();
         }
