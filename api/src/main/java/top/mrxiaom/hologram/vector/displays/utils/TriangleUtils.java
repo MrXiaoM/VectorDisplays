@@ -20,6 +20,10 @@ public class TriangleUtils {
     public static Matrix4f textDisplayUnitSquare() {
         return NMS.textDisplayUnitSquare();
     }
+    /**
+     * 构造局部顶点为 (0, 0)、(1, 0)、(0, 1) 的单位三角形的三个背景片。
+     * 此处为 y 向上的局部坐标，三个片的可见面均朝局部 +Z。
+     */
     public static List<Matrix4f> textDisplayUnitTriangle() {
         return Lists.newArrayList(
                 // Left
@@ -86,6 +90,21 @@ public class TriangleUtils {
             return list;
         }
     }
+    /**
+     * 根据三个世界坐标顶点计算单面三角形的变换。
+     * <p>
+     * 可见面的法线为 (point2 - point1) × (point3 - point1)，按右手法则确定。
+     * 从预期可见的一侧观察时，point1、point2、point3 应为逆时针顺序；
+     * 交换任意两个顶点会翻转可见面，客户端会剔除背面。
+     * <p>
+     * 与三角形控件的 UI 坐标不同，本方法接收的是已完成坐标转换的三维顶点。
+     * UI 的 y 轴向下，因此 UI 二倍有向面积小于 0 的逆时针序列，
+     * 转为 y 向上的平面坐标后，法线才朝向终端正面。
+     * @param point1 第一个世界坐标顶点
+     * @param point2 第二个世界坐标顶点
+     * @param point3 第三个世界坐标顶点；三个点必须互不重合且不共线
+     * @return 保留输入顶点顺序所确定的朝向，不自动调整正反面
+     */
     public static Result textDisplayTriangle(
             Vector3f point1,
             Vector3f point2,
@@ -94,6 +113,7 @@ public class TriangleUtils {
         Vector3f p2 = new Vector3f(point2).sub(point1);
         Vector3f p3 = new Vector3f(point3).sub(point1);
 
+        // 叉乘顺序决定三个背景片的正面朝向，不能在不改变可见面的情况下交换顶点。
         Vector3f zAxis = new Vector3f(p2).cross(p3).normalize();
         Vector3f xAxis = new Vector3f(p2).normalize();
         Vector3f yAxis = new Vector3f(zAxis).cross(xAxis).normalize();

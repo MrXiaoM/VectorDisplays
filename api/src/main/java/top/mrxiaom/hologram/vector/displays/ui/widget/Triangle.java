@@ -22,6 +22,18 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+/**
+ * 使用三个单面文本展示实体的背景拼成的三角形组件。
+ * <p>
+ * 三个顶点使用与其他控件相同的 UI 坐标：x 向右、y 向下。
+ * 要让三角形从终端正面可见，顶点必须按从正面观察时的逆时针顺序设置，
+ * 例如 pos1 = (0, 0)、pos2 = (0, 100)、pos3 = (100, 0)，即左上、左下、右上。
+ * 顶点必须互不重合且不共线；交换任意两个顶点会反转法线与可见面，
+ * 由于客户端剔除背面，反序后的三角形将只能从终端背面看见。
+ * <p>
+ * 这里的正面是终端旋转前局部 +Z 的一侧（未旋转时为世界正南侧），
+ * 终端旋转后随面板一起旋转，不是始终相对于世界坐标判断顺逆时针。
+ */
 public class Triangle extends Element<Triangle, EntityNone> implements Hoverable {
     private final Map<Integer, EntityTextDisplay> entities = new HashMap<>();
     private final TextDisplayStyle style = new TextDisplayStyle();
@@ -150,11 +162,22 @@ public class Triangle extends Element<Triangle, EntityNone> implements Hoverable
         return pos1 == null ? null : new float[] { pos1[0], pos1[1] };
     }
 
+    /**
+     * 设置逆时针顶点序列中的第一个点，坐标为 x 向右、y 向下的 UI 坐标。
+     * @param pos 顶点坐标，null 表示清除该顶点
+     * @see Triangle 类说明中的顶点顺序与可见面约定
+     */
     public Triangle setPos1(float @Nullable [] pos) {
         this.pos1 = pos == null ? null : new float[] { pos[0], pos[1] };
         return this;
     }
 
+    /**
+     * 设置逆时针顶点序列中的第一个点。
+     * @param x UI 横坐标，向右为正
+     * @param y UI 纵坐标，向下为正
+     * @see Triangle 类说明中的顶点顺序与可见面约定
+     */
     public Triangle setPos1(float x, float y) {
         this.pos1 = new float[] { x, y };
         return this;
@@ -164,11 +187,22 @@ public class Triangle extends Element<Triangle, EntityNone> implements Hoverable
         return pos2 == null ? null : new float[] { pos2[0], pos2[1] };
     }
 
+    /**
+     * 设置逆时针顶点序列中的第二个点，坐标为 x 向右、y 向下的 UI 坐标。
+     * @param pos 顶点坐标，null 表示清除该顶点
+     * @see Triangle 类说明中的顶点顺序与可见面约定
+     */
     public Triangle setPos2(float @Nullable [] pos) {
         this.pos2 = pos == null ? null : new float[] { pos[0], pos[1] };
         return this;
     }
 
+    /**
+     * 设置逆时针顶点序列中的第二个点。
+     * @param x UI 横坐标，向右为正
+     * @param y UI 纵坐标，向下为正
+     * @see Triangle 类说明中的顶点顺序与可见面约定
+     */
     public Triangle setPos2(float x, float y) {
         this.pos2 = new float[] { x, y };
         return this;
@@ -178,11 +212,22 @@ public class Triangle extends Element<Triangle, EntityNone> implements Hoverable
         return pos3 == null ? null : new float[] { pos3[0], pos3[1] };
     }
 
+    /**
+     * 设置逆时针顶点序列中的第三个点，坐标为 x 向右、y 向下的 UI 坐标。
+     * @param pos 顶点坐标，null 表示清除该顶点
+     * @see Triangle 类说明中的顶点顺序与可见面约定
+     */
     public Triangle setPos3(float @Nullable [] pos) {
         this.pos3 = pos == null ? null : new float[] { pos[0], pos[1] };
         return this;
     }
 
+    /**
+     * 设置逆时针顶点序列中的第三个点。
+     * @param x UI 横坐标，向右为正
+     * @param y UI 纵坐标，向下为正
+     * @see Triangle 类说明中的顶点顺序与可见面约定
+     */
     public Triangle setPos3(float x, float y) {
         this.pos3 = new float[] { x, y };
         return this;
