@@ -78,11 +78,8 @@ public abstract class TextElement<This extends Element<This, EntityTextDisplay>>
         Component text = getEntity().getTextAsComponent();
         TextDisplayLayout layout = TextDisplayLayout.measure(
                 HologramFont.getTextRenderer(), text, getEntity().getMaxLineWidth());
-        boolean background = isBackgroundOnly();
-        this.textWidth = (background ? layout.backgroundWidth() : layout.width()) * Math.abs(scaleX);
-        this.textHeight = (background
-                ? layout.backgroundHeight(HologramUtils.LINE_HEIGHT)
-                : layout.textHeight(HologramUtils.LINE_HEIGHT)) * Math.abs(scaleY);
+        this.textWidth = layout.backgroundWidth() * Math.abs(scaleX);
+        this.textHeight = layout.backgroundHeight(HologramUtils.LINE_HEIGHT) * Math.abs(scaleY);
         this.width = HologramFont.textToWorld(textWidth);
         this.height = HologramFont.textToWorld(textHeight);
     }
@@ -96,7 +93,7 @@ public abstract class TextElement<This extends Element<This, EntityTextDisplay>>
     }
 
     protected double[] renderOriginCorrection() {
-        double offset = HologramFont.textToWorld((isBackgroundOnly() ? 0.5 : 1.0) * scaleX);
+        double offset = HologramFont.textToWorld(0.5 * scaleX);
         return QuaternionUtils.rotateChildrenToDouble(
                 new double[] { 0, 0, 0 }, getRotation(), new double[] { -offset, 0, 0 });
     }
