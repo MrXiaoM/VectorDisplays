@@ -108,7 +108,7 @@ public class Triangle extends Element<Triangle, EntityNone> implements Hoverable
         float[][] pos = decidePos(terminal);
         if (pos == null) return;
         float[] p1 = pos[0], p2 = pos[1], p3 = pos[2];
-        Location origin = new Location(terminal.getWorld(), p2[0], p2[1], p2[2]);
+        Location origin = terminal.getLocation();
         TriangleUtils.textDisplayTriangle(
                 toVector3f(p1), toVector3f(p2), toVector3f(p3)
         ).create(index -> {
@@ -120,7 +120,7 @@ public class Triangle extends Element<Triangle, EntityNone> implements Hoverable
             entities.put(index, newEntity);
             style.addEntity(newEntity);
             return newEntity;
-        }, new Vector3f(p2[0], p2[1], p2[2]));
+        }, new Vector3f((float) origin.getX(), (float) origin.getY(), (float) origin.getZ()));
         for (EntityTextDisplay entity : entities.values()) {
             if (entity.isDead()) {
                 HologramAPI.getHologram().spawn(entity, origin);
