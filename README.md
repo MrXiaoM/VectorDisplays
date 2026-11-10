@@ -42,6 +42,18 @@
 > 人话：提醒到这个份上了，遇到了后门别找我。
 > 
 
+## 客户端冲突模组
+
+任何修改字体的模组、资源包都会与 VectorDisplays 冲突，下表列出了部分模组的冲突解决方案。
+
+| 模组 | 解决方法 |
+| --- | --- |
+| [Modern UI](https://modrinth.com/mod/modern-ui) | **主菜单 → 模组 → Modern UI → 配置 → 偏好设置 → 文本 (MC)**，关闭 **现代文本引擎**，然后重启游戏。 |
+| [Caxton](https://modrinth.com/mod/caxton) | **选项 → 资源包**，停用 Caxton 的 **Inter、Open Sans** 及其他自定义字体包；仍有异常时移除模组。 |
+| [Font](https://modrinth.com/mod/font) | 默认按 **F7** 打开字体管理，关闭自定义字体并点击 **完成**。 |
+| [FontSwap](https://modrinth.com/mod/fontswap) | 移除模组，恢复原版字体。 |
+| [I want a Better Font](https://modrinth.com/mod/better-google-font) | 移除模组，恢复原版字体。 |
+
 ## 简介
 
 你可想象过各种科幻电影、游戏中，悬在空中的半透明控制面板？  
