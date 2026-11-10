@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Math;
+import top.mrxiaom.hologram.vector.displays.utils.joml.Math;
 import top.mrxiaom.hologram.vector.displays.hologram.*;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
 import top.mrxiaom.hologram.vector.displays.minecraft.font.TextDisplayLayout;
@@ -461,7 +461,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
      */
     public float getRotationPitch() {
         float x = rotation[0], y = rotation[1], z = rotation[2], w = rotation[3];
-        return org.joml.Math.safeAsin(-2.0F * (y * z - w * x));
+        return Math.safeAsin(-2.0F * (y * z - w * x));
     }
 
     /**
@@ -470,7 +470,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
      */
     public float getRotationYaw() {
         float x = rotation[0], y = rotation[1], z = rotation[2], w = rotation[3];
-        return org.joml.Math.atan2(x * z + y * w, 0.5F - y * y - x * x);
+        return Math.atan2(x * z + y * w, 0.5F - y * y - x * x);
     }
 
     /**
@@ -479,7 +479,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
      */
     public float getRotationRoll() {
         float x = rotation[0], y = rotation[1], z = rotation[2], w = rotation[3];
-        return org.joml.Math.atan2(y * x + w * z, 0.5F - x * x - z * z);
+        return Math.atan2(y * x + w * z, 0.5F - x * x - z * z);
     }
 
     /**
@@ -488,9 +488,9 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
      */
     public float[] getRotationEuler() {
         float x = rotation[0], y = rotation[1], z = rotation[2], w = rotation[3];
-        float yaw = org.joml.Math.atan2(x * z + y * w, 0.5F - y * y - x * x);
-        float pitch = org.joml.Math.safeAsin(-2.0F * (y * z - w * x));
-        float roll = org.joml.Math.atan2(y * x + w * z, 0.5F - x * x - z * z);
+        float yaw = Math.atan2(x * z + y * w, 0.5F - y * y - x * x);
+        float pitch = Math.safeAsin(-2.0F * (y * z - w * x));
+        float roll = Math.atan2(y * x + w * z, 0.5F - x * x - z * z);
         return new float[] { yaw, pitch, roll };
     }
 

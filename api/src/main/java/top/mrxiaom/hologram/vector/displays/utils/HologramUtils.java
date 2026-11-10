@@ -19,6 +19,8 @@ import top.mrxiaom.hologram.vector.displays.ui.widget.Triangle;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static top.mrxiaom.hologram.vector.displays.utils.joml.Math.fma;
+
 public class HologramUtils {
     private static IEyeLocationAdapter eyeLocationAdapter = IEyeLocationAdapter.DEFAULT;
     public static double LINE_HEIGHT = 10.0;
@@ -381,9 +383,9 @@ public class HologramUtils {
         // 将悬浮字的默认方向 (0, 0, 1) 旋转到当前方向
         double vX = 0, vY = 0, vZ = 1;
         return new double[] {
-                org.joml.Math.fma((xx - yy - zz + ww) * k, vX, org.joml.Math.fma(2 * (xy - zw) * k, vY, (2 * (xz + yw) * k) * vZ)),
-                org.joml.Math.fma(2 * (xy + zw) * k, vX, org.joml.Math.fma((yy - xx - zz + ww) * k, vY, (2 * (yz - xw) * k) * vZ)),
-                org.joml.Math.fma(2 * (xz - yw) * k, vX, org.joml.Math.fma(2 * (yz + xw) * k, vY, ((zz - xx - yy + ww) * k) * vZ))
+                fma((xx - yy - zz + ww) * k, vX, fma(2 * (xy - zw) * k, vY, (2 * (xz + yw) * k) * vZ)),
+                fma(2 * (xy + zw) * k, vX, fma((yy - xx - zz + ww) * k, vY, (2 * (yz - xw) * k) * vZ)),
+                fma(2 * (xz - yw) * k, vX, fma(2 * (yz + xw) * k, vY, ((zz - xx - yy + ww) * k) * vZ))
         };
     }
 

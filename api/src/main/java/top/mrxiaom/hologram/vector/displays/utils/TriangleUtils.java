@@ -1,38 +1,40 @@
 package top.mrxiaom.hologram.vector.displays.utils;
 
-import com.google.common.collect.Lists;
 import net.kyori.adventure.text.Component;
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.hologram.EntityTextDisplay;
 import top.mrxiaom.hologram.vector.displays.hologram.utils.Vector3F;
 import top.mrxiaom.hologram.vector.displays.minecraft.nms.NMS;
+import top.mrxiaom.hologram.vector.displays.utils.joml.Matrix4f;
+import top.mrxiaom.hologram.vector.displays.utils.joml.Quaternionf;
+import top.mrxiaom.hologram.vector.displays.utils.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+
+import static top.mrxiaom.hologram.vector.displays.utils.joml.Math.toRadians;
 
 /**
  * <a href="https://github.com/TheCymaera/minecraft-hologram/blob/main/src/main/java/com/heledron/hologram/utilities/rendering/textDisplays.kt">TheCymaera/minecraft-hologram</a>
  */
 public class TriangleUtils {
     public static Matrix4f textDisplayUnitSquare() {
-        return NMS.textDisplayUnitSquare();
+        return new Matrix4f(NMS.textDisplayUnitSquare());
     }
     /**
      * 构造局部顶点为 (0, 0)、(1, 0)、(0, 1) 的单位三角形的三个背景片。
      * 此处为 y 向上的局部坐标，三个片的可见面均朝局部 +Z。
      */
     public static List<Matrix4f> textDisplayUnitTriangle() {
-        return Lists.newArrayList(
+        Matrix4f square = textDisplayUnitSquare();
+        return new ArrayList<>(List.of(
                 // Left
-                new Matrix4f().scale(.5f).mul(textDisplayUnitSquare()),
+                new Matrix4f().scale(.5f).mul(square),
                 // Right
-                shear(new Matrix4f().scale(.5f).translate(1f, 0f, 0f), 0, 0, -1f, 0, 0, 0).mul(textDisplayUnitSquare()),
+                shear(new Matrix4f().scale(.5f).translate(1f, 0f, 0f), 0, 0, -1f, 0, 0, 0).mul(square),
                 // Top
-                shear(new Matrix4f().scale(.5f).translate(0f, 1f, 0f), -1f, 0, 0, 0, 0, 0).mul(textDisplayUnitSquare())
-        );
+                shear(new Matrix4f().scale(.5f).translate(0f, 1f, 0f), -1f, 0, 0, 0, 0, 0).mul(square)
+        ));
     }
     public static class Result {
         public final Vector3f point1, point2, point3;
@@ -42,7 +44,9 @@ public class TriangleUtils {
         public final Quaternionf rotation;
         public final float shear;
 
-        public Result(Vector3f point1, Vector3f point2, Vector3f point3, Vector3f xAxis, Vector3f yAxis, Vector3f zAxis, float height, float width, Quaternionf rotation, float shear) {
+        public Result(Vector3f point1, Vector3f point2, Vector3f point3,
+                      Vector3f xAxis, Vector3f yAxis, Vector3f zAxis,
+                      float height, float width, Quaternionf rotation, float shear) {
             this.point1 = point1;
             this.point2 = point2;
             this.point3 = point3;
@@ -136,7 +140,7 @@ public class TriangleUtils {
 
     @SuppressWarnings("SuspiciousNameCombination")
     public static void interpolateTriangleTransform(EntityTextDisplay entity, Matrix4f matrix) {
-        Matrix4f oldTransformation = new Matrix4f(entity.getTransformationMatrix());
+        Matrix4f oldTransformation = entity.getTransformationMatrixFixed();
         float[] oldRight = entity.getRightRotation();
         entity.setTransformationMatrix(matrix);
 
@@ -146,20 +150,24 @@ public class TriangleUtils {
                 .difference(new Quaternionf(newRight[0], newRight[1], newRight[2], newRight[3]))
                 .getEulerAnglesXYZ(new Vector3f());
 
-        if (Math.abs(rightRotationChange.z) >= org.joml.Math.toRadians(45f)) {
-            float rot = org.joml.Math.toRadians(-90f) * Math.signum(rightRotationChange.z);
+        if (Math.abs(rightRotationChange.z) >= toRadians(45f)) {
+            float rot = toRadians(-90f) * Math.signum(rightRotationChange.z);
 
-            Quaternionf leftRotation = entity.getLeftRotationQuaternion();
-            entity.setLeftRotation(leftRotation.rotateZ(-rot));
+            float[] left = entity.getLeftRotation();
+            Quaternionf leftRotation = new Quaternionf(left[0], left[1], left[2], left[3]);
+            leftRotation.rotateZ(-rot);
+            entity.setLeftRotation(leftRotation.x, leftRotation.y, leftRotation.z, leftRotation.w);
 
             Vector3F scale = entity.getScale();
             entity.setScale(scale.y, scale.x, scale.z);
 
-            Quaternionf rightRotation = entity.getRightRotationQuaternion();
-            entity.setRightRotation(rightRotation.rotateZ(rot));
+            float[] right = entity.getRightRotation();
+            Quaternionf rightRotation = new Quaternionf(right[0], right[1], right[2], right[3]);
+            rightRotation.rotateZ(rot);
+            entity.setRightRotation(rightRotation.x, rightRotation.y, rightRotation.z, rightRotation.w);
         }
 
-        if (oldTransformation.equals(entity.getTransformationMatrix())) return;
+        if (oldTransformation.equals(entity.getTransformationMatrixFixed())) return;
         entity.setInterpolationDurationTransformation(0);
     }
 

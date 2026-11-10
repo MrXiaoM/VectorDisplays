@@ -2,7 +2,7 @@ package top.mrxiaom.hologram.vector.displays.utils;
 
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.joml.Math;
+import top.mrxiaom.hologram.vector.displays.utils.joml.Math;
 
 public class QuaternionUtils {
     /**

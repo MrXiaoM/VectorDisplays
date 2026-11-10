@@ -5,7 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
+import top.mrxiaom.hologram.vector.displays.utils.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.hologram.*;
 import top.mrxiaom.hologram.vector.displays.ui.api.ClickMeta;
 import top.mrxiaom.hologram.vector.displays.ui.api.Element;

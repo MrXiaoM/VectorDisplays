@@ -1,8 +1,8 @@
 package top.mrxiaom.hologram.vector.displays.utils.matrix;
 
-import org.joml.Math;
-import org.joml.Matrix3f;
-import org.joml.Quaternionf;
+import top.mrxiaom.hologram.vector.displays.utils.joml.Math;
+import top.mrxiaom.hologram.vector.displays.utils.joml.Matrix3f;
+import top.mrxiaom.hologram.vector.displays.utils.joml.Quaternionf;
 
 /**
  * org.mojang.math.GivensParameters
@@ -21,6 +21,30 @@ public record GivensParameters(float sinHalf, float cosHalf) {
 
     public GivensParameters inverse() {
         return new GivensParameters(-this.sinHalf, this.cosHalf);
+    }
+
+    public org.joml.Quaternionf aroundX(org.joml.Quaternionf quaternionf) {
+        return quaternionf.set(this.sinHalf, 0.0F, 0.0F, this.cosHalf);
+    }
+
+    public org.joml.Quaternionf aroundY(org.joml.Quaternionf quaternionf) {
+        return quaternionf.set(0.0F, this.sinHalf, 0.0F, this.cosHalf);
+    }
+
+    public org.joml.Quaternionf aroundZ(org.joml.Quaternionf quaternionf) {
+        return quaternionf.set(0.0F, 0.0F, this.sinHalf, this.cosHalf);
+    }
+
+    public org.joml.Matrix3f aroundX(org.joml.Matrix3f matrix3f) {
+        return matrix3f.set(aroundX(new Matrix3f()).toNative());
+    }
+
+    public org.joml.Matrix3f aroundY(org.joml.Matrix3f matrix3f) {
+        return matrix3f.set(aroundY(new Matrix3f()).toNative());
+    }
+
+    public org.joml.Matrix3f aroundZ(org.joml.Matrix3f matrix3f) {
+        return matrix3f.set(aroundZ(new Matrix3f()).toNative());
     }
 
     public Quaternionf aroundX(Quaternionf quaternionf) {

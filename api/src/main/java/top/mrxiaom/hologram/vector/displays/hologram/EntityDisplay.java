@@ -5,11 +5,11 @@ import me.tofaa.entitylib.meta.display.AbstractDisplayMeta;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.hologram.utils.Vector3F;
+import top.mrxiaom.hologram.vector.displays.utils.joml.Matrix3f;
 import top.mrxiaom.hologram.vector.displays.utils.matrix.Decomposed;
 import top.mrxiaom.hologram.vector.displays.utils.matrix.MatrixUtil;
 
@@ -69,11 +69,15 @@ public abstract class EntityDisplay<This extends AbstractEntity<This>> extends A
     }
 
     public This setTransformationMatrix(@NotNull Matrix4f matrix) {
+        return setTransformationMatrix(new top.mrxiaom.hologram.vector.displays.utils.joml.Matrix4f(matrix));
+    }
+
+    public This setTransformationMatrix(@NotNull top.mrxiaom.hologram.vector.displays.utils.joml.Matrix4f matrix) {
         // com.mojang.math.Transformation#ensureDecomposed()
         float f = 1.0F / matrix.m33();
 
         Decomposed decomposed = MatrixUtil.svdDecompose(new Matrix3f(matrix).scale(f));
-        this.translation = matrix.getTranslation(new Vector3f()).mul(f);
+        this.translation = new Vector3f(matrix.m30() * f, matrix.m31() * f, matrix.m32() * f);
         this.leftRotation = decomposed.getLeftRotation();
         this.scale = decomposed.getScale();
         this.rightRotation = decomposed.getRightRotation();
@@ -86,22 +90,28 @@ public abstract class EntityDisplay<This extends AbstractEntity<This>> extends A
         return this.matrix;
     }
 
+    @NotNull
+    public top.mrxiaom.hologram.vector.displays.utils.joml.Matrix4f getTransformationMatrixFixed() {
+        return new top.mrxiaom.hologram.vector.displays.utils.joml.Matrix4f(this.matrix);
+    }
+
     protected void composeMatrix() {
         // com.mojang.math.Transformation#compose(Vector3f, Quaternionf, Vector3f, Quaternionf)
-        Matrix4f matrix4f = new Matrix4f();
+        top.mrxiaom.hologram.vector.displays.utils.joml.Matrix4f matrix4f =
+                new top.mrxiaom.hologram.vector.displays.utils.joml.Matrix4f();
         if (translation != null) {
-            matrix4f.translation(translation);
+            matrix4f.translation(translation.x, translation.y, translation.z);
         }
         if (leftRotation != null) {
             matrix4f.rotate(leftRotation.getX(), leftRotation.getY(), leftRotation.getZ(), leftRotation.getW());
         }
         if (scale != null) {
-            matrix4f.scale(scale);
+            matrix4f.scale(scale.x, scale.y, scale.z);
         }
         if (rightRotation != null) {
             matrix4f.rotate(rightRotation.getX(), rightRotation.getY(), rightRotation.getZ(), rightRotation.getW());
         }
-        this.matrix = matrix4f;
+        this.matrix = matrix4f.toNative();
     }
 
     public Vector3F getScale() {

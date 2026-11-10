@@ -1,9 +1,9 @@
 package top.mrxiaom.hologram.vector.displays.utils.matrix;
 
-import org.joml.Math;
-import org.joml.Matrix3f;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
+import top.mrxiaom.hologram.vector.displays.utils.joml.Math;
+import top.mrxiaom.hologram.vector.displays.utils.joml.Matrix3f;
+import top.mrxiaom.hologram.vector.displays.utils.joml.Quaternionf;
+import top.mrxiaom.hologram.vector.displays.utils.joml.Vector3f;
 
 /**
  * org.mojang.math.MatrixUtil
@@ -66,6 +66,13 @@ public class MatrixUtil {
         }
     }
 
+    public static org.joml.Quaternionf eigenvalueJacobi(org.joml.Matrix3f AtA, int numJacobiIterations) {
+        Matrix3f fixed = new Matrix3f(AtA);
+        Quaternionf result = eigenvalueJacobi(fixed, numJacobiIterations);
+        AtA.set(fixed.toNative());
+        return result.toNative();
+    }
+
     public static Quaternionf eigenvalueJacobi(Matrix3f AtA, int numJacobiIterations) {
         Quaternionf quaternionf = new Quaternionf();
         Matrix3f matrix3f = new Matrix3f();
@@ -77,6 +84,13 @@ public class MatrixUtil {
 
         quaternionf.normalize();
         return quaternionf;
+    }
+
+    public static Decomposed svdDecompose(org.joml.Matrix3f A) {
+        Matrix3f fixed = new Matrix3f(A);
+        Decomposed result = svdDecompose(fixed);
+        A.set(fixed.toNative());
+        return result;
     }
 
     public static Decomposed svdDecompose(Matrix3f A) {
@@ -124,6 +138,6 @@ public class MatrixUtil {
         quaternionf2.mul(quaternionf6);
         matrix3f6.transpose().mul(matrix3f5);
         Vector3f vector3f = new Vector3f(matrix3f6.m00, matrix3f6.m11, matrix3f6.m22);
-        return new Decomposed(quaternionf2, vector3f, quaternionf.conjugate());
+        return new Decomposed(quaternionf2.toNative(), vector3f.toNative(), quaternionf.conjugate().toNative());
     }
 }

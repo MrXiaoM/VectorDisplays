@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
+import top.mrxiaom.hologram.vector.displays.utils.joml.Vector3f;
 import top.mrxiaom.hologram.vector.displays.hologram.*;
 import top.mrxiaom.hologram.vector.displays.ui.EnumAlign;
 import top.mrxiaom.hologram.vector.displays.ui.HologramFont;
