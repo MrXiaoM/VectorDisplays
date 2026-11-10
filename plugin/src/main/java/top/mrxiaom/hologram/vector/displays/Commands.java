@@ -19,7 +19,9 @@ import top.mrxiaom.hologram.vector.displays.ui.api.Terminal;
 import top.mrxiaom.hologram.vector.displays.ui.event.HoverStateChange;
 import top.mrxiaom.hologram.vector.displays.ui.widget.Button;
 import top.mrxiaom.hologram.vector.displays.ui.widget.Label;
+import top.mrxiaom.hologram.vector.displays.ui.widget.Triangle;
 import top.mrxiaom.hologram.vector.displays.utils.HologramUtils;
+import top.mrxiaom.hologram.vector.displays.utils.TrianglePointOrder;
 import top.mrxiaom.hologram.vector.displays.utils.TriangleUtils;
 
 import java.lang.reflect.Constructor;
@@ -316,6 +318,17 @@ public class Commands implements CommandExecutor, TabCompleter {
                 label.setPos(0, 15);
             });
 
+            terminal.addElement(new Triangle("animated-triangle"), triangle -> {
+                triangle.setAlign(EnumAlign.CENTER);
+                triangle.configureStyle(style -> style.setBackgroundColor(0xFF40FF80).setShadow(false));
+                updateTrianglePoints(triangle, System.currentTimeMillis());
+                triangle.setTimerTickEvent(element -> {
+                    updateTrianglePoints(element, System.currentTimeMillis());
+                    element.updateLocation();
+                    element.update();
+                });
+            });
+
             BiConsumer<Double, Double> move = (rX, rY) -> {
                 double[] transform = terminal.getTranslation();
                 HologramUtils.add(transform, terminal.getRotatedVector(rX, rY, 0));
@@ -376,6 +389,35 @@ public class Commands implements CommandExecutor, TabCompleter {
             return true;
         }
         return true;
+    }
+
+    private static float[] trianglePoint1(long timeMillis) {
+        double phase = (timeMillis % 6000L) * (2.0 * Math.PI / 6000.0);
+        return new float[] {
+                (float) (14.0 + 2.0 * Math.sin(phase)),
+                (float) (-16.0 + 2.0 * Math.cos(phase))
+        };
+    }
+
+    private static float[] trianglePoint2(long timeMillis) {
+        double phase = (timeMillis % 8000L) * (2.0 * Math.PI / 8000.0);
+        return new float[] {
+                (float) (12.0 + 2.0 * Math.cos(phase)),
+                (float) (-6.0 + 2.0 * Math.sin(phase))
+        };
+    }
+
+    private static float[] trianglePoint3(long timeMillis) {
+        double phase = (timeMillis % 10000L) * (2.0 * Math.PI / 10000.0);
+        return new float[] {
+                (float) (30.0 + 3.0 * Math.sin(phase)),
+                (float) (-11.0 + 3.0 * Math.cos(phase))
+        };
+    }
+
+    private static void updateTrianglePoints(Triangle triangle, long timeMillis) {
+        TrianglePointOrder.applyCounterClockwise(triangle,
+                trianglePoint1(timeMillis), trianglePoint2(timeMillis), trianglePoint3(timeMillis));
     }
 
     private void add(CommandSender sender, List<String> list, String cmd) {
