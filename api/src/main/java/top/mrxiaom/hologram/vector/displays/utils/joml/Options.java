@@ -36,23 +36,6 @@ import java.util.Locale;
 public final class Options {
 
     /**
-     * Whether certain debugging checks should be made, such as that only direct NIO Buffers are used when Unsafe is active,
-     * and a proxy should be created on calls to readOnlyView().
-     */
-    public static final boolean DEBUG = hasOption(System.getProperty("joml.debug", "false"));
-
-//#ifdef __HAS_UNSAFE__
-    /**
-     * Whether <i>not</i> to use sun.misc.Unsafe when copying memory with MemUtil.
-     */
-    public static final boolean NO_UNSAFE = hasOption(System.getProperty("joml.nounsafe", "false"));
-    /**
-     * Whether to <i>force</i> the use of sun.misc.Unsafe when copying memory with MemUtil.
-     */
-    public static final boolean FORCE_UNSAFE = hasOption(System.getProperty("joml.forceUnsafe", "false"));
-//#endif
-
-    /**
      * Whether fast approximations of some java.lang.Math operations should be used.
      */
     public static final boolean FASTMATH = hasOption(System.getProperty("joml.fastmath", "false"));
