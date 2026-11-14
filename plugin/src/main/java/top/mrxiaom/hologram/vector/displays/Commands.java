@@ -388,7 +388,7 @@ public class Commands implements CommandExecutor, TabCompleter {
             animatedLabel.getEntity().setInterpolationDurationTransformation(0);
 
             if (mount) {
-                terminal.mountTo(player, 0, -1, -1.25f);
+                terminal.mountTo(player, 0, -0.5f, -1f);
             }
 
             TerminalManager.inst().spawn(terminal);
