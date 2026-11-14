@@ -112,17 +112,29 @@ public class Commands implements CommandExecutor, TabCompleter {
                     return true;
                 }
             }
-            double terminalWidth;
+            double terminalWidth = 100;
+            int startIndex;
             if (args.length > 1) {
-                terminalWidth = Double.parseDouble(args[1]);
+                try {
+                    terminalWidth = Double.parseDouble(args[1]);
+                    startIndex = 2;
+                } catch (NumberFormatException e) {
+                    startIndex = 1;
+                }
             } else {
-                terminalWidth = 100.0;
+                startIndex = 1;
+            }
+            boolean mount = false;
+            for (int i = startIndex; i < args.length; i++) {
+                if (args[i].equals("--mount")) {
+                    mount = true;
+                }
             }
             Location eyeLocation = player.getEyeLocation().clone();
             eyeLocation.setPitch(0);
             Location loc = player.getLocation().clone().add(0, 0.75, 0).add(eyeLocation.getDirection().multiply(1.5));
             terminal = new SimpleTerminal(RenderMode.NEARBY, "vectordisplays_test", loc, terminalWidth, 50.0);
-            terminal.setRotation(180.0f - eyeLocation.getYaw(), 0);
+            terminal.setRotation(mount ? 0.0f : 180.0f - eyeLocation.getYaw(), 0);
             double height = HologramUtils.LINE_HEIGHT;
 
             TextComponent space = Component.text("  ");
@@ -374,6 +386,10 @@ public class Commands implements CommandExecutor, TabCompleter {
                 display.setInterpolationDurationTransformation(10);
             }
             animatedLabel.getEntity().setInterpolationDurationTransformation(0);
+
+            if (mount) {
+                terminal.mountTo(player, 0, -1, -1.25f);
+            }
 
             TerminalManager.inst().spawn(terminal);
             sender.sendMessage("已添加测试面板");

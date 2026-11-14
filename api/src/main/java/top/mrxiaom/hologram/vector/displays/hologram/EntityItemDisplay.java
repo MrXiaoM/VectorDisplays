@@ -43,7 +43,7 @@ public class EntityItemDisplay extends EntityDisplay<EntityItemDisplay> {
 
     @Override
     public @Nullable PacketWrapper<?> buildSpawnPacket() {
-        Location loc = this.location;
+        Location loc = getPacketLocation();
         if (loc == null) return null;
         Vector3d pos = new Vector3d(loc.getX(), loc.getY(), loc.getZ());
         return new WrapperPlayServerSpawnEntity(

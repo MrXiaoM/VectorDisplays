@@ -7,6 +7,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.NotNull;
@@ -109,6 +112,31 @@ public class TerminalManager implements Listener {
                 destroy(terminal);
             }
         }
+    }
+
+    private void destroyMounted(Player player) {
+        for (Terminal<?> terminal : new ArrayList<>(terminals.values())) {
+            if (terminal.getRootTransform() != null
+                    && terminal.getRootTransform().getPlayer().getUniqueId().equals(player.getUniqueId())) {
+                destroy(terminal);
+            }
+        }
+        HologramAPI.getPassengers().clear(player);
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent e) {
+        destroyMounted(e.getPlayer());
+    }
+
+    @EventHandler
+    public void onPlayerChangedWorld(PlayerChangedWorldEvent e) {
+        destroyMounted(e.getPlayer());
+    }
+
+    @EventHandler
+    public void onPlayerRespawn(PlayerRespawnEvent e) {
+        destroyMounted(e.getPlayer());
     }
 
     /**

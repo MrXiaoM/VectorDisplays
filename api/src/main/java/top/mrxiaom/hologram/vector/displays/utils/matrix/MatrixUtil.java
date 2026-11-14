@@ -140,4 +140,91 @@ public class MatrixUtil {
         Vector3f vector3f = new Vector3f(matrix3f6.m00, matrix3f6.m11, matrix3f6.m22);
         return new Decomposed(quaternionf2.toNative(), vector3f.toNative(), quaternionf.conjugate().toNative());
     }
+
+    public static Decomposed svdDecomposeRoot(Matrix3f matrix) {
+        double[][] columns = {
+                {matrix.m00, matrix.m01, matrix.m02},
+                {matrix.m10, matrix.m11, matrix.m12},
+                {matrix.m20, matrix.m21, matrix.m22}
+        };
+        double[][] right = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+        for (int sweep = 0; sweep < 24; sweep++) {
+            boolean changed = false;
+            for (int p = 0; p < 2; p++) {
+                for (int q = p + 1; q < 3; q++) {
+                    double a = dot(columns[p], columns[p]);
+                    double b = dot(columns[q], columns[q]);
+                    double c = dot(columns[p], columns[q]);
+                    if (c == 0 || java.lang.Math.abs(c) <= 1e-14 * java.lang.Math.sqrt(a * b)) continue;
+                    double tau = (b - a) / (2 * c);
+                    double t = java.lang.Math.copySign(1.0, tau)
+                            / (java.lang.Math.abs(tau) + java.lang.Math.hypot(1, tau));
+                    double cos = 1 / java.lang.Math.sqrt(1 + t * t);
+                    double sin = cos * t;
+                    rotateColumns(columns, p, q, cos, sin);
+                    rotateColumns(right, p, q, cos, sin);
+                    changed = true;
+                }
+            }
+            if (!changed) break;
+        }
+        for (int p = 0; p < 2; p++) {
+            for (int q = p + 1; q < 3; q++) {
+                if (dot(columns[p], columns[p]) < dot(columns[q], columns[q])) {
+                    double[] swap = columns[p]; columns[p] = columns[q]; columns[q] = swap;
+                    swap = right[p]; right[p] = right[q]; right[q] = swap;
+                }
+            }
+        }
+        if (dot(cross(right[0], right[1]), right[2]) < 0) {
+            for (int i = 0; i < 3; i++) {
+                right[2][i] = -right[2][i];
+                columns[2][i] = -columns[2][i];
+            }
+        }
+        double s0 = java.lang.Math.sqrt(dot(columns[0], columns[0]));
+        if (s0 == 0) return new Decomposed(new org.joml.Quaternionf(), new org.joml.Vector3f(), new org.joml.Quaternionf());
+        double[] u0 = columns[0].clone();
+        for (int i = 0; i < 3; i++) u0[i] /= s0;
+        double[] u1 = columns[1].clone();
+        double projection = dot(u0, u1);
+        for (int i = 0; i < 3; i++) u1[i] -= projection * u0[i];
+        double s1 = java.lang.Math.sqrt(dot(u1, u1));
+        if (s1 <= s0 * 1e-12) {
+            int axis = java.lang.Math.abs(u0[0]) < java.lang.Math.abs(u0[1]) ? 0 : 1;
+            if (java.lang.Math.abs(u0[2]) < java.lang.Math.abs(u0[axis])) axis = 2;
+            u1 = new double[3];
+            u1[axis] = 1;
+            projection = u0[axis];
+            for (int i = 0; i < 3; i++) u1[i] -= projection * u0[i];
+        }
+        double length = java.lang.Math.sqrt(dot(u1, u1));
+        for (int i = 0; i < 3; i++) u1[i] /= length;
+        double[] u2 = cross(u0, u1);
+        double s2 = dot(columns[2], u2);
+        Quaternionf leftRotation = new Quaternionf().setFromNormalized(fromColumns(u0, u1, u2)).normalize();
+        Quaternionf rightRotation = new Quaternionf().setFromNormalized(fromColumns(right[0], right[1], right[2])).normalize().conjugate();
+        return new Decomposed(leftRotation.toNative(), new org.joml.Vector3f((float) s0, (float) s1, (float) s2), rightRotation.toNative());
+    }
+
+    private static double dot(double[] a, double[] b) {
+        return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    }
+
+    private static double[] cross(double[] a, double[] b) {
+        return new double[] {a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]};
+    }
+
+    private static void rotateColumns(double[][] columns, int p, int q, double cos, double sin) {
+        for (int i = 0; i < 3; i++) {
+            double a = columns[p][i], b = columns[q][i];
+            columns[p][i] = cos * a - sin * b;
+            columns[q][i] = sin * a + cos * b;
+        }
+    }
+
+    private static Matrix3f fromColumns(double[] a, double[] b, double[] c) {
+        return new Matrix3f((float) a[0], (float) a[1], (float) a[2],
+                (float) b[0], (float) b[1], (float) b[2], (float) c[0], (float) c[1], (float) c[2]);
+    }
 }

@@ -38,12 +38,18 @@ public class HologramAPI implements Listener {
     }).replace('/', '.');
     private static HologramManager hologram;
     private static SpectatorManager spectator;
+    private static DisplayPassengerManager passengers;
     private static ReplaceText replaceText;
     private static PlayerManager playerManager;
     private static final Set<UUID> loadedPlayersMap = new HashSet<>();
 
     public static HologramManager getHologram() {
         return hologram;
+    }
+
+    @ApiStatus.Internal
+    public static DisplayPassengerManager getPassengers() {
+        return passengers;
     }
 
     public static SpectatorManager getSpectator() {
@@ -102,6 +108,8 @@ public class HologramAPI implements Listener {
         playerManager = PacketEvents.getAPI().getPlayerManager();
         hologram = new HologramManager(plugin);
         spectator = new SpectatorManager(plugin, hologram);
+        passengers = new DisplayPassengerManager();
+        PacketEvents.getAPI().getEventManager().registerListener(passengers);
 
         Bukkit.getPluginManager().registerEvents(this, plugin.getPlugin());
         for (Player player : Bukkit.getOnlinePlayers()) {
@@ -133,6 +141,10 @@ public class HologramAPI implements Listener {
         }
         if (spectator != null) {
             spectator.onDisable();
+        }
+        if (passengers != null) {
+            passengers.close();
+            PacketEvents.getAPI().getEventManager().unregisterListener(passengers);
         }
         if (!PacketEvents.class.getName().startsWith(apiPackage)) {
             PacketEvents.getAPI().terminate();

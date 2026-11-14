@@ -4,7 +4,9 @@ import com.github.retrooper.packetevents.util.Quaternion4f;
 import me.tofaa.entitylib.meta.display.AbstractDisplayMeta;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -39,13 +41,37 @@ public abstract class EntityDisplay<This extends AbstractEntity<This>> extends A
         meta.setInterpolationDelay(-1);
         meta.setTransformationInterpolationDuration(this.interpolationDurationTransformation);
         meta.setPositionRotationInterpolationDuration(this.interpolationDurationRotation);
-        meta.setTranslation(toVector3f(this.translation));
-        meta.setScale(toVector3f(this.scale));
-        meta.setBillboardConstraints(AbstractDisplayMeta.BillboardConstraints.valueOf(this.billboard.name()));
         meta.setViewRange(this.viewRange);
         meta.setBrightnessOverride(this.brightnessOverride);
-        meta.setRightRotation(this.rightRotation);
-        meta.setLeftRotation(this.leftRotation);
+        DisplayRoot root = getDisplayRoot();
+        if (root != null) {
+            top.mrxiaom.hologram.vector.displays.utils.joml.Matrix4f transformed = root.transform(this);
+            meta.setTranslation(new com.github.retrooper.packetevents.util.Vector3f(
+                    transformed.m30(), transformed.m31(), transformed.m32()));
+            if (root.isTranslationOnly()) {
+                meta.setLeftRotation(this.leftRotation);
+                meta.setScale(toVector3f(this.scale));
+                meta.setRightRotation(this.rightRotation);
+            } else {
+                Decomposed decomposed = MatrixUtil.svdDecomposeRoot(new Matrix3f(transformed));
+                meta.setLeftRotation(decomposed.getLeftRotation());
+                meta.setScale(toVector3f(decomposed.getScale()));
+                meta.setRightRotation(decomposed.getRightRotation());
+            }
+            meta.setBillboardConstraints(AbstractDisplayMeta.BillboardConstraints.CENTER);
+        } else {
+            meta.setTranslation(toVector3f(this.translation));
+            meta.setLeftRotation(this.leftRotation);
+            meta.setScale(toVector3f(this.scale));
+            meta.setRightRotation(this.rightRotation);
+            meta.setBillboardConstraints(AbstractDisplayMeta.BillboardConstraints.valueOf(this.billboard.name()));
+        }
+    }
+
+    @Override
+    protected @Nullable Location getPacketLocation() {
+        DisplayRoot root = getDisplayRoot();
+        return root == null ? super.getPacketLocation() : root.getSpawnLocation();
     }
 
     @Override
@@ -55,7 +81,45 @@ public abstract class EntityDisplay<This extends AbstractEntity<This>> extends A
     }
 
     protected void _spawn(@NotNull Location location) {
-       super.spawn(location);
+        super.spawn(location);
+        DisplayRoot root = getDisplayRoot();
+        if (root != null && getRenderMode() != RenderMode.NONE) root.onSpawn(this);
+    }
+
+    @Override
+    protected void respawnFor(@NotNull Player player) {
+        super.respawnFor(player);
+        DisplayRoot root = getDisplayRoot();
+        if (root != null && player.getUniqueId().equals(root.getPlayer().getUniqueId())
+                && getRenderMode() != RenderMode.NONE) {
+            root.onSpawn(this);
+        }
+    }
+
+    @Override
+    public void kill() {
+        removeFromRoot();
+        super.kill();
+    }
+
+    @Override
+    public This removeViewer(@NotNull Player player) {
+        DisplayRoot root = getDisplayRoot();
+        if (root != null && player.getUniqueId().equals(root.getPlayer().getUniqueId())) {
+            root.onRemove(this);
+        }
+        return super.removeViewer(player);
+    }
+
+    @Override
+    public This removeAllViewers() {
+        removeFromRoot();
+        return super.removeAllViewers();
+    }
+
+    private void removeFromRoot() {
+        DisplayRoot root = getDisplayRoot();
+        if (root != null) root.onRemove(this);
     }
 
     @Override
@@ -65,6 +129,13 @@ public abstract class EntityDisplay<This extends AbstractEntity<This>> extends A
     }
 
     protected This _teleport(@NotNull Location location) {
+        if (getDisplayRoot() != null) {
+            if (!location.equals(this.location)) {
+                this.location = location;
+                if (!isDead()) update();
+            }
+            return $this();
+        }
         return super.teleport(location);
     }
 
@@ -103,13 +174,15 @@ public abstract class EntityDisplay<This extends AbstractEntity<This>> extends A
             matrix4f.translation(translation.x, translation.y, translation.z);
         }
         if (leftRotation != null) {
-            matrix4f.rotate(leftRotation.getX(), leftRotation.getY(), leftRotation.getZ(), leftRotation.getW());
+            matrix4f.rotate(new top.mrxiaom.hologram.vector.displays.utils.joml.Quaternionf(
+                    leftRotation.getX(), leftRotation.getY(), leftRotation.getZ(), leftRotation.getW()));
         }
         if (scale != null) {
             matrix4f.scale(scale.x, scale.y, scale.z);
         }
         if (rightRotation != null) {
-            matrix4f.rotate(rightRotation.getX(), rightRotation.getY(), rightRotation.getZ(), rightRotation.getW());
+            matrix4f.rotate(new top.mrxiaom.hologram.vector.displays.utils.joml.Quaternionf(
+                    rightRotation.getX(), rightRotation.getY(), rightRotation.getZ(), rightRotation.getW()));
         }
         this.matrix = matrix4f.toNative();
     }

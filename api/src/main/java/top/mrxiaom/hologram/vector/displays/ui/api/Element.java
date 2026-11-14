@@ -495,7 +495,7 @@ public abstract class Element<This extends Element<This, Entity>, Entity extends
     }
 
     public boolean commonPerformClick(Player player, Action action, Location eyeLocation, float[] rotation, double interactDistance) {
-        if (terminal == null) {
+        if (terminal == null || terminal.isMounted()) {
             return false;
         }
         Location clickPos = HologramUtils.raytraceElement(rotation, getAdditionalRotation(), this, eyeLocation);

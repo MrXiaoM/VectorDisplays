@@ -30,6 +30,7 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     protected final PluginWrapper plugin;
 
     protected AbstractEntity<?> parent = null;
+    private DisplayRoot displayRoot;
 
     protected double nearbyEntityScanningDistance = 40.0;
 
@@ -59,6 +60,22 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
 
     public void setParent(@Nullable AbstractEntity<?> parent) {
         this.parent = parent;
+    }
+
+    @ApiStatus.Internal
+    public void setDisplayRoot(@Nullable DisplayRoot displayRoot) {
+        this.displayRoot = displayRoot;
+    }
+
+    @Nullable
+    @ApiStatus.Internal
+    public DisplayRoot getDisplayRoot() {
+        return displayRoot != null ? displayRoot : parent == null ? null : parent.getDisplayRoot();
+    }
+
+    @Nullable
+    protected Location getPacketLocation() {
+        return location;
     }
 
     @ApiStatus.Internal
@@ -274,6 +291,18 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     }
     protected void updateAffectedPlayers(Predicate<Player> nearbyPlayerFilter) {
         if (this.dead || this.location == null) return;
+        DisplayRoot root = getDisplayRoot();
+        if (root != null) {
+            Player owner = root.getPlayer();
+            for (PlayerMeta viewer : getViewerList()) {
+                Player player = viewer.player();
+                if (!player.getUniqueId().equals(owner.getUniqueId()) || !player.isOnline()) {
+                    removeViewer(player);
+                }
+            }
+            if (owner.isOnline()) addViewer(owner);
+            return;
+        }
         // 如果这个实体有父实体
         if (parent != null) {
             // 获取父实体的可视玩家列表
@@ -345,6 +374,8 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
 
     protected void sendPacket(@NotNull PlayerMeta meta, @Nullable PacketWrapper<?> packet) {
         Player player = meta.player();
+        DisplayRoot root = getDisplayRoot();
+        if (root != null && !root.getPlayer().getUniqueId().equals(player.getUniqueId())) return;
         if (packet != null && player.isOnline()) {
             PacketWrapper<?> finalPacket = meta.processPacket(packet);
             HologramAPI.getPlayerManager().sendPacket(player, finalPacket);
@@ -352,6 +383,8 @@ public abstract class AbstractEntity<This extends AbstractEntity<This>> {
     }
 
     protected void sendPacket(@NotNull Player player, @Nullable PacketWrapper<?> packet) {
+        DisplayRoot root = getDisplayRoot();
+        if (root != null && !root.getPlayer().getUniqueId().equals(player.getUniqueId())) return;
         if (packet != null && player.isOnline()) {
             PlayerMeta meta = viewers.get(player.getUniqueId());
             if (meta != null) {

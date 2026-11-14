@@ -13,6 +13,7 @@ public interface Hoverable {
     void tryUpdateHoverState(boolean hover);
 
     static boolean handleHover(Terminal<?> terminal, float[] additionalRotation, Element<?, ?> element) {
+        if (terminal.isMounted()) return false;
         for (Player player : terminal.getViewers()) {
             Location eyeLocation = HologramUtils.getEyeLocation(player);
             Location point = HologramUtils.raytraceElement(terminal, additionalRotation, element, eyeLocation);
@@ -24,6 +25,7 @@ public interface Hoverable {
     }
     @Deprecated
     static boolean handleHover(Terminal<?> terminal, float[] additionalRotation, EntityTextDisplay entity) {
+        if (terminal.isMounted()) return false;
         for (Player player : terminal.getViewers()) {
             Location eyeLocation = HologramUtils.getEyeLocation(player);
             Location point = HologramUtils.raytraceHologram(terminal, additionalRotation, entity, eyeLocation);
@@ -35,6 +37,7 @@ public interface Hoverable {
     }
     @Deprecated
     static boolean handleHover(Terminal<?> terminal, float[] additionalRotation, EntityItemDisplay entity) {
+        if (terminal.isMounted()) return false;
         for (Player player : terminal.getViewers()) {
             Location eyeLocation = HologramUtils.getEyeLocation(player);
             Location point = HologramUtils.raytraceHologram(terminal, additionalRotation, entity, eyeLocation);

@@ -36,6 +36,9 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
     private float[] rotation = { 0, 0, 0, 1 };
     private double[] translation = { 0, 0, 0 };
     private Consumer<This> actionPreTimerTick, actionPostTimerTick, actionPreDispose, actionPostDispose;
+    private TerminalRootTransform rootTransform;
+    private RenderMode worldRenderMode;
+    private List<Player> worldViewers = Collections.emptyList();
     private Terminal(@NotNull RenderMode renderMode, @NotNull String id, @NotNull Location location) {
         this.id = id;
         this.location = location;
@@ -60,6 +63,90 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
 
     public static void setDefaultInteractDistance(double defaultInteractDistance) {
         Terminal.defaultInteractDistance = defaultInteractDistance;
+    }
+
+    /**
+     * 额外加一个交互实体，将终端面板的实际原点移到玩家眼部，使用客户端视角坐标。
+     * <p>
+     * +X 向右、+Y 向上、-Z 向前
+     */
+    public This mountTo(@NotNull Player player, float x, float y, float z) {
+        return setRootTransform(player, new org.joml.Matrix4f().translation(x, y, z));
+    }
+
+    public This setRootTransform(@NotNull Player player, @NotNull org.joml.Matrix4f matrix) {
+        Objects.requireNonNull(player, "绑定玩家不能为空");
+        Objects.requireNonNull(matrix, "根矩阵不能为空");
+        if (!player.isOnline()) throw new IllegalArgumentException("只能绑定在线玩家");
+        if (rootTransform != null && rootTransform.getPlayer().getUniqueId().equals(player.getUniqueId())) {
+            rootTransform.setMatrix(matrix);
+            for (AbstractEntity<?> entity : rootEntities()) {
+                if (entity instanceof EntityDisplay<?> && !entity.isDead()) entity.update();
+            }
+            return $this();
+        }
+        TerminalRootTransform next = new TerminalRootTransform(this, player, matrix);
+        if (rootTransform == null) {
+            worldRenderMode = hologram.getRenderMode();
+            worldViewers = new ArrayList<>(hologram.getViewers());
+        }
+        Map<AbstractEntity<?>, Location> live = stopRootEntities();
+        if (rootTransform != null) rootTransform.close();
+        rootTransform = next;
+        hologram.setDisplayRoot(next);
+        hologram.setRenderMode(RenderMode.VIEWER_LIST);
+        hologram.addViewer(player);
+        restartRootEntities(live, RenderMode.VIEWER_LIST);
+        return $this();
+    }
+
+    @Nullable
+    public TerminalRootTransform getRootTransform() {
+        return rootTransform;
+    }
+
+    public boolean isMounted() {
+        return rootTransform != null;
+    }
+
+    public This clearRootTransform() {
+        if (rootTransform == null) return $this();
+        Map<AbstractEntity<?>, Location> live = stopRootEntities();
+        rootTransform.close();
+        rootTransform = null;
+        hologram.setDisplayRoot(null);
+        hologram.setRenderMode(worldRenderMode);
+        hologram.addAllViewers(worldViewers);
+        restartRootEntities(live, worldRenderMode);
+        worldViewers = Collections.emptyList();
+        return $this();
+    }
+
+    private List<AbstractEntity<?>> rootEntities() {
+        Set<AbstractEntity<?>> entities = new LinkedHashSet<>();
+        entities.add(hologram);
+        for (Element<?, ?> element : resolveAllElements(this)) {
+            entities.add(element.getEntity());
+            entities.addAll(element.collectEntities());
+        }
+        return new ArrayList<>(entities);
+    }
+
+    private Map<AbstractEntity<?>, Location> stopRootEntities() {
+        Map<AbstractEntity<?>, Location> live = new LinkedHashMap<>();
+        for (AbstractEntity<?> entity : rootEntities()) {
+            if (!entity.isDead() && entity.getLocation() != null) {
+                live.put(entity, entity.getLocation().clone());
+            }
+            entity.removeAllViewers();
+            if (!entity.isDead()) entity.kill();
+        }
+        return live;
+    }
+
+    private void restartRootEntities(Map<AbstractEntity<?>, Location> live, RenderMode renderMode) {
+        for (AbstractEntity<?> entity : rootEntities()) entity.setRenderMode(renderMode);
+        live.forEach((entity, position) -> HologramAPI.getHologram().spawn(entity, position));
     }
 
     /**
@@ -128,6 +215,13 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
         }
         hologram.removeAllViewers();
         HologramAPI.getHologram().remove(hologram);
+        if (rootTransform != null) {
+            rootTransform.close();
+            rootTransform = null;
+            hologram.setDisplayRoot(null);
+            hologram.setRenderMode(worldRenderMode);
+            worldViewers = Collections.emptyList();
+        }
         if (actionPostDispose != null) {
             actionPostDispose.accept($this());
         }
@@ -297,6 +391,9 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
      * @param player 玩家
      */
     public void removeViewer(Player player) {
+        if (isMounted() && rootTransform.getPlayer().getUniqueId().equals(player.getUniqueId())) {
+            throw new IllegalStateException("骑乘终端请使用 dispose() 隐藏，或 clearRootTransform() 解除绑定");
+        }
         hologram.removeViewer(player);
         for (Element<?, ?> element : elements) {
             element.getEntity().setParent(hologram);
@@ -308,6 +405,9 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
      * @param player 玩家
      */
     public void addViewer(Player player) {
+        if (isMounted() && !rootTransform.getPlayer().getUniqueId().equals(player.getUniqueId())) {
+            throw new IllegalArgumentException("骑乘终端只允许绑定玩家查看");
+        }
         if (hologram.getViewer(player) == null) {
             hologram.addViewer(player);
         }
@@ -627,6 +727,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
      * @return 是否成功执行点击操作
      */
     public boolean tryPerformClick(Player player, Action action) {
+        if (isMounted()) return false;
         Location eyeLocation = HologramUtils.getEyeLocation(player);
         float[] rotation = getRotation();
         double interactDistance = getInteractDistance();
@@ -645,7 +746,7 @@ public abstract class Terminal<This extends Terminal<This>> implements EntityTex
      */
     public static List<EntityDisplay<?>> resolveAllEntityDisplay(List<Element<?, ?>> elements) {
         List<EntityDisplay<?>> list = new ArrayList<>();
-        for (Element<?, ?> element : elements) {
+        for (Element<?, ?> element : resolveAllElements(elements)) {
             for (AbstractEntity<?> entity : element.collectEntities()) {
                 if (entity instanceof EntityDisplay<?> display) {
                     list.add(display);
